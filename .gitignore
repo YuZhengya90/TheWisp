@@ -1,0 +1,12 @@
+# intermediate files
+*.sdf
+*.suo
+*.opensdf
+*.user
+*.layout
+*.o
+*.obj
+/Debug/*
+!/Debug/*.dll
+/Release/*
+!/Release/*.dll
