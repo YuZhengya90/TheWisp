@@ -29,9 +29,6 @@
     <ClCompile Include="source\TPCoordinate.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
-    <ClCompile Include="source\TPgl.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
     <ClCompile Include="source\TPUI.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
@@ -40,6 +37,15 @@
     </ClCompile>
     <ClCompile Include="source\TPWorld.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\TPJar.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="source\TPWin32.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="source\TPMenu.cpp">
+      <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -58,25 +64,20 @@
     <ClInclude Include="source\TPCoordinate.h">
       <Filter>Source Files\UI</Filter>
     </ClInclude>
-    <ClInclude Include="source\TPgl.h">
-      <Filter>Source Files\UI</Filter>
-    </ClInclude>
     <ClInclude Include="source\TPUI.h">
       <Filter>Source Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="source\TPView.h">
       <Filter>Source Files\UI</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="resource\A.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resource\B.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resource\C.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
+    <ClInclude Include="source\TPJar.h">
+      <Filter>Source Files\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TPWin32.h">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TPMenu.h">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

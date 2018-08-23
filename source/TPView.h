@@ -30,12 +30,19 @@ public:
         mPosY = maxY;
     }
 
+	void SetXAnchor(float minX, float maxX) {
+		mNegX = minX;
+		mPosX = maxX;
+	}
+	void SetYAnchor(float minY, float maxY) {
+		mNegY = minY;
+		mPosY = maxY;
+	}
+
     void Translate(float x, float y);
     void Scale(TPPoint pts, float rate);
     void ScaleAnimation(TPPoint x, float rate, DWORD startTick, DWORD duringTime, unsigned frames);
     void Render();
-    void RenderMesh();
-    void ShowReferValueOnView(bool show);
 
 private:
 

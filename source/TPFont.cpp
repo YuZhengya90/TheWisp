@@ -10,21 +10,18 @@
 #define ORI_FONT_SIZE   40
 
 GLuint TextFont;
+TPFontCollecton tpFontCollection;
 
 void TPDisplayString(const char *s, float x, float y)
 {
     glRasterPos3f(x, y, 0);
     glPushAttrib(GL_LIST_BIT);
 
-    //调用每个字符对应的显示列表，绘制每个字符
     for (; *s != '\0'; ++s)
         glCallList(TextFont + *s);
 
     glPopAttrib();
 }
-
-
-TPFontCollecton tpFontCollection;
 
 int TPDisplayString2(const char* txt, GLfloat x, GLfloat y, GLfloat size, GLuint fontType)
 {

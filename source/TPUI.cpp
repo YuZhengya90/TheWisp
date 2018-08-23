@@ -1,33 +1,7 @@
 #include "TPEnvironment.h"
 #include "TPUI.h"
 
-#include <iostream>
-
 using namespace std;
-
-void TPMenuItem::SetTexture(GLuint textureId)
-{
-    mTextureId = textureId;
-}
-
-void TPMenuItem::SetClickFunc(MENUCLICKCB clickCallback)
-{
-    mCallback = clickCallback;
-}
-
-void TPMenuItem::SetChecked(bool checked)
-{
-    mChecked = checked;
-}
-
-void TPMenuItem::ToggleChecked()
-{
-    mChecked = !mChecked;
-    if (mCallback)
-    {
-        mCallback(this);
-    }
-}
 
 void TPUI::RenderIllusion()
 {
@@ -43,61 +17,19 @@ void TPUI::RenderIllusion()
 
 void TPUI::DisplayIllusionBorder()
 {
+	const float limitDeltaX = 0.0001 * (GetCurrentCoord().GetMaxX() - GetCurrentCoord().GetMinX());
+	const float limitDeltaY = 0.0001 * (GetCurrentCoord().GetMaxY() - GetCurrentCoord().GetMinY());
+	
     glColor3f(0.3f, 0.4f, 0.4f);
     glLineWidth(2.0);
     glBegin(GL_LINE_STRIP);
-    glVertex3f(GetCurrentCoord().GetMinX(), GetCurrentCoord().GetMinY(), 0);
-    glVertex3f(GetCurrentCoord().GetMinX(), GetCurrentCoord().GetMaxY(), 0);
-    glVertex3f(GetCurrentCoord().GetMaxX(), GetCurrentCoord().GetMaxY(), 0);
-    glVertex3f(GetCurrentCoord().GetMaxX(), GetCurrentCoord().GetMinY(), 0);
-    glVertex3f(GetCurrentCoord().GetMinX(), GetCurrentCoord().GetMinY(), 0);
+    glVertex3f(GetCurrentCoord().GetMinX() + limitDeltaX, GetCurrentCoord().GetMinY() + limitDeltaY, 0);
+	glVertex3f(GetCurrentCoord().GetMinX() + limitDeltaX, GetCurrentCoord().GetMaxY() - limitDeltaY, 0);
+	glVertex3f(GetCurrentCoord().GetMaxX() - limitDeltaX, GetCurrentCoord().GetMaxY() - limitDeltaY, 0);
+    glVertex3f(GetCurrentCoord().GetMaxX() - limitDeltaX, GetCurrentCoord().GetMinY() + limitDeltaY, 0);
+    glVertex3f(GetCurrentCoord().GetMinX() + limitDeltaX, GetCurrentCoord().GetMinY() + limitDeltaY, 0);
     glEnd();
     glLineWidth(1.0);
-}
-
-void TPUI::DisplayMenu(unsigned count)
-{
-    GLfloat x = MENU_ITEM_W / 2;
-    GLfloat y = MENU_ITEM_H / 2;
-    GLfloat startPos = MENU_H / 2 - MENU_ITEM_G - MENU_ITEM_H / 2;
-    GLfloat step = -(2 * y + MENU_ITEM_G);
-
-    glColor3f(0.7f, 0.7f, 0.7f);
-    glLoadIdentity();
-    glTranslatef(0, startPos, 0);
-
-    for (unsigned int i = 0; i < count; ++i)
-    {
-        int xMin = SCRN_B * 2;
-        int xMax = xMin + (int)x * 2;
-        int yMin = SCRN_B + MENU_ITEM_G + i * (MENU_ITEM_H + MENU_ITEM_G);
-        int yMax = yMin + MENU_ITEM_H;
-
-        bool onMenu = (mMousePassiveAction.X > xMin && mMousePassiveAction.X < xMax)
-            && (mMousePassiveAction.Y > yMin && mMousePassiveAction.Y < yMax);
-
-        if (onMenu)
-        {
-            glPushMatrix();
-            glScalef(0.95, 0.95, 1);
-        }
-
-        glBindTexture(GL_TEXTURE_2D, mVecMenuItems[i]->mTextureId);
-
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 1.0); glVertex3f(-x, y, 0);
-        glTexCoord2f(0.0, 0.0); glVertex3f(-x,-y, 0);
-        glTexCoord2f(1.0, 0.0); glVertex3f( x,-y, 0);
-        glTexCoord2f(1.0, 1.0); glVertex3f( x, y, 0);
-        glEnd();
-
-        if (onMenu)
-        {
-            glPopMatrix();
-        }
-
-        glTranslatef(0, step, 0);
-    }
 }
 
 TPCoordinate& TPUI::GetCurrentCoord()
@@ -132,7 +64,6 @@ void TPUI::RenderMenu()
     glViewport(SCRN_B, SCRN_B, MENU_W, MENU_H);
 
     DisplayMenuBorder();
-    DisplayMenu(mVecMenuItems.size());
 }
 
 TPUI::TPUI()
@@ -142,11 +73,6 @@ TPUI::TPUI()
 
 TPUI::~TPUI()
 {
-    for (std::vector<TPMenuItem*>::iterator it = mVecMenuItems.begin(); it != mVecMenuItems.end(); ++it)
-    {
-        delete *it;
-    }
-
     for (std::vector<TPCoordinate*>::iterator it = mVecCoordinate.begin(); it != mVecCoordinate.end(); ++it)
     {
         delete *it;
@@ -155,6 +81,9 @@ TPUI::~TPUI()
 
 void TPUI::Render()
 {
+	glClearColor(0.96, 1.0, 1.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
     GetCurrentCoord().GetView().Render();
     GetCurrentCoord().RenderMesh();
     GetCurrentCoord().RenderPoints();
@@ -164,7 +93,7 @@ void TPUI::Render()
     GetCurrentCoord().RenderReferenceValue();
 }
 
-void TPUI::MouseAction(int x, int y)
+void TPUI::Translate(int x, int y)
 {
     if (mDoingAnimation)
     {
@@ -185,12 +114,6 @@ void TPUI::MouseAction(int x, int y)
         mTranslateStartAction.X = x;
         mTranslateStartAction.Y = y;
     }
-}
-
-void TPUI::MousePassiveAction(int x, int y)
-{
-    mMousePassiveAction.X = x;
-    mMousePassiveAction.Y = y;
 }
 
 void TPUI::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts, unsigned szPts)
@@ -232,23 +155,6 @@ void TPUI::StartScale(int x, int y, float rate)
     GetView().Scale(TPPoint(pX, pY), rate);
 }
 
-bool TPUI::IsDoubleClick(int x, int y)
-{
-    bool result = false;
-    if (x == mDoubleClickAction.X && y == mDoubleClickAction.Y
-        && GetTickCount() - mDoubleClickAction.state < 600)
-    {
-        cout << "IsDoubleClick!";
-        result = true;
-    }
-
-    mDoubleClickAction.X = x;
-    mDoubleClickAction.Y = y;
-    mDoubleClickAction.state = GetTickCount();
-
-    return result;
-}
-
 void TPUI::StartScaleAnimation(int x, int y, bool zoomOut)
 {
     if (mDoingAnimation)
@@ -266,67 +172,17 @@ void TPUI::StartScaleAnimation(int x, int y, bool zoomOut)
 
     if (zoomOut)
     {
-        GetView().ScaleAnimation(TPPoint(pX, pY), animationFactor, mDoubleClickAction.state, 300, 20);
+        GetView().ScaleAnimation(TPPoint(pX, pY), animationFactor, GetTickCount(), 300, 20);
     }
     else
     {
-        GetView().ScaleAnimation(TPPoint(pX, pY), 1 / animationFactor, mDoubleClickAction.state, 300, 20);
+        GetView().ScaleAnimation(TPPoint(pX, pY), 1 / animationFactor, GetTickCount(), 300, 20);
     }
 }
 
 TPView& TPUI::GetView()
 {
     return GetCurrentCoord().GetView();
-}
-
-TPMenuItem* TPUI::InMenuItem(int x, int y)
-{
-    for (unsigned int i = 0; i < mVecMenuItems.size(); ++i)
-    {
-        int xMin = SCRN_B * 2;
-		int xMax = xMin + MENU_ITEM_W;
-        int yMin = SCRN_B + MENU_ITEM_G + i * (MENU_ITEM_H + MENU_ITEM_G);
-        int yMax = yMin + MENU_ITEM_H;
-
-        bool onMenu = (x > xMin && x < xMax) && (y > yMin && y < yMax);
-
-        if (onMenu)
-        {
-            return mVecMenuItems[i];
-        }
-    }
-
-    return nullptr;    
-}
-
-TPMenuItem* TPUI::AddMenuItem(char* name)
-{
-    TPMenuItem* menuItem = new TPMenuItem(name);
-    mVecMenuItems.push_back(menuItem);
-    return menuItem;
-}
-
-TPMenuItem* TPUI::GetMenuItemByOrder(unsigned order)
-{
-    if (order < mVecMenuItems.size())
-    {
-        return mVecMenuItems[order];
-    }
-
-    return nullptr;
-}
-
-TPMenuItem* TPUI::GetMenuItemByName(char* name)
-{
-    for (unsigned i = 0; i < mVecMenuItems.size(); ++i)
-    {
-        if (mVecMenuItems[i]->mName == name)
-        {
-            return mVecMenuItems[i];
-        }
-    }
-
-    return nullptr;
 }
 
 TPCoordinate* TPUI::AddCoordinate(char* name)

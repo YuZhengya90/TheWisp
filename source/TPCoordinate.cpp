@@ -9,6 +9,46 @@
 #define TPCOORD_FONT_X_REFIX  0.014
 #define TPCOORD_FONT_Y_REFIX  0.007
 
+void TPCoordinate::SetXAnchor(TPDate minX, TPDate maxX)
+{
+	mXType = XY_DATE;
+	mMinX = (float)minX.ToInt();
+	mMaxX = (float)maxX.ToInt();
+	mView.SetXAnchor(mMinX, mMaxX);
+}
+
+void TPCoordinate::SetXAnchor(double minX, double maxX)
+{
+	mXType = XY_FLOAT;
+	mMinX = (float)minX;
+	mMaxX = (float)maxX;
+	mView.SetXAnchor(mMinX, mMaxX);
+}
+
+void TPCoordinate::SetXAnchor(int minX, int maxX)
+{
+	mXType = XY_INT;
+	mMinX = (float)minX;
+	mMaxX = (float)maxX;
+	mView.SetXAnchor(mMinX, mMaxX);
+}
+
+void TPCoordinate::SetYAnchor(double minY, double maxY)
+{
+	mYType = XY_FLOAT;
+	mMinY = (float)minY;
+	mMaxY = (float)maxY;
+	mView.SetYAnchor(mMinY, mMaxY);
+}
+
+void TPCoordinate::SetYAnchor(int minY, int maxY)
+{
+	mYType = XY_INT;
+	mMinY = (float)minY;
+	mMaxY = (float)maxY;
+	mView.SetYAnchor(mMinY, mMaxY);
+}
+
 void TPCoordinate::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts, unsigned szPts)
 {
     mDrawingType = type;
@@ -23,7 +63,7 @@ void TPCoordinate::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts,
 void TPCoordinate::RenderPoints()
 {
     glColor3f(0.0f, 1.0f, 1.0f);
-    if (mDrawingType == TP_CURVE)
+    if (mDrawingType == RP_CURVE)
     {
         glLoadIdentity();
         if (mDrawingSize > 0.0 && mDrawingSize < 4.0)
@@ -38,7 +78,7 @@ void TPCoordinate::RenderPoints()
         glLineWidth(1.0);
     }
 
-    if (mDrawingType == TP_POINT)
+    if (mDrawingType == RP_POINT)
     {
         glLoadIdentity();
         if (mDrawingSize > 0.0 && mDrawingSize < 10.0)
@@ -58,9 +98,8 @@ void TPCoordinate::RenderMesh()
 {
     float rate, last;
     rate = (mView.GetPosX() - mView.GetNegX()) / (mMaxX - mMinX);
-    mMeshStepX = (mMaxX - mMinX) / TPCOORD_MESH_X_COUNT * rate;
+    float mMeshStepX = (mMaxX - mMinX) / TPCOORD_MESH_X_COUNT * rate;
     last = mMinX + mMeshStepX;
-    mMeshStartX = mMinX + mMeshStepX;
     for (float ix = mMinX + mMeshStepX; ix < mMaxX; ix += mMeshStepX)
     {
         glColor3f(0.0, 0.7, 0.0);
@@ -72,7 +111,6 @@ void TPCoordinate::RenderMesh()
         glEnd();
         glDisable(GL_LINE_STIPPLE);
         last = ix;
-        mMeshEndX = ix;
     }
 
     if (mView.GetNegX() < mMinX)
@@ -87,7 +125,6 @@ void TPCoordinate::RenderMesh()
             glVertex3f(ix, TP_MAX(mMaxY, mView.GetPosY()), 0);
             glEnd();
             glDisable(GL_LINE_STIPPLE);
-            mMeshStartX = ix;
         }
     }
 
@@ -103,13 +140,11 @@ void TPCoordinate::RenderMesh()
             glVertex3f(ix, TP_MAX(mMaxY, mView.GetPosY()), 0);
             glEnd();
             glDisable(GL_LINE_STIPPLE);
-            mMeshEndX = ix;
         }
     }
 
-    mMeshStepY = (mMaxY - mMinY) / TPCOORD_MESH_Y_COUNT * rate;
+    float mMeshStepY = (mMaxY - mMinY) / TPCOORD_MESH_Y_COUNT * rate;
     last = mMinY + mMeshStepY;
-    mMeshStartY = mMinY + mMeshStepY;
     for (float iy = mMinY + mMeshStepY; iy < mMaxY; iy += mMeshStepY)
     {
         glColor3f(0.0, 0.7, 0.0);
@@ -121,7 +156,6 @@ void TPCoordinate::RenderMesh()
         glEnd();
         glDisable(GL_LINE_STIPPLE);
         last = iy;
-        mMeshEndY = iy;
     }
     
     if (mView.GetNegY() < mMinY)
@@ -136,7 +170,6 @@ void TPCoordinate::RenderMesh()
             glVertex3f(TP_MAX(mMaxX, mView.GetPosX()), iy, 0);
             glEnd();
             glDisable(GL_LINE_STIPPLE);
-            mMeshStartY = iy;
         }
     }
 
@@ -152,16 +185,23 @@ void TPCoordinate::RenderMesh()
             glVertex3f(TP_MAX(mMaxX, mView.GetPosX()), iy, 0);
             glEnd();
             glDisable(GL_LINE_STIPPLE);
-            mMeshEndY = iy;
         }
     }
 }
 
 void TPCoordinate::RenderReferenceValue()
 {
-    float step, microX = (mMaxX - mMinX) / TPCOORD_REFR_MICROLH, microY = microX;
-    float fontReFixX = (mMaxX - mMinX) * TPCOORD_FONT_X_REFIX,
-        fontReFixY = (mMaxY - mMinY) * TPCOORD_FONT_Y_REFIX;
+	float step;
+	float microX = (mMaxY - mMinY) / TPCOORD_REFR_MICROLH;
+	float microY = (mMaxX - mMinX) / TPCOORD_REFR_MICROLH;
+
+	if (mXType == XY_DATE || mXType == XY_INT)
+	{
+		//if ((mMaxX - mMinX)		
+	}
+
+	float fontReFixX = (mMaxX - mMinX) * TPCOORD_FONT_X_REFIX;
+    float fontReFixY = (mMaxY - mMinY) * TPCOORD_FONT_Y_REFIX;
 
     unsigned loopCount = 1;
     step = (mMaxX - mMinX) / TPCOORD_REFR_X_COUNT;
@@ -179,8 +219,26 @@ void TPCoordinate::RenderReferenceValue()
     for (float ix = mMinX + step; ix < mMaxX - step / 2; ix += step)
     {
         char value[16] = { 0 };
-        sprintf(value, "%.2f", mView.GetNegX() + fontValueStepX * loopCount);
-        TPDisplayString(value, ix - fontReFixX, mMinY + microY * 2);
+		float curValue = mView.GetNegX() + fontValueStepX * loopCount;
+
+		if (mXType == XY_DATE)
+		{
+			TPDate curDate = TPDate::FromInt((int)curValue);
+			TPDisplayString(curDate.ToString().c_str(), ix - 2 * fontReFixX, mMinY + microX * 2);
+		}
+
+		else if (mXType == XY_INT)
+		{
+			sprintf(value, "%d", (int)curValue);
+			TPDisplayString(value, ix - fontReFixX, mMinY + microX * 2);
+		}
+
+		else
+		{
+			sprintf(value, "%.2f", curValue);
+			TPDisplayString(value, ix - fontReFixX, mMinY + microX * 2);
+		}
+
         loopCount++;
     }
 
@@ -201,8 +259,20 @@ void TPCoordinate::RenderReferenceValue()
     for (float iy = mMinY + step; iy < mMaxY - step / 2; iy += step)
     {
         char value[16] = { 0 };
-        sprintf(value, "%.2f", mView.GetNegY() + fontValueStepY * loopCount);
-        TPDisplayString(value, mMinX + microY * 2, iy - fontReFixY);
+		float curValue = mView.GetNegY() + fontValueStepY * loopCount;
+
+		if (mYType == XY_INT)
+		{
+			sprintf(value, "%d", (int)curValue);
+			TPDisplayString(value, mMinX + microY * 2, iy - fontReFixY);
+		}
+
+		else
+		{
+			sprintf(value, "%.2f", curValue);
+			TPDisplayString(value, mMinX + microY * 2, iy - fontReFixY);
+		}
+
         loopCount++;
     }
 }

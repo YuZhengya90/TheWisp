@@ -7,49 +7,40 @@
 
 typedef enum TPCoord_RP_T
 {
-    TP_CURVE,
-    TP_POINT
+    RP_CURVE,
+    RP_POINT
 };
-class TPCoordinate
+
+typedef enum TPCoord_XY_T
 {
-private:
+	XY_FLOAT,
+	XY_INT,
+	XY_DATE
+};
 
-	int   mId;
-	char* mName;
-	char* mXName;
-	char* mYName;
-	
-	float mMinX;
-	float mMaxX;
-	float mMinY;
-	float mMaxY;
-
-    TPView mView;
-
-    std::vector<TPPoint> mDrawingPoints;
-    TPCoord_RP_T mDrawingType;
-    float mDrawingSize;
-
-    float mMeshStartX;
-    float mMeshEndX;
-    float mMeshStepX;
-
-    float mMeshStartY;
-    float mMeshEndY;
-    float mMeshStepY;	
-	
+class TPCoordinate
+{	
 public:
     TPCoordinate(int id, char * name = nullptr )
         : mId(id), mName(name), mXName(nullptr), mYName(nullptr)
         , mMinX(0), mMaxX(10), mMinY(0), mMaxY(10) 
+		, mXType(XY_FLOAT), mYType(XY_FLOAT)
     { }
     
-    void SetAnchor(float minX, float maxX, float minY, float maxY)
-    {
-        mMinX = minX; mMaxX = maxX;
-        mMinY = minY; mMaxY = maxY;
-        mView.SetAnchor(minX, maxX, minY, maxY);
-    }
+	// X Anchor initialized with Date value.
+	void SetXAnchor(TPDate minX, TPDate maxX);
+
+	// X Anchor initialized with double value.
+	void SetXAnchor(double minX, double maxX);
+
+	// X Anchor initialized with in value.
+	void SetXAnchor(int minX, int maxX);
+
+	// Y Anchor initialized with double value.
+	void SetYAnchor(double minY, double maxY);
+
+	// Y Anchor intialized with int value.
+	void SetYAnchor(int minY, int maxY);
 
     float GetMinX()const { return mMinX; }
     float GetMaxX()const { return mMaxX; }
@@ -59,10 +50,51 @@ public:
     TPView& GetView(){ return mView; }
     char* GetName() { return mName; }
 
-
+	// Set Points here to show it!
     void SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts, unsigned szPts);
-    void RenderPoints();
+	
+	// You can either use this method for easily call from JAR. vector<TPDate> is easy to get from TPDate::GetVector().
+	template<typename T, typename P>
+	void SetDrawingPoints(TPCoord_RP_T type, float size, std::vector<T> xVecValues, std::vector<P> yVecValues)
+	{
+		mDrawingType = type;
+		mDrawingSize = size;
 
+		int xSize = xVecValues.size();
+		int ySize = yVecValues.size();
+		if (xSize > ySize)
+		{
+			return;
+		}
+		for (int i = 0; i < xSize; ++i)
+		{
+			mDrawingPoints.push_back(TPPoint(xVecValues[i], yVecValues[i]));
+		}
+	}
+    
+
+	void RenderPoints();
     void RenderMesh();
     void RenderReferenceValue();
+
+private:
+
+	int   mId;
+	char* mName;
+	char* mXName;
+	char* mYName;
+
+	float mMinX;
+	float mMaxX;
+	float mMinY;
+	float mMaxY;
+
+	TPCoord_XY_T mXType;
+	TPCoord_XY_T mYType;
+
+	TPView mView;
+
+	std::vector<TPPoint> mDrawingPoints;
+	TPCoord_RP_T mDrawingType;
+	float mDrawingSize;
 };
