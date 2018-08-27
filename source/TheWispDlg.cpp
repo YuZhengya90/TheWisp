@@ -3,16 +3,16 @@
 //
 
 #include "stdafx.h"
-#include "TheWisp.h"
+#include "..\TheWisp.h"
 #include "TheWispDlg.h"
 #include "afxdialogex.h"
 
 #include <algorithm>
-#include "source\TPUI.h"
+#include "TPUI.h"
 
-#include "source\TPFont.h"
-#include "source\TPTexture.h"
-#include "source\TPJar.h"
+#include "TPFont.h"
+#include "TPTexture.h"
+#include "TPJar.h"
 
 
 #ifdef _DEBUG

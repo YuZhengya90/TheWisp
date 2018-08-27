@@ -77,7 +77,12 @@ public:
     void RenderMesh();
     void RenderReferenceValue();
 
+	int PointClicked(TPPoint p);
+
 private:
+
+	float GetSuitableXStep();
+	float GetSuitableYStep();
 
 	int   mId;
 	char* mName;
@@ -97,4 +102,6 @@ private:
 	std::vector<TPPoint> mDrawingPoints;
 	TPCoord_RP_T mDrawingType;
 	float mDrawingSize;
+
+	int mClickedPoints;
 };

@@ -7,6 +7,8 @@
 #include "TPJar.h"
 #include "TPWin32.h"
 
+#include "..\resource.h"
+
 TPUI ui;
 
 void TPInitGL()
@@ -57,8 +59,8 @@ void TPInitUI(HWND hwnd)
 
 	TPCoordinate* coord2 = ui.AddCoordinate("2");
 	coord2->SetXAnchor(dateFrom2 - 1, dateTo2 + 1);
-	coord2->SetYAnchor(1.0, 4.0);
-	coord2->SetDrawingPoints(RP_CURVE, 3, pts, dbrsult.size());
+	coord2->SetYAnchor(1, 4);
+	coord2->SetDrawingPoints(RP_POINT, 3, pts, dbrsult.size());
 	free(pts);
 
 	ui.setCurrentCoordByName("1");
@@ -95,10 +97,12 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 {
 	static HGLRC hRC;
 	static HDC hDC;
+	static HINSTANCE hInstance;
 
 	switch (message) {
 	case WM_CREATE:
 	{
+		hInstance = (HINSTANCE)lParam;
 		hDC = GetDC(hwnd);
 		SetupPixelFormat(hDC);
 		hRC = wglCreateContext(hDC);
@@ -108,7 +112,11 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 
 		TPInitGL();
 		TPInitUI(hwnd);
-		TPInitMenu((HINSTANCE)lParam, hwnd);
+		TPInitMenu(hInstance, hwnd);
+
+		
+		
+
 		return 0;
 	}
 	break;
@@ -165,6 +173,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 
 		if (ui.InIllusionSection(x, y))
 		{
+			SetCursor(LoadCursor(NULL, IDC_HAND));
 			ui.StartTranslate(x, y);
 		}
 	}
@@ -175,7 +184,8 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 		int y = HIWORD(lParam);
 
 		if (ui.InIllusionSection(x, y))
-		{
+		{	
+			SetCursor(LoadCursor(NULL, IDC_HAND));
 			ui.Translate(x, y);
 		}
 		else
@@ -186,9 +196,17 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 	break;
 	case WM_LBUTTONUP:
 	{
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
 		if (ui.InTranslating())
 		{
 			ui.StopTranslate();
+		}
+
+		int x = LOWORD(lParam);
+		int y = HIWORD(lParam);
+		if (ui.InIllusionSection(x, y))
+		{
+			ui.ClickPoint(x, y);
 		}
 	}
 	break;
@@ -228,10 +246,25 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 		}
 	}
 	break;
-	default:
-		return DefWindowProc(hwnd, message, wParam, lParam);
+
+	case WM_CONTEXTMENU:
+	{
+		int i = 0;
+		
+		POINT p = { LOWORD(lParam), HIWORD(lParam) }, pC = p;
+		ScreenToClient(hwnd, &pC);
+		if (ui.InIllusionSection(pC.x, pC.y))
+		{
+			HMENU hroot = LoadMenu(nullptr, MAKEINTRESOURCE(IDR_MENU1));
+			HMENU hpop = GetSubMenu(hroot, 0);
+			TrackPopupMenu(hpop, TPM_LEFTALIGN | TPM_TOPALIGN, p.x, p.y, 0, hwnd, NULL);
+		}		
 	}
-	return 0;
+	break;
+	default:
+		break;
+	}
+	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
 HWND CreateMainWindow(HINSTANCE hInstance)
@@ -245,7 +278,7 @@ HWND CreateMainWindow(HINSTANCE hInstance)
 	wndclass.cbClsExtra = 0;
 	wndclass.cbWndExtra = 0;
 	wndclass.hInstance = hInstance;
-	wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wndclass.hbrBackground = NULL;
 	wndclass.lpszMenuName = NULL;

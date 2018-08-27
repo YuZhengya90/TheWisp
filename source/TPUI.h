@@ -38,6 +38,8 @@ public:
     void StartScale(int x, int y, float rate);
     void StartScaleAnimation(int x, int y, bool zoomOut);
 
+	void ClickPoint(int x, int y);
+
     TPView& GetView();
 
     TPCoordinate* AddCoordinate(char* name);

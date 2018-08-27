@@ -10,3 +10,4 @@
 !/Debug/*.dll
 /Release/*
 !/Release/*.dll
+/ipch/*

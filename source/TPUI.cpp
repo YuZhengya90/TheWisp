@@ -82,13 +82,13 @@ TPUI::~TPUI()
 
 void TPUI::Render()
 {
-    if (mVecCoordinate.size() == 0)
-    {
-        return;
-    }
-
 	glClearColor(0.96, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	if (mVecCoordinate.size() == 0)
+	{
+		return;
+	}
 
     GetCurrentCoord().GetView().Render();
     GetCurrentCoord().RenderMesh();
@@ -184,6 +184,15 @@ void TPUI::StartScaleAnimation(int x, int y, bool zoomOut)
     {
         GetView().ScaleAnimation(TPPoint(pX, pY), 1 / animationFactor, GetTickCount(), 300, 20);
     }
+}
+
+void TPUI::ClickPoint(int x, int y)
+{
+	float left = MENU_W + 3 * SCRN_B;
+	float pX = (x - left) / (float)ILLU_W  * (GetView().GetPosX() - GetView().GetNegX()) + GetView().GetNegX();
+	float pY = (ILLU_H + SCRN_B - y) / (float)ILLU_H * (GetView().GetPosY() - GetView().GetNegY()) + GetView().GetNegY();
+
+	GetCurrentCoord().PointClicked(TPPoint(pX, pY));
 }
 
 TPView& TPUI::GetView()
