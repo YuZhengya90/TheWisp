@@ -82,6 +82,11 @@ TPUI::~TPUI()
 
 void TPUI::Render()
 {
+    if (mVecCoordinate.size() == 0)
+    {
+        return;
+    }
+
 	glClearColor(0.96, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 

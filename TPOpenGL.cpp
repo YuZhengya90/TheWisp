@@ -2,14 +2,18 @@
 #include <algorithm>
 #include "TPOpenGL.h"
 
-#include "source/TPUI.h"
+#include "TPUI.h"
 
-#include "source/TPFont.h"
-#include "source/TPTexture.h"
-#include "source/TPJar.h"
+#include "TPFont.h"
+#include "TPTexture.h"
+
 
 TPOpenGL::TPOpenGL()
 {
+    if (!jar.Init())
+    {
+        MessageBoxA(m_hWnd, "", "JAR init failed", MB_OK);
+    }
 }
 
 TPOpenGL::~TPOpenGL()
@@ -63,45 +67,8 @@ void TPOpenGL::TPInitGL()
 
 void TPOpenGL::TPInitUI(HWND hwnd)
 {
-    TPJar jar;
-    if (!jar.Init())
-    {
-        MessageBoxA(hwnd, "", "JAR init failed", MB_OK);
-        return;
-    }
-
-    // TEST1
-
-    TPDate dateFrom1(20170401), dateTo1(20170701);
-    jar.PurchasePricePredictionSetModelPath("D:/GitHub/DataMining/models/");
-    vector<double> dbrsult = jar.PurchasePricePredictionPredictPrice(dateFrom1, dateTo1);
-    vector<TPDate> dtX = TPDate::GetVector(dateFrom1, dateTo1);
-    TPCoordinate* coord1 = ui.AddCoordinate("1");
-    coord1->SetXAnchor(dateFrom1 - 1, dateTo1 + 1);
-    auto pairMinMax = std::minmax_element(dbrsult.begin(), dbrsult.end());
-    double duration = *pairMinMax.second - *pairMinMax.first;
-    coord1->SetYAnchor(*pairMinMax.first - 0.50 * duration, *pairMinMax.second + 0.50 * duration);
-    coord1->SetDrawingPoints<TPDate, double>(RP_POINT, 8, dtX, dbrsult);
-
-    // TEST2
-
-    TPDate dateFrom2(20160101), dateTo2(20160401);
-    vector<double> dbrsult2 = jar.PurchasePricePredictionPredictPrice(dateFrom2, dateTo2);
-    TPPoint* pts = (TPPoint*)malloc(dbrsult2.size() * sizeof(TPPoint));
-    for (unsigned i = 0; i < dbrsult2.size(); ++i)
-    {
-        pts[i].x = dateFrom2.ToInt() + i;
-        pts[i].y = (float)dbrsult2[i];
-    }
-
-    TPCoordinate* coord2 = ui.AddCoordinate("2");
-    coord2->SetXAnchor(dateFrom2 - 1, dateTo2 + 1);
-    coord2->SetYAnchor(1.0, 4.0);
-    coord2->SetDrawingPoints(RP_CURVE, 3, pts, dbrsult.size());
-    free(pts);
-
-    ui.setCurrentCoordByName("1");
 }
+
 BEGIN_MESSAGE_MAP(TPOpenGL, CWnd)
     ON_WM_CREATE()
     ON_WM_PAINT()
@@ -128,6 +95,8 @@ void TPOpenGL::PreSubclassWindow()
     TPInitGL();
     TPInitUI(m_hWnd);
 
+
+
     CWnd::PreSubclassWindow();
 }
 
@@ -137,8 +106,6 @@ int TPOpenGL::OnCreate(LPCREATESTRUCT lpCreateStruct)
         return -1;
 
     // TODO:  Add your specialized creation code here
-
-
 
     return 0;
 }
@@ -252,3 +219,54 @@ void TPOpenGL::OnRButtonDblClk(UINT nFlags, CPoint point)
     CWnd::OnRButtonDblClk(nFlags, point);
 }
 
+
+void TPOpenGL::PredictModel1(CTime predictFrom, CTime predictTo)
+{
+    TPDate dateFrom(predictFrom.GetYear(), predictFrom.GetMonth(), predictFrom.GetDay());
+    TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
+
+    jar.PurchasePricePredictionSetModelPath("D:/GitHub/DataMining/models/");
+    vector<double> dbrsult = jar.PurchasePricePredictionPredictPrice(dateFrom, dateTo);
+    vector<TPDate> dtX = TPDate::GetVector(dateFrom, dateTo);
+
+    TPCoordinate* coordinate = ui.GetCoordinateByName("1");
+    if (coordinate == nullptr)
+    {
+        coordinate = ui.AddCoordinate("1");
+    }
+
+    coordinate->SetXAnchor(dateFrom - 1, dateTo + 1);
+    auto pairMinMax = std::minmax_element(dbrsult.begin(), dbrsult.end());
+    double duration = *pairMinMax.second - *pairMinMax.first;
+    coordinate->SetYAnchor(*pairMinMax.first - 0.50 * duration, *pairMinMax.second + 0.50 * duration);
+    coordinate->SetDrawingPoints<TPDate, double>(RP_POINT, 8, dtX, dbrsult);
+
+    ui.setCurrentCoordByName("1");
+}
+
+void TPOpenGL::PredictModel2(CTime predictFrom, CTime predictTo)
+{
+    TPDate dateFrom(predictFrom.GetYear(), predictFrom.GetMonth(), predictFrom.GetDay());
+    TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
+
+    vector<double> dbrsult = jar.PurchasePricePredictionPredictPrice(dateFrom, dateTo);
+    TPPoint* pts = (TPPoint*)malloc(dbrsult.size() * sizeof(TPPoint));
+    for (unsigned i = 0; i < dbrsult.size(); ++i)
+    {
+        pts[i].x = dateFrom.ToInt() + i;
+        pts[i].y = (float)dbrsult[i];
+    }
+
+    TPCoordinate* coordinate = ui.GetCoordinateByName("2");
+    if (coordinate == nullptr)
+    {
+        coordinate = ui.AddCoordinate("2");
+    }
+
+    coordinate->SetXAnchor(dateFrom - 1, dateTo + 1);
+    coordinate->SetYAnchor(1.0, 4.0);
+    coordinate->SetDrawingPoints(RP_CURVE, 3, pts, dbrsult.size());
+    free(pts);
+
+    ui.setCurrentCoordByName("2");
+}

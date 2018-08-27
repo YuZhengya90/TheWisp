@@ -1,8 +1,9 @@
 #pragma once
 #include "afxwin.h"
-#include "source\GL\GL.H"
-#include "source\TPConst.h"
-#include "source\TPUI.h"
+#include "GL\GL.H"
+#include "TPConst.h"
+#include "TPUI.h"
+#include "TPJar.h"
 
 class TPOpenGL : public CWnd
 {
@@ -17,7 +18,8 @@ public:
 
     GLfloat step, s;
 
-    TPUI ui;
+    TPUI    ui;
+    TPJar   jar;
 
     virtual void PreSubclassWindow();
 
@@ -35,5 +37,9 @@ public:
 protected:
     void TPInitGL();
     void TPInitUI(HWND hwnd);
+
+public:
+    void PredictModel1(CTime predictFrom, CTime predictTo);
+    void PredictModel2(CTime predictFrom, CTime predictTo);
 };
 

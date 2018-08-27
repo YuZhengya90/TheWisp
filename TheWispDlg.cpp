@@ -184,21 +184,10 @@ int CTheWispDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CTheWispDlg::OnBnClickedBtnPredict()
 {
-    //CTime predictFrom, predictTo;
+    CTime predictFrom, predictTo;
 
-    //m_ctrlPredictFrom.GetTime(predictFrom);
-    //m_ctrlPredictTo.GetTime(predictTo);
+    m_ctrlPredictFrom.GetTime(predictFrom);
+    m_ctrlPredictTo.GetTime(predictTo);
 
-    //TPDate dateFrom(predictFrom.GetYear(), predictFrom.GetMonth(), predictFrom.GetDay());
-    //TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
-
-    //jar.PurchasePricePredictionSetModelPath("D:/GitHub/DataMining/models/");
-    //vector<double> dbrsult = jar.PurchasePricePredictionPredictPrice(dateFrom, dateTo);
-    //vector<TPDate> dtX = TPDate::GetVector(dateFrom, dateTo);
-    //TPCoordinate* coord1 = ui.AddCoordinate("1");
-    //coord1->SetXAnchor(dateFrom - 1, dateTo + 1);
-    //auto pairMinMax = std::minmax_element(dbrsult.begin(), dbrsult.end());
-    //double duration = *pairMinMax.second - *pairMinMax.first;
-    //coord1->SetYAnchor(*pairMinMax.first - 0.50 * duration, *pairMinMax.second + 0.50 * duration);
-    //coord1->SetDrawingPoints<TPDate, double>(RP_POINT, 8, dtX, dbrsult);
+    m_ctrlChart.PredictModel1(predictFrom, predictTo);
 }
