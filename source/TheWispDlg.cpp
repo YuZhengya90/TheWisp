@@ -57,6 +57,7 @@ END_MESSAGE_MAP()
 
 CTheWispDlg::CTheWispDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTheWispDlg::IDD, pParent)
+    , m_iRadioBtnGroup0(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -67,6 +68,7 @@ void CTheWispDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_PIC_CHART, m_ctrlChart);
     DDX_Control(pDX, IDC_DATETIMEPICKER1, m_ctrlPredictFrom);
     DDX_Control(pDX, IDC_DATETIMEPICKER2, m_ctrlPredictTo);
+    DDX_Radio(pDX, IDC_RADIO1, m_iRadioBtnGroup0);
 }
 
 BEGIN_MESSAGE_MAP(CTheWispDlg, CDialogEx)
@@ -76,6 +78,11 @@ BEGIN_MESSAGE_MAP(CTheWispDlg, CDialogEx)
     ON_NOTIFY(DTN_DATETIMECHANGE, IDC_DATETIMEPICKER1, &CTheWispDlg::OnDtnDatetimechangeDatetimepicker1)
     ON_WM_CREATE()
     ON_BN_CLICKED(IDC_BTN_PREDICT, &CTheWispDlg::OnBnClickedBtnPredict)
+    ON_BN_CLICKED(IDC_RADIO1, &CTheWispDlg::OnRadioBtnGroup0Clicked)
+    ON_BN_CLICKED(IDC_RADIO2, &CTheWispDlg::OnRadioBtnGroup0Clicked)
+    ON_BN_CLICKED(IDC_RADIO3, &CTheWispDlg::OnRadioBtnGroup0Clicked)
+    ON_BN_CLICKED(IDC_RADIO4, &CTheWispDlg::OnRadioBtnGroup0Clicked)
+    ON_BN_CLICKED(IDC_RADIO5, &CTheWispDlg::OnRadioBtnGroup0Clicked)
 END_MESSAGE_MAP()
 
 
@@ -184,10 +191,78 @@ int CTheWispDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CTheWispDlg::OnBnClickedBtnPredict()
 {
-    CTime predictFrom, predictTo;
+    switch (m_iRadioBtnGroup0)
+    {
+        case 0:
+        {
+            CTime predictFrom, predictTo;
 
-    m_ctrlPredictFrom.GetTime(predictFrom);
-    m_ctrlPredictTo.GetTime(predictTo);
+            ((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER1))->GetTime(predictFrom);
+            ((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER2))->GetTime(predictTo);
 
-    m_ctrlChart.PredictModel1(predictFrom, predictTo);
+            m_ctrlChart.PredictModel1(predictFrom, predictTo);
+        }
+        break;
+        case 1:
+        {
+            CTime predictFrom, predictTo;
+
+            ((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER3))->GetTime(predictFrom);
+            ((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER4))->GetTime(predictTo);
+
+            m_ctrlChart.PredictModel2(predictFrom, predictTo);
+        }
+        break;
+        case 2:
+        {
+
+        }
+        break;
+        case 3:
+        {
+
+        }
+        break;
+        case 4:
+        {
+
+        }
+        break;
+    }
+}
+
+
+void CTheWispDlg::OnRadioBtnGroup0Clicked()
+{
+    UpdateData(TRUE);
+    switch (m_iRadioBtnGroup0)
+    {
+        case 0:
+        {
+
+        }
+        break;
+        case 1:
+        {
+
+        }
+        break;
+        case 2:
+        {
+
+        }
+        break;
+        case 3:
+        {
+
+        }
+        break;
+        case 4:
+        {
+
+        }
+        break;
+        default:
+            break;
+    }
 }
