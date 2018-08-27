@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "TPJar.h"
 
 TPJar::TPJar()
@@ -84,6 +85,7 @@ bool TPJar::Init()
 	const int JavaHomePathMax = 256;
 	CHAR javaHomePath[JavaHomePathMax] = { 0 };
 	GetEnvironmentVariableA("JAVA_HOME", javaHomePath, JavaHomePathMax - 1);
+    strcpy_s(javaHomePath, "C:\\Program Files (x86)\\Java\\jdk1.8.0_181");
 
 #ifdef _DEBUG
 	cout << "JAVA_HOME=" << javaHomePath << endl;
@@ -99,9 +101,10 @@ bool TPJar::Init()
 	iniArgs.options = options;
 	iniArgs.ignoreUnrecognized = JNI_TRUE;
 
-	std::string jvmPath = std::string(javaHomePath) + "\\jre\\bin\\client\\jvm.dll";
+
+	std::string jvmPath = std::string(javaHomePath) + "\\jre\\bin\\server\\jvm.dll";
 	
-	mJVMInstance = LoadLibraryEx(jvmPath.c_str(), NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+	mJVMInstance = LoadLibraryA(jvmPath.c_str());
 	if (mJVMInstance == nullptr)
 	{
 #ifdef _DEBUG

@@ -5,22 +5,94 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Source Files\Component">
-      <UniqueIdentifier>{448aee6a-eb70-430c-b49f-d3f59eb6c403}</UniqueIdentifier>
+      <UniqueIdentifier>{8dce0315-8c6a-4f42-9144-09eb2a97e479}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\3rdParty">
+      <UniqueIdentifier>{5a0b3aa7-2729-497b-9c10-f9f2f6e18190}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\UI">
-      <UniqueIdentifier>{26fe95c4-127c-4052-bbed-5d90288dd660}</UniqueIdentifier>
+      <UniqueIdentifier>{6b082697-0c0a-472d-b7d5-3e8b4fb09544}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Component">
+      <UniqueIdentifier>{3e4ed735-6cde-43c2-ae7a-6780ab2e6a7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI">
+      <UniqueIdentifier>{e7e4a09a-f254-4e6f-9939-e059084c1cce}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TheWisp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TheWispDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TPConst.h">
+      <Filter>Header Files\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TPEnvironment.h">
+      <Filter>Header Files\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TPFont.h">
+      <Filter>Header Files\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TPJar.h">
+      <Filter>Header Files\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TPTexture.h">
+      <Filter>Header Files\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TPCoordinate.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TPUI.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TPView.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TPOpenGL.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TheWisp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TheWispDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\TPEnvironment.cpp">
       <Filter>Source Files\Component</Filter>
     </ClCompile>
     <ClCompile Include="source\TPFont.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="source\TPJar.cpp">
       <Filter>Source Files\Component</Filter>
     </ClCompile>
     <ClCompile Include="source\TPTexture.cpp">
@@ -35,49 +107,23 @@
     <ClCompile Include="source\TPView.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
-    <ClCompile Include="source\TPWorld.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\TPJar.cpp">
-      <Filter>Source Files\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="source\TPWin32.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="source\TPMenu.cpp">
+    <ClCompile Include="TPOpenGL.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\TPConst.h">
-      <Filter>Source Files\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="source\TPEnvironment.h">
-      <Filter>Source Files\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="source\TPFont.h">
-      <Filter>Source Files\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="source\TPTexture.h">
-      <Filter>Source Files\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="source\TPCoordinate.h">
-      <Filter>Source Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="source\TPUI.h">
-      <Filter>Source Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="source\TPView.h">
-      <Filter>Source Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="source\TPJar.h">
-      <Filter>Source Files\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="source\TPWin32.h">
-      <Filter>Source Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="source\TPMenu.h">
-      <Filter>Source Files\UI</Filter>
-    </ClInclude>
+    <ResourceCompile Include="TheWisp.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\TheWisp.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\TheWisp.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

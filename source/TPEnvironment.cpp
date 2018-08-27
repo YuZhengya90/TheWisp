@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "TPEnvironment.h"
 
 TPPoint TPPoint::operator - (const TPPoint& p)
@@ -110,7 +111,7 @@ TPDate::operator int()
 std::string TPDate::ToString()
 {
 	char str[16] = { 0 };
-	itoa(10000 * mY + 100 * mM + mD, str, 10);
+	_itoa_s(10000 * mY + 100 * mM + mD, str, 10);
 	return std::string(str);
 }
 

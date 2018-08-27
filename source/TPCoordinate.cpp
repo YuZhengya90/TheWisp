@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "TPFont.h"
 #include "TPCoordinate.h"
 
@@ -229,13 +230,13 @@ void TPCoordinate::RenderReferenceValue()
 
 		else if (mXType == XY_INT)
 		{
-			sprintf(value, "%d", (int)curValue);
+			sprintf_s(value, "%d", (int)curValue);
 			TPDisplayString(value, ix - fontReFixX, mMinY + microX * 2);
 		}
 
 		else
 		{
-			sprintf(value, "%.2f", curValue);
+			sprintf_s(value, "%.2f", curValue);
 			TPDisplayString(value, ix - fontReFixX, mMinY + microX * 2);
 		}
 
@@ -263,13 +264,13 @@ void TPCoordinate::RenderReferenceValue()
 
 		if (mYType == XY_INT)
 		{
-			sprintf(value, "%d", (int)curValue);
+			sprintf_s(value, "%d", (int)curValue);
 			TPDisplayString(value, mMinX + microY * 2, iy - fontReFixY);
 		}
 
 		else
 		{
-			sprintf(value, "%.2f", curValue);
+			sprintf_s(value, "%.2f", curValue);
 			TPDisplayString(value, mMinX + microY * 2, iy - fontReFixY);
 		}
 

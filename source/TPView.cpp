@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "TPView.h"
 
 #define REFVALUE_XCOUNT  10
