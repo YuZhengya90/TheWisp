@@ -35,9 +35,12 @@ public:
     afx_msg void OnDtnDatetimechangeDatetimepicker1(NMHDR *pNMHDR, LRESULT *pResult);
     afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 
-public:
-    TPOpenGL m_ctrlChart;
-    CDateTimeCtrl m_ctrlPredictFrom;
-    CDateTimeCtrl m_ctrlPredictTo;
     afx_msg void OnBnClickedBtnPredict();
+
+public:
+    TPOpenGL        m_ctrlChart;
+    CDateTimeCtrl   m_ctrlPredictFrom;
+    CDateTimeCtrl   m_ctrlPredictTo;
+    int             m_iRadioBtnGroup0;
+    afx_msg void OnRadioBtnGroup0Clicked();
 };
