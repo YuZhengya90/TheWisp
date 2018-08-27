@@ -7,8 +7,8 @@
 
 typedef enum TPCoord_RP_T
 {
-    RP_CURVE,
-    RP_POINT
+    RP_CURVE = 0x0001,
+    RP_POINT = 0x0002
 };
 
 typedef enum TPCoord_XY_T
@@ -25,6 +25,7 @@ public:
         : mId(id), mName(name), mXName(nullptr), mYName(nullptr)
         , mMinX(0), mMaxX(10), mMinY(0), mMaxY(10) 
 		, mXType(XY_FLOAT), mYType(XY_FLOAT), mClickedPoints(-1)
+		, mEnableCrossLine(true), mEnableCurve(false), mEnableMesh(true)
     { }
     
 	// X Anchor initialized with Date value.
@@ -81,7 +82,40 @@ public:
 	void RenderCrossLine();
     void RenderReferenceValue();
 
-	int PointClicked(TPPoint p);
+	int HoverPoint(TPPoint p);
+	
+	bool GetEnableMesh() const {
+		return mEnableMesh;
+	}
+
+	bool GetEnableCrossLine() const {
+		return mEnableCrossLine;
+	}
+
+	bool GetEnableCurve()  const {
+		return mEnableCurve;
+	}
+
+	void SetEnableMesh(bool enable) {
+		mEnableMesh = enable;
+	}
+
+	void SetEnableCrossLine(bool enable) {
+		mEnableCrossLine = enable;
+	}
+
+	void SetEnableCurve(bool enable){
+		mEnableCurve = enable;
+
+		if (mEnableCurve)
+		{
+			mDrawingType = (int)mDrawingType | RP_CURVE;
+		}
+		else
+		{
+			mDrawingType = (int)mDrawingType & (~RP_CURVE);
+		}
+	}
 
 private:
 
@@ -104,7 +138,7 @@ private:
 	TPView mView;
 
 	std::vector<TPPoint> mDrawingPoints;
-	TPCoord_RP_T mDrawingType;
+	int mDrawingType;
 	float mDrawingSize;
 
 	int mClickedPoints;
@@ -113,4 +147,8 @@ private:
 	float mMeshMaxX;
 	float mMeshMinY;
 	float mMeshMaxY;
+
+	bool mEnableCrossLine;
+	bool mEnableCurve;
+	bool mEnableMesh;
 };

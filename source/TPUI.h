@@ -40,8 +40,14 @@ public:
     void StartScale(int x, int y, float rate);
     void StartScaleAnimation(int x, int y, bool zoomOut);
 
-	void ClickPoint(int x, int y);
 	void HoverPoint(int x, int y);
+
+	bool EnableMesh() { return GetCurrentCoord().GetEnableMesh(); }
+	bool EnableCrossLine() { return GetCurrentCoord().GetEnableCrossLine(); }
+	bool EnableCurve() { return GetCurrentCoord().GetEnableCurve(); }
+	void SetEnableMesh(bool bEnable) { GetCurrentCoord().SetEnableMesh(bEnable); }
+	void SetEnableCrossLine(bool bEnable) { GetCurrentCoord().SetEnableCrossLine(bEnable); }
+	void SetEnableCurve(bool bEnable) { GetCurrentCoord().SetEnableCurve(bEnable); }
 
     TPView& GetView();
 

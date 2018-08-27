@@ -1,11 +1,13 @@
 #include <algorithm>
-#include "TPOpenGL.h"
+#include "..\resource.h"
+
+#include "afxdialogex.h"
+#include "TheWispDlg.h"
 
 #include "TPUI.h"
-
 #include "TPFont.h"
 #include "TPTexture.h"
-
+#include "TPOpenGL.h"
 
 TPOpenGL::TPOpenGL()
 {
@@ -21,7 +23,6 @@ TPOpenGL::~TPOpenGL()
     wglDeleteContext(hglrc);
     ::ReleaseDC(m_hWnd, hdc);
 }
-
 
 void TPOpenGL::SetupPixelFormat(HDC hDC)
 {
@@ -69,16 +70,23 @@ void TPOpenGL::TPInitUI(HWND hwnd)
 }
 
 BEGIN_MESSAGE_MAP(TPOpenGL, CWnd)
-    ON_WM_CREATE()
-    ON_WM_PAINT()
-    ON_WM_TIMER()
-    ON_WM_MOUSEWHEEL()
-    ON_WM_LBUTTONDOWN()
-    ON_WM_MOUSEMOVE()
-    ON_WM_LBUTTONUP()
-    ON_WM_LBUTTONDBLCLK()
-    ON_WM_RBUTTONDBLCLK()
+	ON_WM_CREATE()
+	ON_WM_PAINT()
+	ON_WM_TIMER()
+	ON_WM_MOUSEWHEEL()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_MOUSEMOVE()
+	ON_WM_LBUTTONUP()
+	ON_WM_LBUTTONDBLCLK()
+	ON_WM_RBUTTONDBLCLK()
 	ON_WM_MOUSEHOVER()
+	ON_WM_CONTEXTMENU()
+	ON_WM_INITMENUPOPUP()
+	ON_COMMAND(ID_ILLUSION_ENABLEMESH, OnEnableMesh)
+	ON_COMMAND(ID_ILLUSION_ENABLECROSSLINE, OnEnableCrossLine)
+	ON_COMMAND(ID_ILLUSION_ENABLECURVE, OnEnableCurve)
+	ON_COMMAND(ID_ILLUSION_ABOUT, OnAbout)
+	
 END_MESSAGE_MAP()
 
 
@@ -223,6 +231,86 @@ void TPOpenGL::OnMouseHover(UINT nFlags, CPoint point)
 	{
 		ui.HoverPoint(point.x, point.y);
 	}
+}
+
+void TPOpenGL::OnContextMenu(CWnd*, CPoint point)
+{
+	CPoint pCopy = point;
+	::ScreenToClient(m_hWnd, &point);
+	if (ui.InIllusionSection(point.x, point.y))
+	{
+		CMenu m_Menu;
+		m_Menu.LoadMenu(IDR_MENU1);
+		CMenu *m_SubMenu = m_Menu.GetSubMenu(0);
+		m_SubMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pCopy.x, pCopy.y, this);
+	}
+}
+
+void TPOpenGL::OnInitMenuPopup(CMenu *pMenuPopup, UINT nIndex, BOOL bSysMenu)
+{
+	if (!bSysMenu)
+	{
+		int nCount = pMenuPopup->GetMenuItemCount();
+		for (int i = 0; i < nCount; ++i)
+		{
+			if (pMenuPopup->GetMenuItemID(i) == ID_ILLUSION_ENABLEMESH)
+			{
+				pMenuPopup->CheckMenuItem(ID_ILLUSION_ENABLEMESH, MF_BYCOMMAND | (ui.EnableMesh() ? MF_CHECKED : MF_UNCHECKED));
+			}
+
+			if (pMenuPopup->GetMenuItemID(i) == ID_ILLUSION_ENABLECURVE)
+			{
+				pMenuPopup->CheckMenuItem(ID_ILLUSION_ENABLECURVE, MF_BYCOMMAND | (ui.EnableCurve() ? MF_CHECKED : MF_UNCHECKED));
+			}
+
+			if (pMenuPopup->GetMenuItemID(i) == ID_ILLUSION_ENABLECROSSLINE)
+			{
+				pMenuPopup->CheckMenuItem(ID_ILLUSION_ENABLECROSSLINE, MF_BYCOMMAND | (ui.EnableCrossLine() ? MF_CHECKED : MF_UNCHECKED));
+			}
+		}
+	}
+}
+
+void TPOpenGL::OnEnableMesh()
+{
+	if (ui.EnableMesh())
+	{
+		ui.SetEnableMesh(false);
+	}
+	else
+	{
+		ui.SetEnableMesh(true);
+	}
+}
+
+void TPOpenGL::OnEnableCrossLine()
+{
+	if (ui.EnableCrossLine())
+	{
+		ui.SetEnableCrossLine(false);
+	}
+	else
+	{
+		ui.SetEnableCrossLine(true);
+	}
+}
+
+void TPOpenGL::OnEnableCurve()
+{
+	if (ui.EnableCurve())
+	{
+		ui.SetEnableCurve(false);
+	}
+	else
+	{
+		ui.SetEnableCurve(true);
+	}
+}
+
+void TPOpenGL::OnAbout()
+{
+	CAboutDlg dlgAbout;
+	dlgAbout.DoModal();
 }
 
 void TPOpenGL::PredictModel1(CTime predictFrom, CTime predictTo)

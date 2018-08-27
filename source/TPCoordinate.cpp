@@ -66,7 +66,7 @@ void TPCoordinate::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts,
 void TPCoordinate::RenderPoints()
 {
     glColor3f(0.0f, 1.0f, 1.0f);
-    if (mDrawingType == RP_CURVE)
+    if ((int)mDrawingType & RP_CURVE)
     {
         glLoadIdentity();
         if (mDrawingSize > 0.0 && mDrawingSize < 4.0)
@@ -81,7 +81,7 @@ void TPCoordinate::RenderPoints()
         glLineWidth(1.0);
     }
 
-	if (mDrawingType == RP_POINT)
+	if ((int)mDrawingType & RP_POINT)
     {
         glLoadIdentity();
 		unsigned szPts = mDrawingPoints.size();
@@ -434,7 +434,7 @@ float TPCoordinate::GetSuitableYStep()
 	return (mMaxY - mMinY) / TPCOORD_REFR_Y_COUNT;
 }
 
-int TPCoordinate::PointClicked(TPPoint illuP)
+int TPCoordinate::HoverPoint(TPPoint illuP)
 {
 	unsigned szPts = mDrawingPoints.size();
 	float disX = (mMaxX - mMinX) / szPts * 0.4;

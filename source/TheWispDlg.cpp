@@ -19,25 +19,6 @@
 #define new DEBUG_NEW
 #endif
 
-
-// CAboutDlg dialog used for App About
-
-class CAboutDlg : public CDialogEx
-{
-public:
-	CAboutDlg();
-
-// Dialog Data
-	enum { IDD = IDD_ABOUTBOX };
-
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	DECLARE_MESSAGE_MAP()
-};
-
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
 {
 }
@@ -50,10 +31,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
-
 // CTheWispDlg dialog
-
-
 
 CTheWispDlg::CTheWispDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTheWispDlg::IDD, pParent)

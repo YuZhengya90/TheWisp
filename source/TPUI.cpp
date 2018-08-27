@@ -98,10 +98,17 @@ void TPUI::Render()
 	}
 
     GetCurrentCoord().GetView().Render();
-    GetCurrentCoord().RenderMesh();
-	GetCurrentCoord().RenderCrossLine();
-	GetCurrentCoord().RenderPoints();
+	if (EnableMesh())
+	{
+		GetCurrentCoord().RenderMesh();
+	}
+    
+	if (EnableCrossLine())
+	{
+		GetCurrentCoord().RenderCrossLine();
+	}
 	
+	GetCurrentCoord().RenderPoints();
 
     //RenderMenu();
     RenderIllusion();
@@ -119,7 +126,7 @@ bool TPUI::InIllusionSection(int x, int y)
     if (x > left&& x < left + ILLU_W
         && y > SCRN_B && y < SCRN_B + ILLU_H)
     {
-        return true;
+        return !NoCurrentCoord();
     }
 
     return false;
@@ -189,16 +196,6 @@ void TPUI::StartScaleAnimation(int x, int y, bool zoomOut)
     }
 }
 
-void TPUI::ClickPoint(int x, int y)
-{
-	if (NoCurrentCoord())
-	{
-		return;
-	}
-
-	GetCurrentCoord().PointClicked(ClientToIllusion( TPPoint(x, y)));
-}
-
 void TPUI::HoverPoint(int x, int y)
 {
 	if (NoCurrentCoord())
@@ -207,7 +204,7 @@ void TPUI::HoverPoint(int x, int y)
 	}
 	
 	TPPoint p = ClientToIllusion(TPPoint(x, y));
-	GetCurrentCoord().PointClicked(ClientToIllusion(TPPoint(x, y)));
+	GetCurrentCoord().HoverPoint(ClientToIllusion(TPPoint(x, y)));
 }
 
 TPView& TPUI::GetView()

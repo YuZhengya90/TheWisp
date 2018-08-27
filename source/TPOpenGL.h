@@ -19,7 +19,7 @@ public:
     GLfloat step, s;
 
     TPUI    ui;
-    TPJar   jar;
+    TPJar   jar;	
 
     virtual void PreSubclassWindow();
 
@@ -34,6 +34,12 @@ public:
     afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
     afx_msg void OnRButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnMouseHover(UINT nFlags, CPoint point);
+	afx_msg void OnContextMenu(CWnd*, CPoint point);
+	afx_msg void OnInitMenuPopup(CMenu *pMenuPopup, UINT nIndex, BOOL bSysMenu);
+	afx_msg void OnEnableMesh();
+	afx_msg void OnEnableCrossLine();
+	afx_msg void OnEnableCurve();
+	afx_msg void OnAbout();
 
 protected:
     void TPInitGL();
