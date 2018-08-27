@@ -11,3 +11,4 @@
 /Release/*
 !/Release/*.dll
 /ipch/*
+*.aps

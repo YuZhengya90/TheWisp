@@ -20,7 +20,7 @@
 
 
 // illusion width, height, coordinate x point, y point.
-#define ILLU_W             1000/*(SCRN_W - 4*SCRN_B - MENU_W)*/
+#define ILLU_W             1240/*(SCRN_W - 4*SCRN_B - MENU_W)*/
 #define ILLU_H              600/*(SCRN_H - 2*SCRN_B)*/
 
 #define TP_MIN(a,b) ((a) < (b) ? (a) : (b))

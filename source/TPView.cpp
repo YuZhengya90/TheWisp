@@ -39,7 +39,7 @@ void TPView::Render()
     glOrtho(mNegX, mPosX, mNegY, mPosY, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glViewport(MENU_W + 3 * SCRN_B, SCRN_B, ILLU_W, ILLU_H);
+    glViewport(SCRN_B, SCRN_B, ILLU_W, ILLU_H);
 
     HandlingAnimation();
 }

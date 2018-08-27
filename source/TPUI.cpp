@@ -11,7 +11,7 @@ void TPUI::RenderIllusion()
     glOrtho(GetCurrentCoord().GetMinX(), GetCurrentCoord().GetMaxX(), GetCurrentCoord().GetMinY(), GetCurrentCoord().GetMaxY(), -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glViewport(MENU_W + 3 * SCRN_B, SCRN_B, ILLU_W, ILLU_H);
+    glViewport(SCRN_B, SCRN_B, ILLU_W, ILLU_H);
 
     DisplayIllusionBorder();
 }
@@ -94,7 +94,7 @@ void TPUI::Render()
     GetCurrentCoord().RenderMesh();
     GetCurrentCoord().RenderPoints();
 
-    RenderMenu();
+    //RenderMenu();
     RenderIllusion();
     GetCurrentCoord().RenderReferenceValue();
 }
@@ -129,7 +129,7 @@ void TPUI::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts, unsigne
 
 bool TPUI::InIllusionSection(int x, int y)
 {
-    float left = MENU_W + 3 * SCRN_B;
+    float left = SCRN_B;
     if (x > left&& x < left + ILLU_W
         && y > SCRN_B && y < SCRN_B + ILLU_H)
     {
@@ -153,7 +153,7 @@ void TPUI::StartScale(int x, int y, float rate)
         return;
     }
 
-    float left = MENU_W + 3 * SCRN_B;
+    float left = SCRN_B;
 
     float pX = (x - left) / (float)ILLU_W  * (GetView().GetPosX() - GetView().GetNegX()) + GetView().GetNegX();
     float pY = (ILLU_H + SCRN_B - y) / (float)ILLU_H * (GetView().GetPosY() - GetView().GetNegY()) + GetView().GetNegY();
@@ -168,7 +168,7 @@ void TPUI::StartScaleAnimation(int x, int y, bool zoomOut)
         return;
     }
 
-    float left = MENU_W + 3 * SCRN_B;
+    float left = SCRN_B;
 
     float pX = (x - left) / (float)ILLU_W  * (GetView().GetPosX() - GetView().GetNegX()) + GetView().GetNegX();
     float pY = (ILLU_H + SCRN_B - y) / (float)ILLU_H * (GetView().GetPosY() - GetView().GetNegY()) + GetView().GetNegY();
@@ -188,7 +188,7 @@ void TPUI::StartScaleAnimation(int x, int y, bool zoomOut)
 
 void TPUI::ClickPoint(int x, int y)
 {
-	float left = MENU_W + 3 * SCRN_B;
+	float left = SCRN_B;
 	float pX = (x - left) / (float)ILLU_W  * (GetView().GetPosX() - GetView().GetNegX()) + GetView().GetNegX();
 	float pY = (ILLU_H + SCRN_B - y) / (float)ILLU_H * (GetView().GetPosY() - GetView().GetNegY()) + GetView().GetNegY();
 
