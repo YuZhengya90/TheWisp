@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "TPTexture.h"
 
 TPTextureCollection tpTextureCollection;

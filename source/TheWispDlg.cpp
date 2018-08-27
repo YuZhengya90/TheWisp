@@ -2,7 +2,7 @@
 // TheWispDlg.cpp : implementation file
 //
 
-#include "stdafx.h"
+#include "..\stdafx.h"
 #include "..\TheWisp.h"
 #include "TheWispDlg.h"
 #include "afxdialogex.h"

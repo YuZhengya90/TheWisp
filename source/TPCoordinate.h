@@ -24,7 +24,7 @@ public:
     TPCoordinate(int id, char * name = nullptr )
         : mId(id), mName(name), mXName(nullptr), mYName(nullptr)
         , mMinX(0), mMaxX(10), mMinY(0), mMaxY(10) 
-		, mXType(XY_FLOAT), mYType(XY_FLOAT)
+		, mXType(XY_FLOAT), mYType(XY_FLOAT), mClickedPoints(-1)
     { }
     
 	// X Anchor initialized with Date value.
@@ -66,15 +66,19 @@ public:
 		{
 			return;
 		}
+		mDrawingPoints.clear();
 		for (int i = 0; i < xSize; ++i)
 		{
 			mDrawingPoints.push_back(TPPoint(xVecValues[i], yVecValues[i]));
 		}
+
+		mClickedPoints = -1;
 	}
     
 
 	void RenderPoints();
     void RenderMesh();
+	void RenderCrossLine();
     void RenderReferenceValue();
 
 	int PointClicked(TPPoint p);
@@ -104,4 +108,9 @@ private:
 	float mDrawingSize;
 
 	int mClickedPoints;
+
+	float mMeshMinX;
+	float mMeshMaxX;
+	float mMeshMinY;
+	float mMeshMaxY;
 };

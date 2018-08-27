@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "TPEnvironment.h"
 
 TPPoint TPPoint::operator - (const TPPoint& p)

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "TPEnvironment.h"
 #include "TPUI.h"
 
@@ -38,6 +37,14 @@ TPCoordinate& TPUI::GetCurrentCoord()
     return *mVecCoordinate[mCurrCoordOrder];
 }
 
+TPPoint TPUI::ClientToIllusion(const TPPoint& p)
+{
+	float pX = (p.x - SCRN_B) / (float)ILLU_W  * (GetView().GetPosX() - GetView().GetNegX()) + GetView().GetNegX();
+	float pY = (ILLU_H + SCRN_B - p.y) / (float)ILLU_H * (GetView().GetPosY() - GetView().GetNegY()) + GetView().GetNegY();
+
+	return TPPoint(pX, pY);
+}
+
 void TPUI::DisplayMenuBorder()
 {
     GLfloat x = MENU_W / 2;
@@ -68,7 +75,7 @@ void TPUI::RenderMenu()
 }
 
 TPUI::TPUI()
-: mDoingAnimation(false)
+	: mDoingAnimation(false), mCurrCoordOrder(-1)
 {
 }
 
@@ -92,34 +99,13 @@ void TPUI::Render()
 
     GetCurrentCoord().GetView().Render();
     GetCurrentCoord().RenderMesh();
-    GetCurrentCoord().RenderPoints();
+	GetCurrentCoord().RenderCrossLine();
+	GetCurrentCoord().RenderPoints();
+	
 
     //RenderMenu();
     RenderIllusion();
     GetCurrentCoord().RenderReferenceValue();
-}
-
-void TPUI::Translate(int x, int y)
-{
-    if (mDoingAnimation)
-    {
-        return;
-    }
-
-    if (mTranslateStartAction.state == 1)
-    {
-        //cout << "XMOVE" << xMove << " " << "YMOVE" << yMove << "" << endl;
-
-        // notice that screen (x,y) is not the view's (x,y) screen from left top but view from left bottom.
-        // so mTranslateStaretAction.Y - y is right.
-
-        float moveDeltaX = (GetView().GetPosX() - GetView().GetNegX()) / ILLU_W * (x - mTranslateStartAction.X);
-        float moveDeltaY = (GetView().GetPosY() - GetView().GetNegY()) / ILLU_H * (mTranslateStartAction.Y - y);
-        GetView().Translate(-moveDeltaX, -moveDeltaY);
-
-        mTranslateStartAction.X = x;
-        mTranslateStartAction.Y = y;
-    }
 }
 
 void TPUI::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts, unsigned szPts)
@@ -146,53 +132,82 @@ void TPUI::StartTranslate(int x, int y)
     mTranslateStartAction.state = 1;
 }
 
+bool TPUI::Translate(int x, int y)
+{
+	if (mDoingAnimation || NoCurrentCoord())
+	{
+		return false;
+	}
+
+	if (mTranslateStartAction.state == 1)
+	{
+		//cout << "XMOVE" << xMove << " " << "YMOVE" << yMove << "" << endl;
+
+		// notice that screen (x,y) is not the view's (x,y) screen from left top but view from left bottom.
+		// so mTranslateStaretAction.Y - y is right.
+
+		float moveDeltaX = (GetView().GetPosX() - GetView().GetNegX()) / ILLU_W * (x - mTranslateStartAction.X);
+		float moveDeltaY = (GetView().GetPosY() - GetView().GetNegY()) / ILLU_H * (mTranslateStartAction.Y - y);
+		GetView().Translate(-moveDeltaX, -moveDeltaY);
+
+		mTranslateStartAction.X = x;
+		mTranslateStartAction.Y = y;
+
+		return true;
+	}
+
+	return false;
+}
+
 void TPUI::StartScale(int x, int y, float rate)
 {
-    if (mDoingAnimation)
+	if (mDoingAnimation || NoCurrentCoord())
     {
         return;
     }
-
-    float left = SCRN_B;
-
-    float pX = (x - left) / (float)ILLU_W  * (GetView().GetPosX() - GetView().GetNegX()) + GetView().GetNegX();
-    float pY = (ILLU_H + SCRN_B - y) / (float)ILLU_H * (GetView().GetPosY() - GetView().GetNegY()) + GetView().GetNegY();
-
-    GetView().Scale(TPPoint(pX, pY), rate);
+	
+	GetView().Scale(ClientToIllusion(TPPoint(x, y)), rate);
 }
 
 void TPUI::StartScaleAnimation(int x, int y, bool zoomOut)
 {
-    if (mDoingAnimation)
+	if (mDoingAnimation || NoCurrentCoord())
     {
         return;
     }
-
-    float left = SCRN_B;
-
-    float pX = (x - left) / (float)ILLU_W  * (GetView().GetPosX() - GetView().GetNegX()) + GetView().GetNegX();
-    float pY = (ILLU_H + SCRN_B - y) / (float)ILLU_H * (GetView().GetPosY() - GetView().GetNegY()) + GetView().GetNegY();
-    
+   
     // 300 milliseconds in 20 frames (about 60frames per second)
     float animationFactor = sqrtf(sqrtf(MOUSE_SCALE_FACTOR));
 
     if (zoomOut)
     {
-        GetView().ScaleAnimation(TPPoint(pX, pY), animationFactor, GetTickCount(), 300, 20);
+        GetView().ScaleAnimation(ClientToIllusion(TPPoint(x, y)), animationFactor, GetTickCount(), 300, 20);
     }
     else
     {
-        GetView().ScaleAnimation(TPPoint(pX, pY), 1 / animationFactor, GetTickCount(), 300, 20);
+		GetView().ScaleAnimation(ClientToIllusion(TPPoint(x, y)), 1 / animationFactor, GetTickCount(), 300, 20);
     }
 }
 
 void TPUI::ClickPoint(int x, int y)
 {
-	float left = SCRN_B;
-	float pX = (x - left) / (float)ILLU_W  * (GetView().GetPosX() - GetView().GetNegX()) + GetView().GetNegX();
-	float pY = (ILLU_H + SCRN_B - y) / (float)ILLU_H * (GetView().GetPosY() - GetView().GetNegY()) + GetView().GetNegY();
+	if (NoCurrentCoord())
+	{
+		return;
+	}
 
-	GetCurrentCoord().PointClicked(TPPoint(pX, pY));
+	GetCurrentCoord().PointClicked(ClientToIllusion( TPPoint(x, y)));
+}
+
+void TPUI::HoverPoint(int x, int y)
+{
+	if (NoCurrentCoord())
+	{
+		return;
+	}
+	
+	TPPoint p = ClientToIllusion(TPPoint(x, y));
+	GetCurrentCoord().PointClicked(ClientToIllusion(TPPoint(x, y)));
 }
 
 TPView& TPUI::GetView()

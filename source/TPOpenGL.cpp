@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include <algorithm>
 #include "TPOpenGL.h"
 
@@ -79,6 +78,7 @@ BEGIN_MESSAGE_MAP(TPOpenGL, CWnd)
     ON_WM_LBUTTONUP()
     ON_WM_LBUTTONDBLCLK()
     ON_WM_RBUTTONDBLCLK()
+	ON_WM_MOUSEHOVER()
 END_MESSAGE_MAP()
 
 
@@ -94,8 +94,6 @@ void TPOpenGL::PreSubclassWindow()
 
     TPInitGL();
     TPInitUI(m_hWnd);
-
-
 
     CWnd::PreSubclassWindow();
 }
@@ -113,7 +111,6 @@ int TPOpenGL::OnCreate(LPCREATESTRUCT lpCreateStruct)
 void TPOpenGL::OnPaint()
 {
     CPaintDC dc(this); // device context for painting
-    // TODO: Add your message handler code here
     // Do not call CWnd::OnPaint() for painting messages
 
     ui.Render();
@@ -123,7 +120,6 @@ void TPOpenGL::OnPaint()
 
 void TPOpenGL::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: Add your message handler code here and/or call default
     if (nIDEvent == REDRAW_TIMER_ID)
     {
         ::InvalidateRect(m_hWnd, NULL, FALSE);
@@ -134,7 +130,6 @@ void TPOpenGL::OnTimer(UINT_PTR nIDEvent)
 
 BOOL TPOpenGL::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-    // TODO: Add your message handler code here and/or call default
     ::ScreenToClient(m_hWnd, &pt);
 
     if (zDelta > 0)
@@ -157,8 +152,6 @@ BOOL TPOpenGL::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 
 void TPOpenGL::OnLButtonDown(UINT nFlags, CPoint point)
 {
-    // TODO: Add your message handler code here and/or call default
-
     if (ui.InIllusionSection(point.x, point.y))
     {
         ui.StartTranslate(point.x, point.y);
@@ -170,10 +163,18 @@ void TPOpenGL::OnLButtonDown(UINT nFlags, CPoint point)
 
 void TPOpenGL::OnMouseMove(UINT nFlags, CPoint point)
 {
-    // TODO: Add your message handler code here and/or call default
     if (ui.InIllusionSection(point.x, point.y))
     {
-        ui.Translate(point.x, point.y);
+		bool translate = ui.Translate(point.x, point.y);
+		if (!translate)
+		{
+			TRACKMOUSEEVENT tme;
+			tme.cbSize = sizeof(tme);
+			tme.dwFlags = TME_HOVER;
+			tme.dwHoverTime = 250;
+			tme.hwndTrack = m_hWnd;
+			::TrackMouseEvent(&tme);
+		}
     }
     else
     {
@@ -186,7 +187,6 @@ void TPOpenGL::OnMouseMove(UINT nFlags, CPoint point)
 
 void TPOpenGL::OnLButtonUp(UINT nFlags, CPoint point)
 {
-    // TODO: Add your message handler code here and/or call default
     if (ui.InTranslating())
     {
         ui.StopTranslate();
@@ -209,8 +209,6 @@ void TPOpenGL::OnLButtonDblClk(UINT nFlags, CPoint point)
 
 void TPOpenGL::OnRButtonDblClk(UINT nFlags, CPoint point)
 {
-    // TODO: Add your message handler code here and/or call default
-
     if (ui.InIllusionSection(point.x, point.y))
     {
         ui.StartScaleAnimation(point.x, point.y, false);
@@ -219,6 +217,13 @@ void TPOpenGL::OnRButtonDblClk(UINT nFlags, CPoint point)
     CWnd::OnRButtonDblClk(nFlags, point);
 }
 
+void TPOpenGL::OnMouseHover(UINT nFlags, CPoint point)
+{
+	if (ui.InIllusionSection(point.x, point.y))
+	{
+		ui.HoverPoint(point.x, point.y);
+	}
+}
 
 void TPOpenGL::PredictModel1(CTime predictFrom, CTime predictTo)
 {

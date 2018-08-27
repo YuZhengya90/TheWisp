@@ -1,6 +1,4 @@
-﻿#include "stdafx.h"
-
-#include "freetype/ft2build.h"
+﻿#include "freetype/ft2build.h"
 
 #include "freetype/freetype.h"
 #include "freetype/ftglyph.h"

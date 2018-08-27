@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "TPFont.h"
 #include "TPCoordinate.h"
 
@@ -7,7 +6,7 @@
 #define TPCOORD_REFR_X_COUNT  10
 #define TPCOORD_REFR_Y_COUNT   6
 #define TPCOORD_REFR_MICROLH 100
-#define TPCOORD_FONT_X_REFIX  0.014
+#define TPCOORD_FONT_X_REFIX  0.012
 #define TPCOORD_FONT_Y_REFIX  0.007
 
 void TPCoordinate::SetXAnchor(TPDate minX, TPDate maxX)
@@ -55,10 +54,13 @@ void TPCoordinate::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts,
     mDrawingType = type;
     mDrawingSize = size;
 
+	mDrawingPoints.clear();
     for (unsigned i = 0; i < szPts; ++i)
     {
         mDrawingPoints.push_back(TPPoint(pts[i]));
     }
+
+	mClickedPoints = -1;
 }
 
 void TPCoordinate::RenderPoints()
@@ -137,7 +139,7 @@ void TPCoordinate::RenderMesh()
         glVertex3f(ix, TP_MAX(mMaxY,mView.GetPosY()), 0);
         glEnd();
         glDisable(GL_LINE_STIPPLE);
-        last = ix;
+        last = ix;		
     }
 
     if (mView.GetNegX() < mMinX)
@@ -216,6 +218,77 @@ void TPCoordinate::RenderMesh()
     }
 }
 
+void TPCoordinate::RenderCrossLine()
+{
+	if (mView.DoingAnimation())
+	{
+		return;
+	}
+
+	unsigned szPts = mDrawingPoints.size();
+	for (unsigned i = 0; i < szPts; ++i)
+	{
+		if (mClickedPoints == i)
+		{
+			float fontReFixX = (mView.GetPosX() - mView.GetNegX()) * TPCOORD_FONT_X_REFIX * 2;
+			float fontReFixY = (mView.GetPosY() - mView.GetNegY()) * TPCOORD_FONT_Y_REFIX;
+
+			glColor3f(0.8, 0.3, 0.3);
+			glEnable(GL_LINE_STIPPLE);
+			glLineStipple(1, 0x1F1F);
+			glBegin(GL_LINES);
+			glVertex3f(mView.GetNegX() - fontReFixX, mDrawingPoints[i].y, 0);
+			glVertex3f(mView.GetPosX() - fontReFixX, mDrawingPoints[i].y, 0);
+			glEnd();
+			glDisable(GL_LINE_STIPPLE);
+
+			char value[16] = { 0 };
+			if (mYType == XY_INT)
+			{
+				sprintf_s(value, "%d", (int)roundf(mDrawingPoints[i].y));
+				TPDisplayString(value, mView.GetPosX() -  fontReFixX, 
+					TP_MAX(mDrawingPoints[i].y - fontReFixY, mView.GetNegY() + fontReFixY * 0.2));
+			}
+
+			else
+			{
+				sprintf_s(value, "%.2f", mDrawingPoints[i].y);
+				TPDisplayString(value, mView.GetPosX() - fontReFixX, 
+					TP_MAX(mDrawingPoints[i].y - fontReFixY, mView.GetNegY() + fontReFixY * 0.2));
+			}
+
+
+			glEnable(GL_LINE_STIPPLE);
+			glLineStipple(1, 0x1F1F);
+			glBegin(GL_LINES);
+			glVertex3f(mDrawingPoints[i].x, mView.GetNegY() - 4 * fontReFixY, 0);
+			glVertex3f(mDrawingPoints[i].x, mView.GetPosY() - 4 * fontReFixY, 0);
+			glEnd();
+			glDisable(GL_LINE_STIPPLE);
+
+			if (mXType == XY_DATE)
+			{
+				TPDate curDate = TPDate::FromInt((int)roundf(mDrawingPoints[i].x));
+				TPDisplayString(curDate.ToString().c_str(), TP_MAX((mDrawingPoints[i].x - fontReFixX), mView.GetNegX() + fontReFixX * 0.2)
+					, mView.GetPosY() - 3 * fontReFixY);
+			}
+			else if (mXType == XY_INT)
+			{
+				sprintf_s(value, "%d", (int)roundf(mDrawingPoints[i].x));
+				TPDisplayString(value, TP_MAX((mDrawingPoints[i].x - fontReFixX), mView.GetNegX() + fontReFixX * 0.2)
+					, mView.GetPosY() - 3 * fontReFixY);
+			}
+
+			else
+			{
+				sprintf_s(value, "%.2f", mDrawingPoints[i].x);
+				TPDisplayString(value, TP_MAX((mDrawingPoints[i].x - fontReFixX), mView.GetNegX() + fontReFixX * 0.2)
+					, mView.GetPosY() - 3 * fontReFixY);
+			}
+		}
+	}
+}
+
 void TPCoordinate::RenderReferenceValue()
 {
 	float step;
@@ -226,84 +299,90 @@ void TPCoordinate::RenderReferenceValue()
 
     unsigned loopCount = 1;
 	step = GetSuitableXStep();
-    for (float ix = mMinX + step; ix < mMaxX - step / 2; ix += step)
-    {
-        glBegin(GL_LINES);
-        glVertex3f(ix, mMinY + microX, 0);
-        glVertex3f(ix, mMinY, 0);
-        glEnd();
-        loopCount++;
-    }
-
-    float fontValueStepX = (mView.GetPosX() - mView.GetNegX()) / loopCount;
-    loopCount = 1;
-    for (float ix = mMinX + step; ix < mMaxX - step / 2; ix += step)
-    {
-        char value[16] = { 0 };
-		float curValue = mView.GetNegX() + fontValueStepX * loopCount;
-
-		if (mXType == XY_DATE)
+	if (step > 0.0f)
+	{
+		for (float ix = mMinX + step; ix < mMaxX - step / 2; ix += step)
 		{
-			TPDate curDate = TPDate::FromInt((int)curValue);
-			TPDisplayString(curDate.ToString().c_str(), ix - 2 * fontReFixX, mMinY + microX * 2);
+			glBegin(GL_LINES);
+			glVertex3f(ix, mMinY + microX, 0);
+			glVertex3f(ix, mMinY, 0);
+			glEnd();
+			loopCount++;
 		}
 
-		else if (mXType == XY_INT)
+		float fontValueStepX = (mView.GetPosX() - mView.GetNegX()) / loopCount;
+		loopCount = 1;
+		for (float ix = mMinX + step; ix < mMaxX - step / 2; ix += step)
 		{
-			sprintf_s(value, "%d", (int)curValue);
-			TPDisplayString(value, ix - fontReFixX, mMinY + microX * 2);
-		}
+			char value[16] = { 0 };
+			float curValue = mView.GetNegX() + fontValueStepX * loopCount;
 
-		else
-		{
-			sprintf_s(value, "%.2f", curValue);
-			TPDisplayString(value, ix - fontReFixX, mMinY + microX * 2);
-		}
+			if (mXType == XY_DATE)
+			{
+				TPDate curDate = TPDate::FromInt((int)roundf(curValue));
+				TPDisplayString(curDate.ToString().c_str(), ix - 2 * fontReFixX, mMinY + microX * 2);
+			}
 
-        loopCount++;
-    }
+			else if (mXType == XY_INT)
+			{
+				sprintf_s(value, "%d", (int)roundf(curValue));
+				TPDisplayString(value, ix - fontReFixX, mMinY + microX * 2);
+			}
+
+			else
+			{
+				sprintf_s(value, "%.2f", curValue);
+				TPDisplayString(value, ix - fontReFixX, mMinY + microX * 2);
+			}
+
+			loopCount++;
+		}
+	}
+
 
     loopCount = 1;
 	step = GetSuitableYStep();
-    for (float iy = mMinY + step; iy < mMaxY - step / 2; iy += step)
-    {
-        glBegin(GL_LINES);
-        glVertex3f(mMinX + microY, iy, 0);
-        glVertex3f(mMinX, iy, 0);
-        glEnd();
-        loopCount++;
-
-    }
-
-    float fontValueStepY = (mView.GetPosY() - mView.GetNegY()) / loopCount;
-    loopCount = 1;
-    for (float iy = mMinY + step; iy < mMaxY - step / 2; iy += step)
-    {
-        char value[16] = { 0 };
-		float curValue = mView.GetNegY() + fontValueStepY * loopCount;
-
-		if (mYType == XY_INT)
+	if (step > 0.0f)
+	{
+		for (float iy = mMinY + step; iy < mMaxY - step / 2; iy += step)
 		{
-			sprintf_s(value, "%d", (int)curValue);
-			TPDisplayString(value, mMinX + microY * 2, iy - fontReFixY);
+			glBegin(GL_LINES);
+			glVertex3f(mMinX + microY, iy, 0);
+			glVertex3f(mMinX, iy, 0);
+			glEnd();
+			loopCount++;
+
 		}
 
-		else
+		float fontValueStepY = (mView.GetPosY() - mView.GetNegY()) / loopCount;
+		loopCount = 1;
+		for (float iy = mMinY + step; iy < mMaxY - step / 2; iy += step)
 		{
-			sprintf_s(value, "%.2f", curValue);
-			TPDisplayString(value, mMinX + microY * 2, iy - fontReFixY);
-		}
+			char value[16] = { 0 };
+			float curValue = mView.GetNegY() + fontValueStepY * loopCount;
 
-        loopCount++;
-    }
+			if (mYType == XY_INT)
+			{
+				sprintf_s(value, "%d", (int)roundf(curValue));
+				TPDisplayString(value, mMinX + microY * 2, iy - fontReFixY);
+			}
+
+			else
+			{
+				sprintf_s(value, "%.2f", curValue);
+				TPDisplayString(value, mMinX + microY * 2, iy - fontReFixY);
+			}
+
+			loopCount++;
+		}
+	}
 }
 
 float TPCoordinate::GetSuitableXStep()
 {
-	int refCount = TPCOORD_REFR_X_COUNT;
 	if (mXType == XY_INT || mXType == XY_DATE)
 	{
-		int duration = (int)(mMaxX - mMinX);
+		int duration = (int)roundf((mMaxX - mMinX));
 		const int delta[] = { 5, 6, 8, 10 };
 		const int deltaSize = sizeof(delta) / sizeof(delta[0]);
 		while (true)
@@ -312,7 +391,12 @@ float TPCoordinate::GetSuitableXStep()
 			{
 				if (duration % delta[i] == 0)
 				{
-					return (int)(mMaxX - mMinX) / delta[i];
+					if ((int)roundf(mMaxX - mMinX) >= delta[i])
+					{
+						return (int)roundf(mMaxX - mMinX) / delta[i];
+					}
+					
+					return -1;
 				}
 			}
 			duration++;
@@ -325,7 +409,6 @@ float TPCoordinate::GetSuitableXStep()
 
 float TPCoordinate::GetSuitableYStep()
 {
-	int refCount = TPCOORD_REFR_Y_COUNT;
 	if (mYType == XY_INT)
 	{
 		int duration = (int)(mMaxY - mMinY);
@@ -337,15 +420,18 @@ float TPCoordinate::GetSuitableYStep()
 			{
 				if (duration % delta[i] == 0)
 				{
-					refCount = delta[i];
-					return (int)(mMaxY - mMinY) / delta[i];
+					if ((int)roundf(mMaxY - mMinY) >= delta[i])
+					{
+						return (int)roundf(mMaxY - mMinY) / delta[i];
+					}
+					return -1;
 				}
 			}
 			duration++;
 		}
 	}
 
-	return (mMaxY - mMinY) / refCount;
+	return (mMaxY - mMinY) / TPCOORD_REFR_Y_COUNT;
 }
 
 int TPCoordinate::PointClicked(TPPoint illuP)
@@ -354,12 +440,20 @@ int TPCoordinate::PointClicked(TPPoint illuP)
 	float disX = (mMaxX - mMinX) / szPts * 0.4;
 	float disY = (mMaxY - mMinY) / (mMaxX - mMinX) * 0.6;
 	
-	for (int i = 0; i < szPts; ++i)
+	for (unsigned i = 0; i < szPts; ++i)
 	{
 		if (illuP.x > mDrawingPoints[i].x - disX && illuP.x < mDrawingPoints[i].x + disX
 			&& illuP.y > mDrawingPoints[i].y - disY && illuP.y < mDrawingPoints[i].y + disY)
 		{
-			mClickedPoints = (i);
+			/*if (mClickedPoints == i)
+			{
+				mClickedPoints = -1;
+			}
+			else
+			{
+				mClickedPoints = (i);
+			}*/
+			mClickedPoints = i;
 			return i;
 		}
 	}

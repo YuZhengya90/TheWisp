@@ -23,6 +23,8 @@ public:
     float GetNegY()const { return mNegY; }
     float GetPosY()const { return mPosY; }
 
+	bool DoingAnimation() const { return mTpAnimation.mDoing; }
+
     void SetAnchor(float minX, float maxX, float minY, float maxY){
         mNegX = minX;
         mPosX = maxX;
