@@ -41,7 +41,6 @@ public class Delivery
 			suggestion = operationAdvice.solve(featureVector);
 			double salePrice = ((Number) suggestion.getFieldValue("SalePrice")).doubleValue();
 			int purchaseQuantity = ((Number) suggestion.getFieldValue("PurchaseQuantity")).intValue();
-			double dailyProfit = ((Number) suggestion.getFieldValue("Profit")).doubleValue();
 			
 			featureVector = purchasePricePredict.createFeatureVector();
 			featureVector.setValue("Year", today.getYear());
@@ -50,7 +49,7 @@ public class Delivery
 			dayOfWeek = today.getDayOfWeek().getValue() % DayOfWeek.SUNDAY.getValue();
 			featureVector.setValue("WeekDay", dayOfWeek);
 			suggestion = purchasePricePredict.solve(featureVector);
-//			double purchasePrice = ((Number) suggestion.getFieldValue("Price")).doubleValue();
+			double purchasePrice = ((Number) suggestion.getFieldValue("Price")).doubleValue();
 			
 			featureVector = saleCommentsPredict.createFeatureVector();
 			featureVector.setValue("Year", today.getYear());
@@ -71,7 +70,7 @@ public class Delivery
 			int saleQuantity = ((Number) suggestion.getFieldValue("SalesQuantity")).intValue();
 			
 			stockQuantity += purchaseQuantity - saleQuantity;
-			profit += dailyProfit;
+			profit += salePrice * saleQuantity - purchasePrice * purchaseQuantity;
 			System.out.println(today.toString() + '\t' + purchaseQuantity + '\t' + saleQuantity + '\t' + stockQuantity + '\t' + profit);
 			today = today.plusDays(1);
 		}
