@@ -48,6 +48,8 @@ protected:
 public:
     void PredictModel1(CTime predictFrom, CTime predictTo);
     void PredictModel2(CTime predictFrom, CTime predictTo);
-    void PredictModel4(CTime predictFrom, CTime predictTo, double dStockQty, double dSalesPrice, double dPurQty, double dPurPrice);
+    void PredictModel3(CTime predictAt, double dStockQty, double dSalesPrice);
+    void PredictModel4(CTime predictWhen, CTime predictTo, double dStockQty, double dSalesPrice, double dPurQty, double dPurPrice);
+    void PredictModel5(CTime predictWhen, CTime predictTo, double dStockQty);
 };
 

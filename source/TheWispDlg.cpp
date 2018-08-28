@@ -220,7 +220,7 @@ void CTheWispDlg::OnBnClickedBtnPredict()
             CTime predictAt;
             m_dateAtPredict3.GetTime(predictAt);
 
-            //m_ctrlChart.PredictModel2();
+            m_ctrlChart.PredictModel3(predictAt, m_dStockQtyPredict3, m_dSalesPricePredict3);
         }
         break;
         case 3:
@@ -235,7 +235,11 @@ void CTheWispDlg::OnBnClickedBtnPredict()
         break;
         case 4:
         {
+            CTime predictWhen, predictTo;
+            m_dateWhenPredict5.GetTime(predictWhen);
+            m_dateToPredict5.GetTime(predictTo);
 
+            m_ctrlChart.PredictModel5(predictWhen, predictTo, m_dStockQtyPredict5);
         }
         break;
     }
