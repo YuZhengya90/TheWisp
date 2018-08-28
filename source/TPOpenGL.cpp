@@ -1,6 +1,8 @@
 #include <algorithm>
 #include "..\resource.h"
 
+#define _WIN32_WINNT _WIN32_WINNT_MAXVER
+
 #include "afxdialogex.h"
 #include "TheWispDlg.h"
 
@@ -11,7 +13,7 @@
 
 TPOpenGL::TPOpenGL()
 {
-    if (!jar.Init())
+    if (!jar.Init("data-mining/models/"))
     {
         MessageBoxA(m_hWnd, "", "JAR init failed", MB_OK);
     }
@@ -313,14 +315,23 @@ void TPOpenGL::OnAbout()
 	dlgAbout.DoModal();
 }
 
+
 void TPOpenGL::PredictModel1(CTime predictFrom, CTime predictTo)
 {
     TPDate dateFrom(predictFrom.GetYear(), predictFrom.GetMonth(), predictFrom.GetDay());
     TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
+#if 1
 
-    jar.PurchasePricePredictionSetModelPath("D:/GitHub/DataMining/models/");
     vector<double> dbrsult = jar.PurchasePricePredictionPredictPrice(dateFrom, dateTo);
     vector<TPDate> dtX = TPDate::GetVector(dateFrom, dateTo);
+
+	//vector<double> dbrsult = jar.SalePricePredictionPredictPrice(dateFrom, dateTo);
+	//vector<TPDate> dtX = TPDate::GetVector(dateFrom, dateTo);
+
+	//vector<double> dbrsult = jar.SaleQuantityPredictionPredictSaleQuantity(dateTo, 5.99f, 100);
+
+	//vector<double> dbrsult = jar.ProfitPredictionPredictProfit(dateFrom, dateTo, 100, 2.59, 100, 5.99);
+	//vector<double> dbrsult = jar.OperationAdviceAdvice(dateFrom,dateTo, 100);
 
     TPCoordinate* coordinate = ui.GetCoordinateByName("1");
     if (coordinate == nullptr)
@@ -333,8 +344,21 @@ void TPOpenGL::PredictModel1(CTime predictFrom, CTime predictTo)
     double duration = *pairMinMax.second - *pairMinMax.first;
     coordinate->SetYAnchor(*pairMinMax.first - 0.50 * duration, *pairMinMax.second + 0.50 * duration);
     coordinate->SetDrawingPoints<TPDate, double>(RP_POINT, 8, dtX, dbrsult);
+	coordinate->DrawPoints(true);
 
     ui.setCurrentCoordByName("1");
+#else
+
+	TPCoordinate* coordinate = ui.GetCoordinateByName("1");
+	if (coordinate == nullptr)
+	{
+		coordinate = ui.AddCoordinate("1");
+	}
+
+	vector<string> sdf;
+	vector<double> sd;
+	coordinate->SetTable("Profit Prediction", dateFrom, dateTo, 1, 1, sdf, sd);
+#endif
 }
 
 void TPOpenGL::PredictModel2(CTime predictFrom, CTime predictTo)

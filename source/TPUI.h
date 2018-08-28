@@ -17,8 +17,6 @@ class TPUI
 private:
     void RenderIllusion();
     void DisplayIllusionBorder();
-    void RenderMenu();
-    void DisplayMenuBorder();
 
 	bool NoCurrentCoord(){ return mCurrCoordOrder < 0; }
     TPCoordinate& GetCurrentCoord();

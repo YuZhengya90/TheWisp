@@ -15,12 +15,32 @@ public:
 	TPJar();
 	~TPJar();
 
-	bool Init();
-	void PurchasePricePredictionSetModelPath(const char* str);
+	bool Init(const char* modelPath);
+	
+	// return [sDay, eDay]'s purchase price vector.
 	vector<double> PurchasePricePredictionPredictPrice(TPDate sDay, TPDate eDay);
+
+	// return [sDay, eDay]'s sales price vector.
+	vector<double> SalePricePredictionPredictPrice(TPDate sDay, TPDate eDay);
+
+	// return the [AtDay]'s sale quantity.
+	vector<double> SaleQuantityPredictionPredictSaleQuantity(TPDate atDay, float price, int stockQuantity);
+
+	// return [today, targetDay]'s profit vector.
+	vector<double> ProfitPredictionPredictProfit(
+		TPDate today, TPDate targetDay, int stockQuantity, float purchasePrice, int purchaseQuantity, float salePrice);
+
+	// return the [SalePrice,PurchaseQuantity,Profit]
+	vector<double> OperationAdviceAdvice(TPDate today, TPDate targetDay, int stockQuantity);
 
 private:
 	
+	void PurchasePricePredictionSetModelPath(const char* str);
+	void SalePricePredictionSetModelPath(const char* str);
+	void SaleQuantityPredictionSetModelPath(const char* str);
+	void ProfitPredictionSetModelPath(const char* str);
+	void OperationAdviceSetModelPath(const char* str);
+
 	void DeInit();
 
 	JavaVM * mJVM;

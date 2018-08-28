@@ -45,35 +45,6 @@ TPPoint TPUI::ClientToIllusion(const TPPoint& p)
 	return TPPoint(pX, pY);
 }
 
-void TPUI::DisplayMenuBorder()
-{
-    GLfloat x = MENU_W / 2;
-    GLfloat y = MENU_H / 2;
-
-    glColor3f(0.3, 0.4, 0.4);
-    glLineWidth(2.0);
-    glBegin(GL_LINE_STRIP);
-    glVertex3f(-x, y, 0);
-    glVertex3f(-x, -y, 0);
-    glVertex3f(x, -y, 0);
-    glVertex3f(x, y, 0);
-    glVertex3f(-x, y, 0);
-    glEnd();
-    glLineWidth(1.0);
-}
-
-void TPUI::RenderMenu()
-{
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-MENU_W / 2, MENU_W / 2, -MENU_H / 2, MENU_H / 2, -1, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glViewport(SCRN_B, SCRN_B, MENU_W, MENU_H);
-
-    DisplayMenuBorder();
-}
-
 TPUI::TPUI()
 	: mDoingAnimation(false), mCurrCoordOrder(-1)
 {
@@ -108,11 +79,12 @@ void TPUI::Render()
 		GetCurrentCoord().RenderCrossLine();
 	}
 	
-	GetCurrentCoord().RenderPoints();
-
-    //RenderMenu();
-    RenderIllusion();
-    GetCurrentCoord().RenderReferenceValue();
+	if (GetCurrentCoord().EnableDrawPoints())
+	{
+		GetCurrentCoord().RenderPoints();
+		RenderIllusion();
+		GetCurrentCoord().RenderReferenceValue();
+	}    
 }
 
 void TPUI::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts, unsigned szPts)
