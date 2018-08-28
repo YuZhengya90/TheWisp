@@ -69,6 +69,11 @@ void TPOpenGL::TPInitGL()
 
 void TPOpenGL::TPInitUI(HWND hwnd)
 {
+    ui.GetCoordinateByName("1");
+    ui.GetCoordinateByName("2");
+    ui.GetCoordinateByName("3");
+    ui.GetCoordinateByName("4");
+    ui.GetCoordinateByName("5");
 }
 
 BEGIN_MESSAGE_MAP(TPOpenGL, CWnd)
@@ -366,13 +371,8 @@ void TPOpenGL::PredictModel2(CTime predictFrom, CTime predictTo)
     TPDate dateFrom(predictFrom.GetYear(), predictFrom.GetMonth(), predictFrom.GetDay());
     TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
 
-    vector<double> dbrsult = jar.PurchasePricePredictionPredictPrice(dateFrom, dateTo);
-    TPPoint* pts = (TPPoint*)malloc(dbrsult.size() * sizeof(TPPoint));
-    for (unsigned i = 0; i < dbrsult.size(); ++i)
-    {
-        pts[i].x = dateFrom.ToInt() + i;
-        pts[i].y = (float)dbrsult[i];
-    }
+    vector<double> dbrsult = jar.SalePricePredictionPredictPrice(dateFrom, dateTo);
+    vector<TPDate> dtX = TPDate::GetVector(dateFrom, dateTo);
 
     TPCoordinate* coordinate = ui.GetCoordinateByName("2");
     if (coordinate == nullptr)
@@ -381,9 +381,45 @@ void TPOpenGL::PredictModel2(CTime predictFrom, CTime predictTo)
     }
 
     coordinate->SetXAnchor(dateFrom - 1, dateTo + 1);
-    coordinate->SetYAnchor(1.0, 4.0);
-    coordinate->SetDrawingPoints(RP_CURVE, 3, pts, dbrsult.size());
-    free(pts);
+    auto pairMinMax = std::minmax_element(dbrsult.begin(), dbrsult.end());
+    double duration = *pairMinMax.second - *pairMinMax.first;
+    coordinate->SetYAnchor(*pairMinMax.first - 0.50 * duration, *pairMinMax.second + 0.50 * duration);
+    coordinate->SetDrawingPoints<TPDate, double>(RP_POINT, 8, dtX, dbrsult);
+    coordinate->DrawPoints(true);
 
     ui.setCurrentCoordByName("2");
+}
+
+void TPOpenGL::PredictModel3(CTime predictAt, double dStockQty, double dSalesPrice)
+{
+
+}
+
+void TPOpenGL::PredictModel4(CTime predictWhen, CTime predictTo, double dStockQty, double dSalesPrice, double dPurQty, double dPurPrice)
+{
+    TPDate dateWhen(predictWhen.GetYear(), predictWhen.GetMonth(), predictWhen.GetDay());
+    TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
+
+    vector<double> dbrsult = jar.ProfitPredictionPredictProfit(dateWhen, dateTo, dStockQty, dSalesPrice, dPurQty, dPurPrice);
+    vector<TPDate> dtX = TPDate::GetVector(dateWhen, dateTo);
+
+    TPCoordinate* coordinate = ui.GetCoordinateByName("4");
+    if (coordinate == nullptr)
+    {
+        coordinate = ui.AddCoordinate("4");
+    }
+
+    coordinate->SetXAnchor(dateWhen - 1, dateTo + 1);
+    auto pairMinMax = std::minmax_element(dbrsult.begin(), dbrsult.end());
+    double duration = *pairMinMax.second - *pairMinMax.first;
+    coordinate->SetYAnchor(*pairMinMax.first - 0.50 * duration, *pairMinMax.second + 0.50 * duration);
+    coordinate->SetDrawingPoints<TPDate, double>(RP_POINT, 8, dtX, dbrsult);
+    coordinate->DrawPoints(true);
+
+    ui.setCurrentCoordByName("4");
+}
+
+void TPOpenGL::PredictModel5(CTime predictWhen, CTime predictTo, double dStockQty)
+{
+
 }

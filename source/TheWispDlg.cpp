@@ -225,7 +225,12 @@ void CTheWispDlg::OnBnClickedBtnPredict()
         break;
         case 3:
         {
+            CTime predictWhen, predictTo;
 
+            m_dateWhenPredict4.GetTime(predictWhen);
+            m_dateToPredict4.GetTime(predictTo);
+
+            m_ctrlChart.PredictModel4(predictWhen, predictTo, m_dStockQtyPredict4, m_dSalesPricePredict4, m_dPurQtyPredict4, m_dPurPricePredict4);
         }
         break;
         case 4:
@@ -244,27 +249,27 @@ void CTheWispDlg::OnRadioBtnGroup0Clicked()
     {
         case 0:
         {
-
+            m_ctrlChart.ui.setCurrentCoordByName("1");
         }
         break;
         case 1:
         {
-
+            m_ctrlChart.ui.setCurrentCoordByName("2");
         }
         break;
         case 2:
         {
-
+            m_ctrlChart.ui.setCurrentCoordByName("3");
         }
         break;
         case 3:
         {
-
+            m_ctrlChart.ui.setCurrentCoordByName("4");
         }
         break;
         case 4:
         {
-
+            m_ctrlChart.ui.setCurrentCoordByName("5");
         }
         break;
         default:
