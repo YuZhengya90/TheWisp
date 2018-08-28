@@ -147,7 +147,8 @@ public class OperationAdvice extends AbstractModel
 
 		int purchaseQuantityCeil = (int) (histPurchaseQuantityMax * 1.2);
 		int purchaseQuantityFloor = (int) (histPurchaseQuantityMin * 0.8);
-		int purchaseQuantityPortion = (purchaseQuantityCeil - purchaseQuantityFloor) / 10;
+		int purchaseQuantityPortion = (purchaseQuantityCeil - purchaseQuantityFloor) / 100;
+		purchaseQuantityPortion = (0 == purchaseQuantityPortion ? 1 : purchaseQuantityPortion);
 		Suggestion suggestion = null;
 		int optimalPurchaseQuantity = 0;
 		double optimalProfit = 0.0;
@@ -199,10 +200,11 @@ public class OperationAdvice extends AbstractModel
 
 		int purchaseQuantityCeil = (int) (histPurchaseQuantityMax * 1.2);
 		int purchaseQuantityFloor = (int) (histPurchaseQuantityMin * 0.8);
-		int purchaseQuantityPortion = (purchaseQuantityCeil - purchaseQuantityFloor) / 10;
+		int purchaseQuantityPortion = (purchaseQuantityCeil - purchaseQuantityFloor) / 100;
+		purchaseQuantityPortion = (0 == purchaseQuantityPortion ? 1 : purchaseQuantityPortion);
 		double salePriceCeil = (histSalePriceMax * 1.2);
 		double salePriceFloor = (histSalePriceMin * 0.8);
-		double salePricePortion = (salePriceCeil - salePriceFloor) / 10.0;
+		double salePricePortion = (salePriceCeil - salePriceFloor) / 100.0;
 		Suggestion suggestion = null;
 		int optimalPurchaseQuantity = 0;
 		double optimalSalePrice = 0.0;
