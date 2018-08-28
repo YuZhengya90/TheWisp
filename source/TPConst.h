@@ -12,15 +12,15 @@
 #define WINDOW_TITLE     "TheWisp"
 
 // menu width height item height, item gap, item width
-#define MENU_W              200
-#define MENU_H              600/*(SCRN_H - 2*SCRN_B)*/
-#define MENU_ITEM_W         160
-#define MENU_ITEM_H          40
-#define MENU_ITEM_G          20
+//#define MENU_W              200
+//#define MENU_H              600/*(SCRN_H - 2*SCRN_B)*/
+//#define MENU_ITEM_W         160
+//#define MENU_ITEM_H          40
+//#define MENU_ITEM_G          20
 
 
 // illusion width, height, coordinate x point, y point.
-#define ILLU_W             1240/*(SCRN_W - 4*SCRN_B - MENU_W)*/
+#define ILLU_W             1240/*(SCRN_W - 2*SCRN_B)*/
 #define ILLU_H              600/*(SCRN_H - 2*SCRN_B)*/
 
 #define TP_MIN(a,b) ((a) < (b) ? (a) : (b))

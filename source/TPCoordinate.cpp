@@ -51,9 +51,11 @@ void TPCoordinate::SetYAnchor(int minY, int maxY)
 
 void TPCoordinate::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts, unsigned szPts)
 {
-    mDrawingType = type;
-    mDrawingSize = size;
+    mDrawingType = 0;
+	mDrawingType |= (int)type;
+	mDrawingType |= mEnableCurve ? (int)RP_CURVE : 0;
 
+    mDrawingSize = size;
 	mDrawingPoints.clear();
     for (unsigned i = 0; i < szPts; ++i)
     {
@@ -61,6 +63,12 @@ void TPCoordinate::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts,
     }
 
 	mClickedPoints = -1;
+}
+
+void TPCoordinate::SetTable(const std::string& caption, TPDate from, TPDate to,
+	unsigned rows, unsigned cols, std::vector<std::string> titles, std::vector<double> values)
+{
+	TPDisplayString2(caption.c_str(), 500, 300, 40, 0);
 }
 
 void TPCoordinate::RenderPoints()

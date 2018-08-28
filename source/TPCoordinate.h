@@ -1,7 +1,6 @@
 #pragma once
-
-#include "TPConst.h"
 #include <vector>
+#include "TPConst.h"
 #include "TPEnvironment.h"
 #include "TPView.h"
 
@@ -25,7 +24,8 @@ public:
         : mId(id), mName(name), mXName(nullptr), mYName(nullptr)
         , mMinX(0), mMaxX(10), mMinY(0), mMaxY(10) 
 		, mXType(XY_FLOAT), mYType(XY_FLOAT), mClickedPoints(-1)
-		, mEnableCrossLine(true), mEnableCurve(false), mEnableMesh(true)
+		, mEnableCrossLine(false), mEnableCurve(false), mEnableMesh(false)
+		, mDraw(false)
     { }
     
 	// X Anchor initialized with Date value.
@@ -58,7 +58,10 @@ public:
 	template<typename T, typename P>
 	void SetDrawingPoints(TPCoord_RP_T type, float size, std::vector<T> xVecValues, std::vector<P> yVecValues)
 	{
-		mDrawingType = type;
+		mDrawingType = 0;
+		mDrawingType |= (int)type;
+		mDrawingType |= mEnableCurve ? (int)RP_CURVE : 0;
+
 		mDrawingSize = size;
 
 		int xSize = xVecValues.size();
@@ -75,12 +78,35 @@ public:
 
 		mClickedPoints = -1;
 	}
+
+	//           ------------------                   ----------------------
+	//           |   Advice       |                   |20180101~20180201   |
+	//           ------------------                   ----------------------
+	//           ------------------------------------------------------------
+	//           |  SalePrice       |    PurchaseQuantity     |    Profit   |
+	//           ------------------------------------------------------------
+	//           |   5.99           |         1130            |     5320    |
+	//           ------------------------------------------------------------
+	//
+	//           Advice = caption 
+	//           from ~ to
+	//           rows = 2 cols = 3 titles = {"SalePrice", "PurchaseQuantitiy", "Profit"}, values = {5.99, 1130, 5320}
+
+	void SetTable(const std::string& caption, TPDate from, TPDate to, 
+		unsigned rows, unsigned cols, /*rows is the real row (include titles.)*/
+		std::vector<std::string> titles, std::vector<double> values);
     
+
+	void DrawPoints(bool bDraw) { mDraw = bDraw; }
+	bool EnableDrawPoints() const {
+		return mDraw;
+	}
 
 	void RenderPoints();
     void RenderMesh();
 	void RenderCrossLine();
     void RenderReferenceValue();
+	
 
 	int HoverPoint(TPPoint p);
 	
@@ -151,4 +177,6 @@ private:
 	bool mEnableCrossLine;
 	bool mEnableCurve;
 	bool mEnableMesh;
+
+	bool mDraw;
 };
