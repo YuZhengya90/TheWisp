@@ -1,4 +1,4 @@
-package horus.datamining;
+package horus.datamining.test;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -7,7 +7,6 @@ import horus.datamining.env.EnvironmentImpl;
 import horus.datamining.model.*;
 import horus.datamining.model.feature.FeatureVector;
 import horus.datamining.wrapper.OperationAdviceWrapper;
-import horus.datamining.wrapper.ProfitPredictionWrapper;
 
 
 public final class Test

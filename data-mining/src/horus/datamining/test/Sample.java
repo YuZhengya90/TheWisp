@@ -1,4 +1,4 @@
-package horus.datamining;
+package horus.datamining.test;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
