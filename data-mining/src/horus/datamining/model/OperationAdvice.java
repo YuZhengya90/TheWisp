@@ -79,19 +79,7 @@ public class OperationAdvice extends AbstractModel
 			featureVector.setValue("Day", todayDate.getDayOfMonth());
 			suggestion = salePricePrediction.solve(featureVector);
 			salePrice = (double) suggestion.getFieldValue("Price");
-		}
-		
-		featureVector = saleQuantityPrediction.createFeatureVector();
-		featureVector.setValue("Year", todayDate.getYear());
-		featureVector.setValue("Month", todayDate.getMonthValue());
-		featureVector.setValue("Day", todayDate.getDayOfMonth());
-		dayOfWeek = todayDate.getDayOfWeek().getValue() % DayOfWeek.SUNDAY.getValue();
-		featureVector.setValue("WeekDay", dayOfWeek);
-		featureVector.setValue("Comments", saleComments);
-		featureVector.setValue("Price", salePrice);
-		featureVector.setValue("StockQuantity", stockQuantity);
-		suggestion = saleQuantityPrediction.solve(featureVector);
-		int saleQuantity = ((Number) suggestion.getFieldValue("SalesQuantity")).intValue();
+		}		
 		
 		int targetYear = (int) instance.value(instances.attribute("TargetYear"));
 		int targetMonth = (int) instance.value(instances.attribute("TargetMonth"));
@@ -99,9 +87,9 @@ public class OperationAdvice extends AbstractModel
 		LocalDate targetDate = LocalDate.of(targetYear, targetMonth, targetDay);
 		
 		if (isPredictedSalePrice)
-			suggestion = solve(todayDate, purchasePrice, stockQuantity, saleComments, salePrice, saleQuantity, targetDate);
+			suggestion = solveWithPredictedSalePrice(todayDate, purchasePrice, stockQuantity, saleComments, salePrice, targetDate);
 		else
-			suggestion = solve(todayDate, purchasePrice, stockQuantity, saleComments, saleQuantity, targetDate);
+			suggestion = solveWithoutPredictedSalePrice(todayDate, purchasePrice, stockQuantity, saleComments, targetDate);
 		return suggestion;
 	}
 	
@@ -117,13 +105,12 @@ public class OperationAdvice extends AbstractModel
 	}
 
 	
-	private Suggestion solve(
+	private Suggestion solveWithPredictedSalePrice(
 			LocalDate todayDate,
 			double purchasePrice,
 			double stockQuantity,
 			double saleComments,
 			double salePrice,
-			double saleQuantity,
 			LocalDate targetDate) throws Exception
 	{
 		FeatureVector featureVector = profitPrediction.createFeatureVector();
@@ -136,7 +123,6 @@ public class OperationAdvice extends AbstractModel
 		featureVector.setValue("PurchasePrice", purchasePrice);
 		featureVector.setValue("Comments", saleComments);
 		featureVector.setValue("SalePrice", salePrice);
-		featureVector.setValue("SaleQuantity", saleQuantity);
 		featureVector.setValue("TargetYear", targetDate.getYear());
 		featureVector.setValue("TargetMonth", targetDate.getMonthValue());
 		featureVector.setValue("TargetDay", targetDate.getDayOfMonth());
@@ -144,6 +130,15 @@ public class OperationAdvice extends AbstractModel
 		featureVector.setValue("TargetWeekDay", dayOfWeek);
 		int duration = (int) ChronoUnit.DAYS.between(todayDate, targetDate);
 		featureVector.setValue("Duration", duration);
+		
+		FeatureVector quantityFeatureVector = saleQuantityPrediction.createFeatureVector();
+		quantityFeatureVector.setValue("Year", todayDate.getYear());
+		quantityFeatureVector.setValue("Month", todayDate.getMonthValue());
+		quantityFeatureVector.setValue("Day", todayDate.getDayOfMonth());
+		dayOfWeek = todayDate.getDayOfWeek().getValue() % DayOfWeek.SUNDAY.getValue();
+		quantityFeatureVector.setValue("WeekDay", dayOfWeek);
+		quantityFeatureVector.setValue("Comments", saleComments);
+		quantityFeatureVector.setValue("Price", salePrice);
 
 		int purchaseQuantityCeil = (int) (histPurchaseQuantityMax * 1.2);
 		int purchaseQuantityFloor = (int) (histPurchaseQuantityMin * 0.8);
@@ -154,7 +149,12 @@ public class OperationAdvice extends AbstractModel
 		double optimalProfit = 0.0;
 		for (int purchaseQuantity = purchaseQuantityFloor; purchaseQuantity <= purchaseQuantityCeil; purchaseQuantity += purchaseQuantityPortion)
 		{
+			quantityFeatureVector.setValue("StockQuantity", stockQuantity + purchaseQuantity);
+			suggestion = saleQuantityPrediction.solve(quantityFeatureVector);
+			int saleQuantity = ((Number) suggestion.getFieldValue("SalesQuantity")).intValue();
+			featureVector.setValue("SaleQuantity", saleQuantity);
 			featureVector.setValue("PurchaseQuantity", purchaseQuantity);
+			
 			suggestion = profitPrediction.solve(featureVector);
 			double profit = (double) suggestion.getFieldValue("Profit");
 			if (profit > optimalProfit)
@@ -172,12 +172,11 @@ public class OperationAdvice extends AbstractModel
 	}
 	
 	
-	private Suggestion solve(
+	private Suggestion solveWithoutPredictedSalePrice(
 			LocalDate todayDate,
 			double purchasePrice,
 			double stockQuantity,
 			double saleComments,
-			double saleQuantity,
 			LocalDate targetDate) throws Exception
 	{
 		FeatureVector featureVector = profitPrediction.createFeatureVector();
@@ -189,7 +188,6 @@ public class OperationAdvice extends AbstractModel
 		featureVector.setValue("StockQuantity", stockQuantity);
 		featureVector.setValue("PurchasePrice", purchasePrice);
 		featureVector.setValue("Comments", saleComments);
-		featureVector.setValue("SaleQuantity", saleQuantity);
 		featureVector.setValue("TargetYear", targetDate.getYear());
 		featureVector.setValue("TargetMonth", targetDate.getMonthValue());
 		featureVector.setValue("TargetDay", targetDate.getDayOfMonth());
@@ -197,6 +195,14 @@ public class OperationAdvice extends AbstractModel
 		featureVector.setValue("TargetWeekDay", dayOfWeek);
 		int duration = (int) ChronoUnit.DAYS.between(todayDate, targetDate);
 		featureVector.setValue("Duration", duration);
+		
+		FeatureVector quantityFeatureVector = saleQuantityPrediction.createFeatureVector();
+		quantityFeatureVector.setValue("Year", todayDate.getYear());
+		quantityFeatureVector.setValue("Month", todayDate.getMonthValue());
+		quantityFeatureVector.setValue("Day", todayDate.getDayOfMonth());
+		dayOfWeek = todayDate.getDayOfWeek().getValue() % DayOfWeek.SUNDAY.getValue();
+		quantityFeatureVector.setValue("WeekDay", dayOfWeek);
+		quantityFeatureVector.setValue("Comments", saleComments);
 
 		int purchaseQuantityCeil = (int) (histPurchaseQuantityMax * 1.2);
 		int purchaseQuantityFloor = (int) (histPurchaseQuantityMin * 0.8);
@@ -214,7 +220,13 @@ public class OperationAdvice extends AbstractModel
 			featureVector.setValue("PurchaseQuantity", purchaseQuantity);
 			for (double salePrice = salePriceFloor; salePrice <= salePriceCeil; salePrice += salePricePortion)
 			{
+				quantityFeatureVector.setValue("Price", salePrice);
+				quantityFeatureVector.setValue("StockQuantity", stockQuantity + purchaseQuantity);
+				suggestion = saleQuantityPrediction.solve(quantityFeatureVector);
+				int saleQuantity = ((Number) suggestion.getFieldValue("SalesQuantity")).intValue();
+				featureVector.setValue("SaleQuantity", saleQuantity);
 				featureVector.setValue("SalePrice", salePrice);
+				
 				suggestion = profitPrediction.solve(featureVector);
 				double profit = (double) suggestion.getFieldValue("Profit");
 				if (profit > optimalProfit)
