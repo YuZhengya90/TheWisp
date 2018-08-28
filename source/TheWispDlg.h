@@ -6,6 +6,7 @@
 
 #include "TPOpenGL.h"
 #include "afxdtctl.h"
+#include "afxwin.h"
 
 // CAboutDlg dialog used for App About
 
@@ -56,10 +57,34 @@ public:
 
     afx_msg void OnBnClickedBtnPredict();
 
-public:
-    TPOpenGL        m_ctrlChart;
-    CDateTimeCtrl   m_ctrlPredictFrom;
-    CDateTimeCtrl   m_ctrlPredictTo;
-    int             m_iRadioBtnGroup0;
     afx_msg void OnRadioBtnGroup0Clicked();
+
+public:
+
+    TPOpenGL        m_ctrlChart;
+
+    int             m_iRadioBtnGroup0;
+
+    CDateTimeCtrl   m_dateFromPredict1;
+    CDateTimeCtrl   m_dateToPredict1;
+
+    CDateTimeCtrl   m_dateFromPredict2;
+    CDateTimeCtrl   m_dateToPredict2;
+
+    CDateTimeCtrl   m_dateAtPredict3;
+    CEdit           m_editStockQtyPredict3;
+    CEdit           m_editSalesPricePredict3;
+    double          m_dStockQtyPredict3;
+    double          m_dSalesPricePredict3;
+
+    CDateTimeCtrl   m_dateWhenPredict4;
+    CDateTimeCtrl   m_dateToPredict4;
+    double          m_dStockQtyPredict4;
+    double          m_dSalesPricePredict4;
+    double          m_dPurQtyPredict4;
+    double          m_dPurPricePredict4;
+
+    CDateTimeCtrl   m_dateWhenPredict5;
+    CDateTimeCtrl   m_dateToPredict5;
+    double          m_dStockQtyPredict5;
 };

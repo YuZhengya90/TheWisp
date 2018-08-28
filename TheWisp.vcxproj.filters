@@ -16,9 +16,6 @@
     <Filter Include="Source Files\Component">
       <UniqueIdentifier>{8dce0315-8c6a-4f42-9144-09eb2a97e479}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\3rdParty">
-      <UniqueIdentifier>{5a0b3aa7-2729-497b-9c10-f9f2f6e18190}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{6b082697-0c0a-472d-b7d5-3e8b4fb09544}</UniqueIdentifier>
     </Filter>

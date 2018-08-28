@@ -36,6 +36,13 @@ END_MESSAGE_MAP()
 CTheWispDlg::CTheWispDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTheWispDlg::IDD, pParent)
     , m_iRadioBtnGroup0(0)
+    , m_dStockQtyPredict4(0)
+    , m_dSalesPricePredict4(0)
+    , m_dStockQtyPredict3(0)
+    , m_dSalesPricePredict3(0)
+    , m_dPurQtyPredict4(0)
+    , m_dPurPricePredict4(0)
+    , m_dStockQtyPredict5(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -44,9 +51,25 @@ void CTheWispDlg::DoDataExchange(CDataExchange* pDX)
 {
     CDialogEx::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_PIC_CHART, m_ctrlChart);
-    DDX_Control(pDX, IDC_DATETIMEPICKER1, m_ctrlPredictFrom);
-    DDX_Control(pDX, IDC_DATETIMEPICKER2, m_ctrlPredictTo);
+    DDX_Control(pDX, IDC_DATETIMEPICKER1, m_dateFromPredict1);
+    DDX_Control(pDX, IDC_DATETIMEPICKER2, m_dateToPredict1);
     DDX_Radio(pDX, IDC_RADIO1, m_iRadioBtnGroup0);
+    DDX_Control(pDX, IDC_DATETIMEPICKER3, m_dateFromPredict2);
+    DDX_Control(pDX, IDC_DATETIMEPICKER4, m_dateToPredict2);
+    DDX_Control(pDX, IDC_DATETIMEPICKER5, m_dateAtPredict3);
+    DDX_Control(pDX, IDC_EDIT1, m_editStockQtyPredict3);
+    DDX_Control(pDX, IDC_EDIT2, m_editSalesPricePredict3);
+    DDX_Control(pDX, IDC_DATETIMEPICKER6, m_dateWhenPredict4);
+    DDX_Control(pDX, IDC_DATETIMEPICKER7, m_dateToPredict4);
+    DDX_Text(pDX, IDC_EDIT3, m_dStockQtyPredict4);
+    DDX_Text(pDX, IDC_EDIT6, m_dSalesPricePredict4);
+    DDX_Text(pDX, IDC_EDIT1, m_dStockQtyPredict3);
+    DDX_Text(pDX, IDC_EDIT2, m_dSalesPricePredict3);
+    DDX_Text(pDX, IDC_EDIT5, m_dPurQtyPredict4);
+    DDX_Text(pDX, IDC_EDIT4, m_dPurPricePredict4);
+    DDX_Control(pDX, IDC_DATETIMEPICKER8, m_dateWhenPredict5);
+    DDX_Control(pDX, IDC_DATETIMEPICKER9, m_dateToPredict5);
+    DDX_Text(pDX, IDC_EDIT7, m_dStockQtyPredict5);
 }
 
 BEGIN_MESSAGE_MAP(CTheWispDlg, CDialogEx)
@@ -169,14 +192,15 @@ int CTheWispDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CTheWispDlg::OnBnClickedBtnPredict()
 {
+    UpdateData(TRUE);
     switch (m_iRadioBtnGroup0)
     {
         case 0:
         {
             CTime predictFrom, predictTo;
 
-            ((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER1))->GetTime(predictFrom);
-            ((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER2))->GetTime(predictTo);
+            m_dateFromPredict1.GetTime(predictFrom);
+            m_dateToPredict1.GetTime(predictTo);
 
             m_ctrlChart.PredictModel1(predictFrom, predictTo);
         }
@@ -185,15 +209,18 @@ void CTheWispDlg::OnBnClickedBtnPredict()
         {
             CTime predictFrom, predictTo;
 
-            ((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER3))->GetTime(predictFrom);
-            ((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER4))->GetTime(predictTo);
+            m_dateFromPredict2.GetTime(predictFrom);
+            m_dateToPredict2.GetTime(predictTo);
 
             m_ctrlChart.PredictModel2(predictFrom, predictTo);
         }
         break;
         case 2:
         {
+            CTime predictAt;
+            m_dateAtPredict3.GetTime(predictAt);
 
+            //m_ctrlChart.PredictModel2();
         }
         break;
         case 3:
