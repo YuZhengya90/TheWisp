@@ -57,7 +57,7 @@ public final class SaleQuantityPredictionWrapper
 
 			suggestion = quantityModel.solve(featureVector);
 			result = new double[1];
-			result[0] = (double) suggestion.getFieldValue("SalesQuantity");
+			result[0] = ((Number) suggestion.getFieldValue("SalesQuantity")).doubleValue();
 		}
 		catch (Exception e)
 		{
