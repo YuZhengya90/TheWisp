@@ -1,0 +1,1 @@
+select YEAR("DocDate") "Year", DAYOFYEAR("DocDate") "DayOfYear", TO_DECIMAL("Comments", 21, 6) "Comments" from HACKATHON6.ORDR order by "DocEntry";

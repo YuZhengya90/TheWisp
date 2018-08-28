@@ -1,0 +1,15 @@
+@relation QueryResult
+
+@attribute TodayYear numeric
+@attribute TodayMonth numeric
+@attribute TodayDay numeric
+@attribute StockQuantity numeric
+@attribute TargetYear numeric
+@attribute TargetMonth numeric
+@attribute TargetDay numeric
+@attribute SalePrice numeric
+@attribute PurchaseQuantity numeric
+@attribute Profit numeric
+
+@data
+2017,3,26,546,4.98889,2017,3,31,0,12885.421268
