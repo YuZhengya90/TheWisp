@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "TPFont.h"
 #include "TPCoordinate.h"
 
@@ -9,25 +10,27 @@
 #define TPCOORD_FONT_X_REFIX  0.012
 #define TPCOORD_FONT_Y_REFIX  0.007
 
+TPCoordinate::TPCoordinate(char * name)
+	:mName(name), mMinX(0), mMaxX(10), mMinY(0), mMaxY(10), mYType(XY_FLOAT)
+{
+	Init();
+}
+
+void TPCoordinate::Init()
+{
+	mHoveredPoint = -1;
+	mEnableFeatures = 0;
+}
+
 void TPCoordinate::SetXAnchor(TPDate minX, TPDate maxX)
 {
-	mXType = XY_DATE;
 	mMinX = (float)minX.ToInt();
 	mMaxX = (float)maxX.ToInt();
 	mView.SetXAnchor(mMinX, mMaxX);
 }
 
-void TPCoordinate::SetXAnchor(double minX, double maxX)
-{
-	mXType = XY_FLOAT;
-	mMinX = (float)minX;
-	mMaxX = (float)maxX;
-	mView.SetXAnchor(mMinX, mMaxX);
-}
-
 void TPCoordinate::SetXAnchor(int minX, int maxX)
-{
-	mXType = XY_INT;
+{	
 	mMinX = (float)minX;
 	mMaxX = (float)maxX;
 	mView.SetXAnchor(mMinX, mMaxX);
@@ -49,50 +52,76 @@ void TPCoordinate::SetYAnchor(int minY, int maxY)
 	mView.SetYAnchor(mMinY, mMaxY);
 }
 
-void TPCoordinate::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts, unsigned szPts)
+void TPCoordinate::SetValues(std::vector<TPDate> dates, std::vector<double> values)
 {
-    mDrawingType = 0;
-	mDrawingType |= (int)type;
-	mDrawingType |= mEnableCurve ? (int)RP_CURVE : 0;
+	std::vector<string> titles;
+	unsigned szDates = dates.size();
+	for (unsigned i = 0; i < szDates; ++i)
+	{
+		titles.push_back(dates[i].ToString());
+	}
 
-    mDrawingSize = size;
-	mDrawingPoints.clear();
-    for (unsigned i = 0; i < szPts; ++i)
-    {
-        mDrawingPoints.push_back(TPPoint(pts[i]));
-    }
-
-	mClickedPoints = -1;
+	SetValues(dates, values, titles, false);
 }
 
-void TPCoordinate::SetTable(const std::string& caption, TPDate from, TPDate to,
-	unsigned rows, unsigned cols, std::vector<std::string> titles, std::vector<double> values)
+void TPCoordinate::SetValues(std::vector<TPDate> dates, std::vector<double> values, std::vector<string> titles, bool onlyTable)
 {
-	TPDisplayString2(caption.c_str(), 500, 300, 40, 0);
+	Init();
+
+	unsigned dateSize = dates.size();
+	unsigned valueSize = values.size();
+	unsigned titleSize = titles.size();
+
+	if (titleSize != valueSize)
+	{
+		return;
+	}
+
+	mTableFromto = dates;
+	mTableTitles = titles;
+	mTableValues = values;
+
+	SetXAnchor(0, ILLU_W);
+	SetYAnchor(0, ILLU_H);
+	mTableAnchor.Push(mMinX, mMaxX, mMinY, mMaxY, mView);
+
+	if (!onlyTable)
+	{
+		SetXAnchor(dates[0], dates[dateSize - 1]);
+		auto pairMinMax = std::minmax_element(values.begin(), values.end());
+		double duration = *pairMinMax.second - *pairMinMax.first;
+		SetYAnchor(*pairMinMax.first - 0.40 * duration, *pairMinMax.second + 0.40 * duration);
+		mIllusionAnchor.Push(mMinX, mMaxX, mMinY, mMaxY, mView);
+		SetEnableFeatures(F_MESH, true);
+		SetEnableFeatures(F_CROSSLINE, true);
+		SetEnableFeatures(F_POINT, true);
+		SetEnableFeatures(F_TABLE, false);
+	}
+	else
+	{
+		SetEnableFeatures(F_TABLE, true);
+	}
 }
 
 void TPCoordinate::RenderPoints()
 {
     glColor3f(0.0f, 1.0f, 1.0f);
-    if ((int)mDrawingType & RP_CURVE)
+    if (IsEnableFeatures(F_CURVE))
     {
         glLoadIdentity();
-        if (mDrawingSize > 0.0 && mDrawingSize < 4.0)
-            glLineWidth(mDrawingSize);
         glBegin(GL_LINE_STRIP);
-        unsigned szPts = mDrawingPoints.size();
+        unsigned szPts = mTableFromto.size();
         for (unsigned i = 0; i < szPts; ++i)
         {
-            glVertex3f(mDrawingPoints[i].x, mDrawingPoints[i].y, 0);
+			glVertex3f(mTableFromto[i].ToInt(), mTableValues[i], 0);
         }
         glEnd();
-        glLineWidth(1.0);
     }
 
-	if ((int)mDrawingType & RP_POINT)
+	if (IsEnableFeatures(F_POINT))
     {
         glLoadIdentity();
-		unsigned szPts = mDrawingPoints.size();
+		unsigned szPts = mTableFromto.size();
 		float disX = 1.0f, disY = 1.0f;
 		if (szPts > 1)
 		{
@@ -100,7 +129,7 @@ void TPCoordinate::RenderPoints()
 			disY = (mMaxY - mMinY) / (mMaxX - mMinX) * 0.6;
 			for (unsigned i = 0; i < szPts; ++i)
 			{
-				if (mClickedPoints == i)
+				if (mHoveredPoint == i)
 				{
 					glColor3f(0.6f, 1.0f, 0.6f);
 				}
@@ -110,19 +139,19 @@ void TPCoordinate::RenderPoints()
 				}
 				
 				glBegin(GL_QUADS);
-				glVertex3f(mDrawingPoints[i].x - disX, mDrawingPoints[i].y - disY, 0);
-				glVertex3f(mDrawingPoints[i].x - disX, mDrawingPoints[i].y + disY, 0);
-				glVertex3f(mDrawingPoints[i].x + disX, mDrawingPoints[i].y + disY, 0);
-				glVertex3f(mDrawingPoints[i].x + disX, mDrawingPoints[i].y - disY, 0);
+				glVertex3f(mTableFromto[i].ToInt() - disX, mTableValues[i] - disY, 0);
+				glVertex3f(mTableFromto[i].ToInt() - disX, mTableValues[i] + disY, 0);
+				glVertex3f(mTableFromto[i].ToInt() + disX, mTableValues[i] + disY, 0);
+				glVertex3f(mTableFromto[i].ToInt() + disX, mTableValues[i] - disY, 0);
 				glEnd();
 
 				glColor3f(0.5, 0.5, 0.5);
 				glBegin(GL_LINE_STRIP);
-				glVertex3f(mDrawingPoints[i].x - disX, mDrawingPoints[i].y - disY, 0);
-				glVertex3f(mDrawingPoints[i].x - disX, mDrawingPoints[i].y + disY, 0);
-				glVertex3f(mDrawingPoints[i].x + disX, mDrawingPoints[i].y + disY, 0);
-				glVertex3f(mDrawingPoints[i].x + disX, mDrawingPoints[i].y - disY, 0);
-				glVertex3f(mDrawingPoints[i].x - disX, mDrawingPoints[i].y - disY, 0);
+				glVertex3f(mTableFromto[i].ToInt() - disX, mTableValues[i] - disY, 0);
+				glVertex3f(mTableFromto[i].ToInt() - disX, mTableValues[i] + disY, 0);
+				glVertex3f(mTableFromto[i].ToInt() + disX, mTableValues[i] + disY, 0);
+				glVertex3f(mTableFromto[i].ToInt() + disX, mTableValues[i] - disY, 0);
+				glVertex3f(mTableFromto[i].ToInt() - disX, mTableValues[i] - disY, 0);
 				glEnd();
 			}
 		}
@@ -233,10 +262,10 @@ void TPCoordinate::RenderCrossLine()
 		return;
 	}
 
-	unsigned szPts = mDrawingPoints.size();
+	unsigned szPts = mTableFromto.size();
 	for (unsigned i = 0; i < szPts; ++i)
 	{
-		if (mClickedPoints == i)
+		if (mHoveredPoint == i)
 		{
 			float fontReFixX = (mView.GetPosX() - mView.GetNegX()) * TPCOORD_FONT_X_REFIX * 2;
 			float fontReFixY = (mView.GetPosY() - mView.GetNegY()) * TPCOORD_FONT_Y_REFIX;
@@ -245,54 +274,38 @@ void TPCoordinate::RenderCrossLine()
 			glEnable(GL_LINE_STIPPLE);
 			glLineStipple(1, 0x1F1F);
 			glBegin(GL_LINES);
-			glVertex3f(mView.GetNegX() - fontReFixX, mDrawingPoints[i].y, 0);
-			glVertex3f(mView.GetPosX() - fontReFixX, mDrawingPoints[i].y, 0);
+			glVertex3f(mView.GetNegX() - fontReFixX, mTableValues[i], 0);
+			glVertex3f(mView.GetPosX() - fontReFixX, mTableValues[i], 0);
 			glEnd();
 			glDisable(GL_LINE_STIPPLE);
 
 			char value[16] = { 0 };
 			if (mYType == XY_INT)
 			{
-				sprintf_s(value, "%d", (int)roundf(mDrawingPoints[i].y));
-				TPDisplayString(value, mView.GetPosX() -  fontReFixX, 
-					TP_MAX(mDrawingPoints[i].y - fontReFixY, mView.GetNegY() + fontReFixY * 0.2));
+				sprintf_s(value, "%d", (int)roundf(mTableValues[i]));
+				TPDisplayString(value, mView.GetPosX() - fontReFixX, 
+					TP_MAX(mTableValues[i] - fontReFixY, mView.GetNegY() + fontReFixY * 0.2));
 			}
 
 			else
 			{
-				sprintf_s(value, "%.2f", mDrawingPoints[i].y);
+				sprintf_s(value, "%.2f", (float)mTableValues[i]);
 				TPDisplayString(value, mView.GetPosX() - fontReFixX, 
-					TP_MAX(mDrawingPoints[i].y - fontReFixY, mView.GetNegY() + fontReFixY * 0.2));
+					TP_MAX(mTableValues[i] - fontReFixY, mView.GetNegY() + fontReFixY * 0.2));
 			}
-
 
 			glEnable(GL_LINE_STIPPLE);
 			glLineStipple(1, 0x1F1F);
 			glBegin(GL_LINES);
-			glVertex3f(mDrawingPoints[i].x, mView.GetNegY() - 4 * fontReFixY, 0);
-			glVertex3f(mDrawingPoints[i].x, mView.GetPosY() - 4 * fontReFixY, 0);
+			glVertex3f(mTableFromto[i].ToInt(), mView.GetNegY() - 4 * fontReFixY, 0);
+			glVertex3f(mTableFromto[i].ToInt(), mView.GetPosY() - 4 * fontReFixY, 0);
 			glEnd();
 			glDisable(GL_LINE_STIPPLE);
 
-			if (mXType == XY_DATE)
-			{
-				TPDate curDate = TPDate::FromInt((int)roundf(mDrawingPoints[i].x));
-				TPDisplayString(curDate.ToString().c_str(), TP_MAX((mDrawingPoints[i].x - fontReFixX), mView.GetNegX() + fontReFixX * 0.2)
-					, mView.GetPosY() - 3 * fontReFixY);
-			}
-			else if (mXType == XY_INT)
-			{
-				sprintf_s(value, "%d", (int)roundf(mDrawingPoints[i].x));
-				TPDisplayString(value, TP_MAX((mDrawingPoints[i].x - fontReFixX), mView.GetNegX() + fontReFixX * 0.2)
-					, mView.GetPosY() - 3 * fontReFixY);
-			}
 
-			else
-			{
-				sprintf_s(value, "%.2f", mDrawingPoints[i].x);
-				TPDisplayString(value, TP_MAX((mDrawingPoints[i].x - fontReFixX), mView.GetNegX() + fontReFixX * 0.2)
-					, mView.GetPosY() - 3 * fontReFixY);
-			}
+			TPDisplayString(mTableFromto[i].ToString().c_str(), 
+				TP_MAX((mTableFromto[i].ToInt() - fontReFixX), mView.GetNegX() + fontReFixX * 0.2)
+				, mView.GetPosY() - 3 * fontReFixY);
 		}
 	}
 }
@@ -324,29 +337,11 @@ void TPCoordinate::RenderReferenceValue()
 		{
 			char value[16] = { 0 };
 			float curValue = mView.GetNegX() + fontValueStepX * loopCount;
-
-			if (mXType == XY_DATE)
-			{
-				TPDate curDate = TPDate::FromInt((int)roundf(curValue));
-				TPDisplayString(curDate.ToString().c_str(), ix - 2 * fontReFixX, mMinY + microX * 2);
-			}
-
-			else if (mXType == XY_INT)
-			{
-				sprintf_s(value, "%d", (int)roundf(curValue));
-				TPDisplayString(value, ix - fontReFixX, mMinY + microX * 2);
-			}
-
-			else
-			{
-				sprintf_s(value, "%.2f", curValue);
-				TPDisplayString(value, ix - fontReFixX, mMinY + microX * 2);
-			}
-
+			TPDate curDate = TPDate::FromInt((int)roundf(curValue));
+			TPDisplayString(curDate.ToString().c_str(), ix - 2 * fontReFixX, mMinY + microX * 2);
 			loopCount++;
 		}
 	}
-
 
     loopCount = 1;
 	step = GetSuitableYStep();
@@ -359,7 +354,6 @@ void TPCoordinate::RenderReferenceValue()
 			glVertex3f(mMinX, iy, 0);
 			glEnd();
 			loopCount++;
-
 		}
 
 		float fontValueStepY = (mView.GetPosY() - mView.GetNegY()) / loopCount;
@@ -386,33 +380,99 @@ void TPCoordinate::RenderReferenceValue()
 	}
 }
 
-float TPCoordinate::GetSuitableXStep()
+void TPCoordinate::RenderTables()
 {
-	if (mXType == XY_INT || mXType == XY_DATE)
+	TPDisplayString2(mName, 50, 500, 40, 1);
+	std::string dateString = mTableFromto[0].ToString();
+	if (mTableFromto.size() >= 1)
 	{
-		int duration = (int)roundf((mMaxX - mMinX));
-		const int delta[] = { 5, 6, 8, 10 };
-		const int deltaSize = sizeof(delta) / sizeof(delta[0]);
-		while (true)
+		dateString = mTableFromto[0].ToString() + "-" + mTableFromto[mTableFromto.size() - 1].ToString();
+	}
+	
+	TPDisplayString2(dateString.c_str(), 50, 450, 20, 0);
+
+	glColor3f(0.0, 0.0, 0.0);
+	glLineWidth(5);
+	glBegin(GL_LINES);
+	glVertex3f(50.0f, 420.0, 0);
+	glVertex3f(1190.0f, 420.0, 0);
+	glEnd();
+	glLineWidth(1);
+
+	unsigned tableTitleSize = mTableTitles.size();
+	unsigned tableValueSize = mTableValues.size();
+
+	if (tableTitleSize != tableValueSize)
+	{
+		return;
+	}
+
+	for (unsigned i = 0; i < tableTitleSize; ++i)
+	{
+		int yp = (320 - i * 80);
+		TPDisplayString2(mTableTitles[i].c_str(), 50, I2F(yp), 40, 1);
+
+		char value[16] = { 0 };
+		sprintf_s(value, "%.2lf", mTableValues[i]);
+		TPDisplayString2(value, 750, I2F(yp), 40, 0);
+	}
+}
+
+void TPCoordinate::SetEnableFeatures(TPCoord_F_T efType, bool enable)
+{
+	if (efType == F_TABLE)
+	{
+		if (IsEnableFeatures(efType) != enable)
 		{
-			for (int i = 0; i < deltaSize; ++i)
+			if (enable)
 			{
-				if (duration % delta[i] == 0)
-				{
-					if ((int)roundf(mMaxX - mMinX) >= delta[i])
-					{
-						return (int)roundf(mMaxX - mMinX) / delta[i];
-					}
-					
-					return -1;
-				}
+				Exchange2TableAnchor();
 			}
-			duration++;
+			else
+			{
+				Exchange2IllusionAnchor();
+			}
 		}
 	}
 
-	return (mMaxX - mMinX) / TPCOORD_REFR_X_COUNT;
-	
+	if (enable)
+	{
+		mEnableFeatures |= (int)efType;
+	}
+	else
+	{
+		mEnableFeatures &= (~(int)efType);
+	}
+}
+
+bool TPCoordinate::IsEnableFeatures(TPCoord_F_T efType)
+{
+	return (mEnableFeatures & efType) != 0;
+}
+
+float TPCoordinate::GetSuitableXStep()
+{
+	int duration = (int)roundf((mMaxX - mMinX));
+	const int delta[] = { 5, 6, 8, 10 };
+	const int deltaSize = sizeof(delta) / sizeof(delta[0]);
+	while (true)
+	{
+		for (int i = 0; i < deltaSize; ++i)
+		{
+			if (duration % delta[i] == 0)
+			{
+				if ((int)roundf(mMaxX - mMinX) >= delta[i])
+				{
+					return (int)roundf(mMaxX - mMinX) / delta[i];
+				}
+					
+				return -1;
+			}
+		}
+		duration++;
+	}
+
+	return (mMaxX - mMinX) / TPCOORD_REFR_X_COUNT;	
 }
 
 float TPCoordinate::GetSuitableYStep()
@@ -444,28 +504,32 @@ float TPCoordinate::GetSuitableYStep()
 
 int TPCoordinate::HoverPoint(TPPoint illuP)
 {
-	unsigned szPts = mDrawingPoints.size();
+	unsigned szPts = mTableFromto.size();
 	float disX = (mMaxX - mMinX) / szPts * 0.4;
 	float disY = (mMaxY - mMinY) / (mMaxX - mMinX) * 0.6;
 	
 	for (unsigned i = 0; i < szPts; ++i)
 	{
-		if (illuP.x > mDrawingPoints[i].x - disX && illuP.x < mDrawingPoints[i].x + disX
-			&& illuP.y > mDrawingPoints[i].y - disY && illuP.y < mDrawingPoints[i].y + disY)
+		if (illuP.x > mTableFromto[i].ToInt() - disX && illuP.x < mTableFromto[i].ToInt() + disX
+			&& illuP.y > mTableValues[i] - disY && illuP.y < mTableValues[i] + disY)
 		{
-			/*if (mClickedPoints == i)
-			{
-				mClickedPoints = -1;
-			}
-			else
-			{
-				mClickedPoints = (i);
-			}*/
-			mClickedPoints = i;
+			mHoveredPoint = i;
 			return i;
 		}
 	}
 
-	mClickedPoints = -1;
+	mHoveredPoint = -1;
 	return -1;
+}
+
+void TPCoordinate::Exchange2TableAnchor()
+{
+	mIllusionAnchor.Push(mMinX, mMaxX, mMinY, mMaxY, mView);
+	mTableAnchor.Pop(mMinX, mMaxX, mMinY, mMaxY, mView);
+}
+
+void TPCoordinate::Exchange2IllusionAnchor()
+{
+	mTableAnchor.Push(mMinX, mMaxX, mMinY, mMaxY, mView);
+	mIllusionAnchor.Pop(mMinX, mMaxX, mMinY, mMaxY, mView);
 }

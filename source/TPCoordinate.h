@@ -4,35 +4,73 @@
 #include "TPEnvironment.h"
 #include "TPView.h"
 
-typedef enum TPCoord_RP_T
-{
-    RP_CURVE = 0x0001,
-    RP_POINT = 0x0002
-};
+using namespace std;
 
-typedef enum TPCoord_XY_T
+// y coordinate
+typedef enum TPCoord_Y_T
 {
 	XY_FLOAT,
-	XY_INT,
-	XY_DATE
+	XY_INT,	
+};
+
+// features
+typedef enum TPCoord_F_T
+{
+	// 0000 0000 0000 0001
+	F_MESH       = 0x0001,
+
+	// 0000 0000 0000 0010
+	F_CROSSLINE  = 0x0002,
+
+	// 0000 0000 0000 0100
+	F_POINT      = 0x0004,
+
+	// 0000 0000 0000 1000
+	F_CURVE      = 0x0008,
+
+	// 0000 0000 0001 0000
+	F_CHART      = 0x0010,
+
+	// 0000 0000 0010 0000
+	F_TABLE      = 0x0020
+};
+
+class TPCoordAnchorHelper
+{
+public:
+	float mMinX;
+	float mMaxX;
+	float mMinY;
+	float mMaxY;
+
+	float mNegX;
+	float mPosX;
+	float mNegY;
+	float mPosY;
+
+public:
+	void Push(float minX, float maxX, float minY, float maxY, TPView view){
+		mMinX = minX; mMaxX = maxX; mMinY = minY; mMaxY = maxY;
+		mNegX = view.GetNegX(); mPosX = view.GetPosX();
+		mNegY = view.GetNegY(); mPosY = view.GetPosY();
+	}
+
+	void Pop(float &minX, float &maxX, float &minY, float &maxY, TPView& view) {
+		minX = mMinX; maxX = mMaxX; minY = mMinY; maxY = mMaxY;
+		view.SetAnchor(mNegX, mPosX, mNegY, mPosY);
+	}
 };
 
 class TPCoordinate
 {	
 public:
-    TPCoordinate(int id, char * name = nullptr )
-        : mId(id), mName(name), mXName(nullptr), mYName(nullptr)
-        , mMinX(0), mMaxX(10), mMinY(0), mMaxY(10) 
-		, mXType(XY_FLOAT), mYType(XY_FLOAT), mClickedPoints(-1)
-		, mEnableCrossLine(false), mEnableCurve(false), mEnableMesh(false)
-		, mDraw(false)
-    { }
-    
+	TPCoordinate(char * name);
+
+	void Init();
+   
+protected:
 	// X Anchor initialized with Date value.
 	void SetXAnchor(TPDate minX, TPDate maxX);
-
-	// X Anchor initialized with double value.
-	void SetXAnchor(double minX, double maxX);
 
 	// X Anchor initialized with in value.
 	void SetXAnchor(int minX, int maxX);
@@ -43,6 +81,8 @@ public:
 	// Y Anchor intialized with int value.
 	void SetYAnchor(int minY, int maxY);
 
+public:
+
     float GetMinX()const { return mMinX; }
     float GetMaxX()const { return mMaxX; }
     float GetMinY()const { return mMinY; }
@@ -50,35 +90,7 @@ public:
 
     TPView& GetView(){ return mView; }
     char* GetName() { return mName; }
-
-	// Set Points here to show it!
-    void SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts, unsigned szPts);
 	
-	// You can either use this method for easily call from JAR. vector<TPDate> is easy to get from TPDate::GetVector().
-	template<typename T, typename P>
-	void SetDrawingPoints(TPCoord_RP_T type, float size, std::vector<T> xVecValues, std::vector<P> yVecValues)
-	{
-		mDrawingType = 0;
-		mDrawingType |= (int)type;
-		mDrawingType |= mEnableCurve ? (int)RP_CURVE : 0;
-
-		mDrawingSize = size;
-
-		int xSize = xVecValues.size();
-		int ySize = yVecValues.size();
-		if (xSize > ySize)
-		{
-			return;
-		}
-		mDrawingPoints.clear();
-		for (int i = 0; i < xSize; ++i)
-		{
-			mDrawingPoints.push_back(TPPoint(xVecValues[i], yVecValues[i]));
-		}
-
-		mClickedPoints = -1;
-	}
-
 	//           ------------------                   ----------------------
 	//           |   Advice       |                   |20180101~20180201   |
 	//           ------------------                   ----------------------
@@ -92,91 +104,47 @@ public:
 	//           from ~ to
 	//           rows = 2 cols = 3 titles = {"SalePrice", "PurchaseQuantitiy", "Profit"}, values = {5.99, 1130, 5320}
 
-	void SetTable(const std::string& caption, TPDate from, TPDate to, 
-		unsigned rows, unsigned cols, /*rows is the real row (include titles.)*/
-		std::vector<std::string> titles, std::vector<double> values);
-    
-
-	void DrawPoints(bool bDraw) { mDraw = bDraw; }
-	bool EnableDrawPoints() const {
-		return mDraw;
-	}
+	void SetValues(std::vector<TPDate> dates, std::vector<double> values);
+	void SetValues(std::vector<TPDate> dates, std::vector<double> values, std::vector<string> titles, bool onlyTable);
+	void SetEnableFeatures(TPCoord_F_T efType, bool bEnable);
+	bool IsEnableFeatures(TPCoord_F_T efType);
+	int HoverPoint(TPPoint p);
 
 	void RenderPoints();
     void RenderMesh();
 	void RenderCrossLine();
     void RenderReferenceValue();
-	
-
-	int HoverPoint(TPPoint p);
-	
-	bool GetEnableMesh() const {
-		return mEnableMesh;
-	}
-
-	bool GetEnableCrossLine() const {
-		return mEnableCrossLine;
-	}
-
-	bool GetEnableCurve()  const {
-		return mEnableCurve;
-	}
-
-	void SetEnableMesh(bool enable) {
-		mEnableMesh = enable;
-	}
-
-	void SetEnableCrossLine(bool enable) {
-		mEnableCrossLine = enable;
-	}
-
-	void SetEnableCurve(bool enable){
-		mEnableCurve = enable;
-
-		if (mEnableCurve)
-		{
-			mDrawingType = (int)mDrawingType | RP_CURVE;
-		}
-		else
-		{
-			mDrawingType = (int)mDrawingType & (~RP_CURVE);
-		}
-	}
+	void RenderTables();
 
 private:
 
 	float GetSuitableXStep();
 	float GetSuitableYStep();
+	void Exchange2TableAnchor();
+	void Exchange2IllusionAnchor();
 
-	int   mId;
+	// identity
 	char* mName;
 	char* mXName;
 	char* mYName;
 
+	// Anchor info
 	float mMinX;
 	float mMaxX;
 	float mMinY;
 	float mMaxY;
 
-	TPCoord_XY_T mXType;
-	TPCoord_XY_T mYType;
+	TPCoordAnchorHelper mIllusionAnchor;
+	TPCoordAnchorHelper mTableAnchor;
+
+	TPCoord_Y_T mYType;
 
 	TPView mView;
 
-	std::vector<TPPoint> mDrawingPoints;
-	int mDrawingType;
-	float mDrawingSize;
+	int mHoveredPoint;
 
-	int mClickedPoints;
-
-	float mMeshMinX;
-	float mMeshMaxX;
-	float mMeshMinY;
-	float mMeshMaxY;
-
-	bool mEnableCrossLine;
-	bool mEnableCurve;
-	bool mEnableMesh;
-
-	bool mDraw;
+	int mEnableFeatures;
+	vector<TPDate> mTableFromto;
+	vector<string> mTableTitles;
+	vector<double> mTableValues;
 };

@@ -27,25 +27,34 @@ public:
     ~TPUI();
 
     void Render();
-    void SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts, unsigned szPts);
 
     bool InIllusionSection(int x, int y);
+
     void StartTranslate(int x, int y);
 	bool Translate(int x, int y);
     void StopTranslate(){ mTranslateStartAction.state = 0; }
     bool InTranslating(){ return mTranslateStartAction.state == 1; }
+	void ScrollTranslate(bool scrollDown);
 
     void StartScale(int x, int y, float rate);
     void StartScaleAnimation(int x, int y, bool zoomOut);
 
 	void HoverPoint(int x, int y);
 
-	bool EnableMesh() { return GetCurrentCoord().GetEnableMesh(); }
-	bool EnableCrossLine() { return GetCurrentCoord().GetEnableCrossLine(); }
-	bool EnableCurve() { return GetCurrentCoord().GetEnableCurve(); }
-	void SetEnableMesh(bool bEnable) { GetCurrentCoord().SetEnableMesh(bEnable); }
-	void SetEnableCrossLine(bool bEnable) { GetCurrentCoord().SetEnableCrossLine(bEnable); }
-	void SetEnableCurve(bool bEnable) { GetCurrentCoord().SetEnableCurve(bEnable); }
+	bool EnableIllusion() { return !EnableTable(); }
+	bool EnableMesh() { return !EnableTable() && GetCurrentCoord().IsEnableFeatures(F_MESH); }
+	bool EnableCrossLine() { return !EnableTable() && GetCurrentCoord().IsEnableFeatures(F_CROSSLINE); }
+	bool EnableCurve() { return !EnableTable() && GetCurrentCoord().IsEnableFeatures(F_CURVE); }
+	bool EnablePoint() { return !EnableTable() && GetCurrentCoord().IsEnableFeatures(F_POINT); }
+	bool EnableTable() { return GetCurrentCoord().IsEnableFeatures(F_TABLE); }
+	
+	void SetEnableIllusion(bool bEnable) { GetCurrentCoord().SetEnableFeatures(F_TABLE, !bEnable); }
+	void SetEnableMesh(bool bEnable) { GetCurrentCoord().SetEnableFeatures(F_MESH, bEnable); }
+	void SetEnableCrossLine(bool bEnable) { GetCurrentCoord().SetEnableFeatures(F_CROSSLINE, bEnable); }
+	void SetEnableCurve(bool bEnable) { GetCurrentCoord().SetEnableFeatures(F_CURVE, bEnable); }
+	void SetEnablePoint(bool bEnable) { GetCurrentCoord().SetEnableFeatures(F_POINT, bEnable); }
+	void SetEnableTable(bool bEnable) { GetCurrentCoord().SetEnableFeatures(F_TABLE, bEnable); }
+	
 
     TPView& GetView();
 

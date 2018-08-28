@@ -78,24 +78,22 @@ void TPUI::Render()
 	{
 		GetCurrentCoord().RenderCrossLine();
 	}
-	
-	if (GetCurrentCoord().EnableDrawPoints())
+
+	if (EnableTable())
+	{
+		GetCurrentCoord().RenderTables();
+	}
+	else
 	{
 		GetCurrentCoord().RenderPoints();
 		RenderIllusion();
 		GetCurrentCoord().RenderReferenceValue();
-	}    
-}
-
-void TPUI::SetDrawingPoints(TPCoord_RP_T type, float size, TPPoint* pts, unsigned szPts)
-{
-    GetCurrentCoord().SetDrawingPoints(type, size, pts, szPts);
+	}	
 }
 
 bool TPUI::InIllusionSection(int x, int y)
 {
-    float left = SCRN_B;
-    if (x > left&& x < left + ILLU_W
+	if (x > SCRN_B && x < SCRN_B + ILLU_W
         && y > SCRN_B && y < SCRN_B + ILLU_H)
     {
         return !NoCurrentCoord();
@@ -125,8 +123,13 @@ bool TPUI::Translate(int x, int y)
 		// notice that screen (x,y) is not the view's (x,y) screen from left top but view from left bottom.
 		// so mTranslateStaretAction.Y - y is right.
 
-		float moveDeltaX = (GetView().GetPosX() - GetView().GetNegX()) / ILLU_W * (x - mTranslateStartAction.X);
+		float moveDeltaX = 0.0f;
 		float moveDeltaY = (GetView().GetPosY() - GetView().GetNegY()) / ILLU_H * (mTranslateStartAction.Y - y);
+		if (EnableIllusion())
+		{
+			moveDeltaX = (GetView().GetPosX() - GetView().GetNegX()) / ILLU_W * (x - mTranslateStartAction.X);
+		}
+		
 		GetView().Translate(-moveDeltaX, -moveDeltaY);
 
 		mTranslateStartAction.X = x;
@@ -136,6 +139,23 @@ bool TPUI::Translate(int x, int y)
 	}
 
 	return false;
+}
+
+void TPUI::ScrollTranslate(bool scrollDown)
+{
+	if (mDoingAnimation || NoCurrentCoord() || mTranslateStartAction.state == 1)
+	{
+		return;
+	}
+
+	if (scrollDown)
+	{
+		GetView().Translate(0, 40);
+	}
+	else
+	{
+		GetView().Translate(0,-40);
+	}
 }
 
 void TPUI::StartScale(int x, int y, float rate)
@@ -186,7 +206,7 @@ TPView& TPUI::GetView()
 
 TPCoordinate* TPUI::AddCoordinate(char* name)
 {
-    TPCoordinate* coord = new TPCoordinate(mVecCoordinate.size(), name);
+    TPCoordinate* coord = new TPCoordinate(name);
     mVecCoordinate.push_back(coord);
     mCurrCoordOrder = mVecCoordinate.size() - 1;
     return coord;

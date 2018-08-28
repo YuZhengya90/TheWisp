@@ -32,3 +32,5 @@
 // render screen in each 20ms. about 1000/20= 50frames
 #define REDRAW_TIMER_ID  20
 #define HOVER_TIMER_ID   30
+
+#define I2F(a) (a < 0 ? -(float)((int)(-(a))) : (float)a)

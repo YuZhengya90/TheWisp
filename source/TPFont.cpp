@@ -22,15 +22,42 @@ void TPDisplayString(const char *s, float x, float y)
     glPopAttrib();
 }
 
+//int TESTFont(const char* txt, GLfloat x, GLfloat y, GLfloat size, GLuint fontType)
+//{
+//	glPushAttrib(GL_LIST_BIT);
+//
+//	unsigned txtLength = strlen(txt);
+//	float xAnch = x;
+//	float XscreenToCoordFactor = (float)10 / 1000;
+//	float YscreenToCoordFactor = (float)10 / 600;
+//
+//
+//	float rateOfSize = size / ORI_FONT_SIZE;
+//	for (unsigned i = 0; i < strlen(txt); ++i)
+//	{
+//		TPFont font = tpFontCollection.tpFont[txt[i]];
+//		if (i != 0)
+//		{
+//			TPFont fontPrev = tpFontCollection.tpFont[txt[i - 1]];
+//			xAnch += (fontPrev.w + font.l) * rateOfSize * XscreenToCoordFactor;
+//
+//		}
+//
+//		glRasterPos2f(0, 300);
+//		glPixelZoom(rateOfSize, rateOfSize);
+//		glDrawPixels(font.p, font.h, GL_ALPHA, GL_UNSIGNED_BYTE, font.bitmap);
+//	}
+//	glPopAttrib();
+//	return 0;
+//}
+
+
 int TPDisplayString2(const char* txt, GLfloat x, GLfloat y, GLfloat size, GLuint fontType)
 {
 	glPushAttrib(GL_LIST_BIT);
 	
 	unsigned txtLength = strlen(txt);
 	float xAnch = x;
-    float XscreenToCoordFactor = (float)10 / 1000;
-    float YscreenToCoordFactor = (float)10 / 600;
-
 	
 	float rateOfSize = size / ORI_FONT_SIZE;
 	for (unsigned i = 0; i < strlen(txt); ++i)
@@ -39,11 +66,21 @@ int TPDisplayString2(const char* txt, GLfloat x, GLfloat y, GLfloat size, GLuint
 		if (i != 0)
 		{
 			TPFont fontPrev = tpFontCollection.tpFont[txt[i - 1] + fontType * ASCII_READ_MAX];
-            xAnch += (fontPrev.w + font.l) * rateOfSize * XscreenToCoordFactor;
+            xAnch += (fontPrev.w + font.l) * rateOfSize;
             
 		}
 		
-		glRasterPos2f(xAnch, y - (font.h - font.t) * rateOfSize * YscreenToCoordFactor);
+		float yAnch = y - (font.h - font.t) * rateOfSize;
+		//float yAnchP = 0 - yAnch;
+		//if (yAnch < 0)
+		//{
+		//	glRasterPos2f(xAnch, 0);
+		//}
+		//else
+		{
+			glRasterPos2f(xAnch, yAnch);
+		}
+		
 		glPixelZoom(rateOfSize, rateOfSize);
 		glDrawPixels(font.p, font.h, GL_ALPHA, GL_UNSIGNED_BYTE, font.bitmap);
 	}
@@ -123,7 +160,7 @@ static int LoadFontFromPath(unsigned typeOrder, char* path)
 
 int TPLoadFont()
 {
-	const unsigned tpType = 1;
+	const unsigned tpType = 2;
 	tpFontCollection.collectSize = ASCII_READ_MAX * tpType;
 	tpFontCollection.tpFont = (TPFont *)malloc(sizeof(TPFont) * tpFontCollection.collectSize);
 	
@@ -134,7 +171,8 @@ int TPLoadFont()
 
 	// test;
 	{
-		LoadFontFromPath(0, "C:\\Windows\\Fonts\\ARIALN.TTF");
+		LoadFontFromPath(0, "C:\\Windows\\Fonts\\ITCKRIST.TTF");
+		LoadFontFromPath(1, "C:\\Windows\\Fonts\\FORTE.TTF");
 	}
 
     // new string format

@@ -11,6 +11,13 @@
 #include "TPTexture.h"
 #include "TPOpenGL.h"
 
+
+#define PRE_PURCHASE_PRICE "Predict Purchase Price"
+#define PRE_SALES_PRICE "Predict Sales Price"
+#define PRE_SALES_QUANTITY "Predict Sales Quantity"
+#define PRE_PROFIT "Predict Profit"
+#define OPR_ADVICE "Operation Advice"
+
 TPOpenGL::TPOpenGL()
 {
     if (!jar.Init("data-mining/models/"))
@@ -69,11 +76,11 @@ void TPOpenGL::TPInitGL()
 
 void TPOpenGL::TPInitUI(HWND hwnd)
 {
-    ui.GetCoordinateByName("1");
-    ui.GetCoordinateByName("2");
-    ui.GetCoordinateByName("3");
-    ui.GetCoordinateByName("4");
-    ui.GetCoordinateByName("5");
+    ui.AddCoordinate(PRE_PURCHASE_PRICE);
+    ui.AddCoordinate(PRE_SALES_PRICE);
+	ui.AddCoordinate(PRE_SALES_QUANTITY);
+    ui.AddCoordinate(PRE_PROFIT);
+	ui.AddCoordinate(OPR_ADVICE);
 }
 
 BEGIN_MESSAGE_MAP(TPOpenGL, CWnd)
@@ -89,9 +96,12 @@ BEGIN_MESSAGE_MAP(TPOpenGL, CWnd)
 	ON_WM_MOUSEHOVER()
 	ON_WM_CONTEXTMENU()
 	ON_WM_INITMENUPOPUP()
+	ON_COMMAND(ID_ILLUSION_USETABLE, OnEnableTable)
+	ON_COMMAND(ID_ILLUSION_USECHART, OnEnableChart)
 	ON_COMMAND(ID_ILLUSION_ENABLEMESH, OnEnableMesh)
 	ON_COMMAND(ID_ILLUSION_ENABLECROSSLINE, OnEnableCrossLine)
 	ON_COMMAND(ID_ILLUSION_ENABLECURVE, OnEnableCurve)
+	ON_COMMAND(ID_ILLUSION_ENABLEPOINT, OnEnablePoint)
 	ON_COMMAND(ID_ILLUSION_ABOUT, OnAbout)
 	
 END_MESSAGE_MAP()
@@ -118,15 +128,12 @@ int TPOpenGL::OnCreate(LPCREATESTRUCT lpCreateStruct)
     if (CWnd::OnCreate(lpCreateStruct) == -1)
         return -1;
 
-    // TODO:  Add your specialized creation code here
-
     return 0;
 }
 
 void TPOpenGL::OnPaint()
 {
     CPaintDC dc(this); // device context for painting
-    // Do not call CWnd::OnPaint() for painting messages
 
     ui.Render();
     SwapBuffers(hdc);
@@ -147,19 +154,16 @@ BOOL TPOpenGL::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
     ::ScreenToClient(m_hWnd, &pt);
 
-    if (zDelta > 0)
+    if (ui.InIllusionSection(pt.x, pt.y))
     {
-        if (ui.InIllusionSection(pt.x, pt.y))
-        {
-            ui.StartScale(pt.x, pt.y, MOUSE_SCALE_FACTOR);
-        }
-    }
-    else if (zDelta < 0)
-    {
-        if (ui.InIllusionSection(pt.x, pt.y))
-        {
-            ui.StartScale(pt.x, pt.y, 1 / MOUSE_SCALE_FACTOR);
-        }
+		if (ui.EnableIllusion())
+		{
+			ui.StartScale(pt.x, pt.y, zDelta > 0 ? MOUSE_SCALE_FACTOR : 1 / MOUSE_SCALE_FACTOR);
+		}
+		else
+		{
+			ui.ScrollTranslate(zDelta > 0);
+		}
     }
 
     return CWnd::OnMouseWheel(nFlags, zDelta, pt);
@@ -213,7 +217,7 @@ void TPOpenGL::OnLButtonUp(UINT nFlags, CPoint point)
 
 void TPOpenGL::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
-    if (ui.InIllusionSection(point.x, point.y))
+    if (ui.InIllusionSection(point.x, point.y) && ui.EnableIllusion())
     {
         ui.StartScaleAnimation(point.x, point.y, true);
     }
@@ -224,7 +228,7 @@ void TPOpenGL::OnLButtonDblClk(UINT nFlags, CPoint point)
 
 void TPOpenGL::OnRButtonDblClk(UINT nFlags, CPoint point)
 {
-    if (ui.InIllusionSection(point.x, point.y))
+    if (ui.InIllusionSection(point.x, point.y) && ui.EnableIllusion())
     {
         ui.StartScaleAnimation(point.x, point.y, false);
     }
@@ -234,7 +238,7 @@ void TPOpenGL::OnRButtonDblClk(UINT nFlags, CPoint point)
 
 void TPOpenGL::OnMouseHover(UINT nFlags, CPoint point)
 {
-	if (ui.InIllusionSection(point.x, point.y))
+	if (ui.InIllusionSection(point.x, point.y) && ui.EnableIllusion())
 	{
 		ui.HoverPoint(point.x, point.y);
 	}
@@ -260,6 +264,15 @@ void TPOpenGL::OnInitMenuPopup(CMenu *pMenuPopup, UINT nIndex, BOOL bSysMenu)
 		int nCount = pMenuPopup->GetMenuItemCount();
 		for (int i = 0; i < nCount; ++i)
 		{
+			if (ui.EnableTable())
+			{
+				pMenuPopup->CheckMenuRadioItem(ID_ILLUSION_USETABLE, ID_ILLUSION_USECHART, ID_ILLUSION_USETABLE, MF_BYCOMMAND);
+			}
+			else
+			{
+				pMenuPopup->CheckMenuRadioItem(ID_ILLUSION_USETABLE, ID_ILLUSION_USECHART, ID_ILLUSION_USECHART, MF_BYCOMMAND);
+			}
+
 			if (pMenuPopup->GetMenuItemID(i) == ID_ILLUSION_ENABLEMESH)
 			{
 				pMenuPopup->CheckMenuItem(ID_ILLUSION_ENABLEMESH, MF_BYCOMMAND | (ui.EnableMesh() ? MF_CHECKED : MF_UNCHECKED));
@@ -270,12 +283,27 @@ void TPOpenGL::OnInitMenuPopup(CMenu *pMenuPopup, UINT nIndex, BOOL bSysMenu)
 				pMenuPopup->CheckMenuItem(ID_ILLUSION_ENABLECURVE, MF_BYCOMMAND | (ui.EnableCurve() ? MF_CHECKED : MF_UNCHECKED));
 			}
 
+			if (pMenuPopup->GetMenuItemID(i) == ID_ILLUSION_ENABLEPOINT)
+			{
+				pMenuPopup->CheckMenuItem(ID_ILLUSION_ENABLEPOINT, MF_BYCOMMAND | (ui.EnablePoint() ? MF_CHECKED : MF_UNCHECKED));
+			}
+
 			if (pMenuPopup->GetMenuItemID(i) == ID_ILLUSION_ENABLECROSSLINE)
 			{
 				pMenuPopup->CheckMenuItem(ID_ILLUSION_ENABLECROSSLINE, MF_BYCOMMAND | (ui.EnableCrossLine() ? MF_CHECKED : MF_UNCHECKED));
 			}
 		}
 	}
+}
+
+void TPOpenGL::OnEnableTable()
+{
+	ui.SetEnableTable(true);
+}
+
+void TPOpenGL::OnEnableChart()
+{
+	ui.SetEnableTable(false);
 }
 
 void TPOpenGL::OnEnableMesh()
@@ -314,6 +342,18 @@ void TPOpenGL::OnEnableCurve()
 	}
 }
 
+void TPOpenGL::OnEnablePoint()
+{
+	if (ui.EnablePoint())
+	{
+		ui.SetEnablePoint(false);
+	}
+	else
+	{
+		ui.SetEnablePoint(true);
+	}
+}
+
 void TPOpenGL::OnAbout()
 {
 	CAboutDlg dlgAbout;
@@ -338,22 +378,17 @@ void TPOpenGL::PredictModel1(CTime predictFrom, CTime predictTo)
 	//vector<double> dbrsult = jar.ProfitPredictionPredictProfit(dateFrom, dateTo, 100, 2.59, 100, 5.99);
 	//vector<double> dbrsult = jar.OperationAdviceAdvice(dateFrom,dateTo, 100);
 
-    TPCoordinate* coordinate = ui.GetCoordinateByName("1");
+    TPCoordinate* coordinate = ui.GetCoordinateByName(PRE_PURCHASE_PRICE);
     if (coordinate == nullptr)
     {
-        coordinate = ui.AddCoordinate("1");
+		return;
     }
 
-    coordinate->SetXAnchor(dateFrom - 1, dateTo + 1);
-    auto pairMinMax = std::minmax_element(dbrsult.begin(), dbrsult.end());
-    double duration = *pairMinMax.second - *pairMinMax.first;
-    coordinate->SetYAnchor(*pairMinMax.first - 0.50 * duration, *pairMinMax.second + 0.50 * duration);
-    coordinate->SetDrawingPoints<TPDate, double>(RP_POINT, 8, dtX, dbrsult);
-	coordinate->DrawPoints(true);
+	coordinate->SetValues(dtX, dbrsult);
+	ui.setCurrentCoordByName(PRE_PURCHASE_PRICE);
 
-    ui.setCurrentCoordByName("1");
 #else
-
+    vector<double> dbrsult = jar.OperationAdviceAdvice(dateFrom, dateTo, 100);	
 	TPCoordinate* coordinate = ui.GetCoordinateByName("1");
 	if (coordinate == nullptr)
 	{
@@ -361,8 +396,24 @@ void TPOpenGL::PredictModel1(CTime predictFrom, CTime predictTo)
 	}
 
 	vector<string> sdf;
-	vector<double> sd;
-	coordinate->SetTable("Profit Prediction", dateFrom, dateTo, 1, 1, sdf, sd);
+	sdf.push_back("SalePrice");
+	sdf.push_back("PurchaseQuantity");
+	sdf.push_back("Profit");
+	sdf.push_back("SalePrice");
+	sdf.push_back("PurchaseQuantity");
+	sdf.push_back("Profit");
+
+	vector<double> fff;
+	fff.push_back(5.99);
+	fff.push_back(1152);
+	fff.push_back(55650.51);
+
+	fff.push_back(4.99);
+	fff.push_back(222);
+	fff.push_back(55923.2);
+
+	coordinate->SetTable("Advice", dateFrom, dateTo, sdf, fff);
+	ui.SetEnableTable(true);
 #endif
 }
 
@@ -374,25 +425,32 @@ void TPOpenGL::PredictModel2(CTime predictFrom, CTime predictTo)
     vector<double> dbrsult = jar.SalePricePredictionPredictPrice(dateFrom, dateTo);
     vector<TPDate> dtX = TPDate::GetVector(dateFrom, dateTo);
 
-    TPCoordinate* coordinate = ui.GetCoordinateByName("2");
+    TPCoordinate* coordinate = ui.GetCoordinateByName(PRE_SALES_PRICE);
     if (coordinate == nullptr)
     {
-        coordinate = ui.AddCoordinate("2");
+		return;
     }
 
-    coordinate->SetXAnchor(dateFrom - 1, dateTo + 1);
-    auto pairMinMax = std::minmax_element(dbrsult.begin(), dbrsult.end());
-    double duration = *pairMinMax.second - *pairMinMax.first;
-    coordinate->SetYAnchor(*pairMinMax.first - 0.50 * duration, *pairMinMax.second + 0.50 * duration);
-    coordinate->SetDrawingPoints<TPDate, double>(RP_POINT, 8, dtX, dbrsult);
-    coordinate->DrawPoints(true);
-
-    ui.setCurrentCoordByName("2");
+    coordinate->SetValues(dtX, dbrsult);
+	ui.setCurrentCoordByName(PRE_SALES_PRICE);
 }
 
 void TPOpenGL::PredictModel3(CTime predictAt, double dStockQty, double dSalesPrice)
 {
+	TPDate dateAt(predictAt.GetYear(), predictAt.GetMonth(), predictAt.GetDay());
 
+	vector<double> dbrsult = jar.SaleQuantityPredictionPredictSaleQuantity(dateAt, dSalesPrice, dStockQty);
+	TPCoordinate* coordinate = ui.GetCoordinateByName(PRE_SALES_QUANTITY);
+	vector<TPDate> dtX = TPDate::GetVector(dateAt, dateAt);
+	if (coordinate == nullptr)
+	{
+		return;
+	}
+
+	vector<string> titles;
+	titles.push_back("Profit");
+	coordinate->SetValues(dtX, dbrsult, titles, true);
+	ui.setCurrentCoordByName(PRE_SALES_QUANTITY);
 }
 
 void TPOpenGL::PredictModel4(CTime predictWhen, CTime predictTo, double dStockQty, double dSalesPrice, double dPurQty, double dPurPrice)
@@ -403,23 +461,32 @@ void TPOpenGL::PredictModel4(CTime predictWhen, CTime predictTo, double dStockQt
     vector<double> dbrsult = jar.ProfitPredictionPredictProfit(dateWhen, dateTo, dStockQty, dSalesPrice, dPurQty, dPurPrice);
     vector<TPDate> dtX = TPDate::GetVector(dateWhen, dateTo);
 
-    TPCoordinate* coordinate = ui.GetCoordinateByName("4");
+    TPCoordinate* coordinate = ui.GetCoordinateByName(PRE_PROFIT);
     if (coordinate == nullptr)
     {
-        coordinate = ui.AddCoordinate("4");
+		return;
     }
 
-    coordinate->SetXAnchor(dateWhen - 1, dateTo + 1);
-    auto pairMinMax = std::minmax_element(dbrsult.begin(), dbrsult.end());
-    double duration = *pairMinMax.second - *pairMinMax.first;
-    coordinate->SetYAnchor(*pairMinMax.first - 0.50 * duration, *pairMinMax.second + 0.50 * duration);
-    coordinate->SetDrawingPoints<TPDate, double>(RP_POINT, 8, dtX, dbrsult);
-    coordinate->DrawPoints(true);
-
-    ui.setCurrentCoordByName("4");
+	coordinate->SetValues(dtX, dbrsult);
+	ui.setCurrentCoordByName(PRE_PROFIT);
 }
 
 void TPOpenGL::PredictModel5(CTime predictWhen, CTime predictTo, double dStockQty)
 {
+	TPDate dateWhen(predictWhen.GetYear(), predictWhen.GetMonth(), predictWhen.GetDay());
+	TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
+	vector<double> dbrsult = jar.OperationAdviceAdvice(dateWhen, dateTo, dStockQty);
+	vector<TPDate> dtX = TPDate::GetVector(dateTo, dateTo);
 
+	TPCoordinate* coordinate = ui.GetCoordinateByName(OPR_ADVICE);
+	if (coordinate == nullptr){
+		return;
+	}
+
+	vector<string> titles;
+	titles.push_back("Sale Price");		
+	titles.push_back("Purchase Quantity");
+	titles.push_back("Profit");
+	coordinate->SetValues(dtX, dbrsult, titles, true);
+	ui.setCurrentCoordByName(OPR_ADVICE);
 }
