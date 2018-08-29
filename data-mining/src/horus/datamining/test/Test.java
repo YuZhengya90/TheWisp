@@ -7,13 +7,14 @@ import horus.datamining.env.EnvironmentImpl;
 import horus.datamining.model.*;
 import horus.datamining.model.feature.FeatureVector;
 import horus.datamining.wrapper.OperationAdviceWrapper;
+import horus.datamining.wrapper.ProfitPredictionWrapper;
 
 
 public final class Test
 {
 	public static void main(String[] args) throws Exception
 	{
-		testOperationAdvice();
+		ProfitPredictionWrapper.test();
 		OperationAdviceWrapper.test();
 	}
 

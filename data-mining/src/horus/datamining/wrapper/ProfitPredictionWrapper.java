@@ -73,7 +73,7 @@ public class ProfitPredictionWrapper
 			featureVector.setValue("WeekDay", dayOfWeek);
 			featureVector.setValue("Comments", comments);
 			featureVector.setValue("Price", salePrice);
-			featureVector.setValue("StockQuantity", stockQuantity);
+			featureVector.setValue("StockQuantity", stockQuantity + purchaseQuantity);
 			suggestion = saleQuantityModel.solve(featureVector);
 			int saleQuantity = ((Number) suggestion.getFieldValue("SalesQuantity")).intValue();
 			
@@ -114,7 +114,7 @@ public class ProfitPredictionWrapper
 	{
 		ProfitPredictionWrapper.setModelPath("D:/my-git/data-mining/DataMining/models/");
 		double[] result = ProfitPredictionWrapper.predictProfit(
-				2017,4,1,0,2.334107431547618,235,4.99,2017,6,30);
+				2017, 4, 1, 0, 2.334107431547618, 235, 4.99, 2017, 6, 30);
 		System.out.println(result[0]);
 	}
 }
