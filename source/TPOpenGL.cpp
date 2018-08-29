@@ -59,7 +59,7 @@ void TPOpenGL::SetupPixelFormat(HDC hDC)
 void TPOpenGL::TPInitGL()
 {
     TPLoadFont();
-    TPLoadTexture();
+    //TPLoadTexture();
 
     glEnable(GL_BLEND);
     glEnable(GL_LINE_SMOOTH);
