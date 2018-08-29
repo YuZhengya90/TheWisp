@@ -27,5 +27,7 @@ public class SaleQuantityPrediction extends AbstractLearningModel
 		Number saleQuantity = (Number) suggestion.getFieldValue("SalesQuantity");
 		if (saleQuantity.intValue() > stockQuantity.intValue())
 			suggestion.setFieldValue("SalesQuantity", stockQuantity.intValue());
+		else
+			suggestion.setFieldValue("SalesQuantity", saleQuantity.intValue());
 	}
 }
