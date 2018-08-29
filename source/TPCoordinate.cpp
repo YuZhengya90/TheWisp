@@ -290,41 +290,43 @@ void TPCoordinate::RenderCrossLine()
 			float fontReFixY = (mView.GetPosY() - mView.GetNegY()) * TPCOORD_FONT_Y_REFIX;
 
 			glColor3f(0.8, 0.3, 0.3);
-			glEnable(GL_LINE_STIPPLE);
-			glLineStipple(1, 0x1F1F);
-			glBegin(GL_LINES);
-			glVertex3f(mView.GetNegX() - fontReFixX, mTableValues[i], 0);
-			glVertex3f(mView.GetPosX() - fontReFixX, mTableValues[i], 0);
-			glEnd();
-			glDisable(GL_LINE_STIPPLE);
 
 			char value[16] = { 0 };
 			if (mYType == XY_INT)
 			{
 				sprintf_s(value, "%d", (int)roundf(mTableValues[i]));
-				TPDisplayString(value, mView.GetPosX() - fontReFixX, 
+				TPDisplayString(value, mView.GetPosX() - fontReFixX * strlen(value) / 3.8, 
 					TP_MAX(mTableValues[i] - fontReFixY, mView.GetNegY() + fontReFixY * 0.2));
 			}
 
 			else
 			{
 				sprintf_s(value, "%.2f", (float)mTableValues[i]);
-				TPDisplayString(value, mView.GetPosX() - fontReFixX, 
+				TPDisplayString(value, mView.GetPosX() - fontReFixX * strlen(value) / 3.8,
 					TP_MAX(mTableValues[i] - fontReFixY, mView.GetNegY() + fontReFixY * 0.2));
 			}
 
 			glEnable(GL_LINE_STIPPLE);
-			glLineStipple(1, 0x1F1F);
+			glLineStipple(1, 0x5555);
 			glBegin(GL_LINES);
-			glVertex3f(mTableFromto[i].ToInt(), mView.GetNegY() - 4 * fontReFixY, 0);
-			glVertex3f(mTableFromto[i].ToInt(), mView.GetPosY() - 4 * fontReFixY, 0);
+			glVertex3f(mView.GetNegX() - fontReFixX * strlen(value) / 3.8, mTableValues[i], 0);
+			glVertex3f(mView.GetPosX() - fontReFixX * strlen(value) / 3.8, mTableValues[i], 0);
 			glEnd();
 			glDisable(GL_LINE_STIPPLE);
 
 
 			TPDisplayString(mTableFromto[i].ToString().c_str(), 
 				TP_MAX((mTableFromto[i].ToInt() - fontReFixX), mView.GetNegX() + fontReFixX * 0.2)
-				, mView.GetPosY() - 3 * fontReFixY);
+				, mView.GetPosY() - 3.2 * fontReFixY);
+
+
+			glEnable(GL_LINE_STIPPLE);
+			glLineStipple(1, 0x5555);
+			glBegin(GL_LINES);
+			glVertex3f(mTableFromto[i].ToInt(), mView.GetNegY() - 4 * fontReFixY, 0);
+			glVertex3f(mTableFromto[i].ToInt(), mView.GetPosY() - 4 * fontReFixY, 0);
+			glEnd();
+			glDisable(GL_LINE_STIPPLE);
 		}
 	}
 }
@@ -402,8 +404,13 @@ void TPCoordinate::RenderReferenceValue()
 void TPCoordinate::RenderTables()
 {
 	TPDisplayString2(mName, 50, 500, 40, 1);
+	if (mTableFromto.size() == 0)
+	{
+		return;
+	}
+
 	std::string dateString = mTableFromto[0].ToString();
-	if (mTableFromto.size() >= 1)
+	if (mTableFromto.size() > 1)
 	{
 		dateString = mTableFromto[0].ToString() + "-" + mTableFromto[mTableFromto.size() - 1].ToString();
 	}
