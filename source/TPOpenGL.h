@@ -5,6 +5,12 @@
 #include "TPUI.h"
 #include "TPJar.h"
 
+#define PRE_PURCHASE_PRICE "Predict Purchase Price"
+#define PRE_SALES_PRICE "Predict Sales Price"
+#define PRE_SALES_QUANTITY "Predict Sales Quantity"
+#define PRE_PROFIT "Predict Profit"
+#define OPR_ADVICE "Operation Advice"
+
 class TPOpenGL : public CWnd
 {
 public:
