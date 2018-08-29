@@ -119,6 +119,21 @@ BOOL CTheWispDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+    CTime originalDate(2017, 4, 1, 0, 0, 0);
+
+    m_dateFromPredict1.SetTime(&originalDate);
+    m_dateToPredict1.SetTime(&originalDate);
+
+    m_dateFromPredict2.SetTime(&originalDate);
+    m_dateToPredict2.SetTime(&originalDate);
+
+    m_dateAtPredict3.SetTime(&originalDate);
+
+    m_dateWhenPredict4.SetTime(&originalDate);
+    m_dateToPredict4.SetTime(&originalDate);
+
+    m_dateWhenPredict5.SetTime(&originalDate);
+    m_dateToPredict5.SetTime(&originalDate);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -232,6 +247,11 @@ void CTheWispDlg::OnBnClickedBtnPredict()
             CTime predictAt;
             m_dateAtPredict3.GetTime(predictAt);
 
+            if (m_dStockQtyPredict3 < 0)
+            {
+                MessageBox(CString("The stock quantity must be greater than 0."));
+                return;
+            }
             if (m_dSalesPricePredict3 < 0)
             {
                 MessageBox(CString("The sales price must be greater than 0."));
@@ -248,6 +268,11 @@ void CTheWispDlg::OnBnClickedBtnPredict()
             m_dateWhenPredict4.GetTime(predictWhen);
             m_dateToPredict4.GetTime(predictTo);
 
+            if (predictWhen > predictTo)
+            {
+                MessageBox(CString("The date range is not correct!!!"));
+                return;
+            }
             if (m_dStockQtyPredict4 < 0)
             {
                 MessageBox(CString("The stock quantity must be greater than 0."));
@@ -278,6 +303,11 @@ void CTheWispDlg::OnBnClickedBtnPredict()
             m_dateWhenPredict5.GetTime(predictWhen);
             m_dateToPredict5.GetTime(predictTo);
 
+            if (predictWhen > predictTo)
+            {
+                MessageBox(CString("The date range is not correct!!!"));
+                return;
+            }
             if (m_dStockQtyPredict5 < 0)
             {
                 MessageBox(CString("The stock quantity must be greater than 0."));
