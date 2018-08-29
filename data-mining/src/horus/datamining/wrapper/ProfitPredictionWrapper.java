@@ -27,14 +27,14 @@ public class ProfitPredictionWrapper
 	
 	
 	// Input:
-	//		todayYear - numeric
+	//		todayYear - numeric			(in 2017)
 	//		todayMonth - numeric
 	//		todayDay - numeric
-	//		stockQuantity - numeric
-	//		purchasePrice - numeric
-	//		purchaseQuantity - numeric
-	//		salePrice - numeric
-	//		targetYear - numeric
+	//		stockQuantity - numeric		(0~25000)
+	//		purchasePrice - numeric		(1.53~3.95)
+	//		purchaseQuantity - numeric	(0~1159)
+	//		salePrice - numeric			(3.99~7.19)
+	//		targetYear - numeric		(in 2017, no earlier than today)
 	//		targetMonth - numeric
 	//		targetDay - numeric
 	//	Output:

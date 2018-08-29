@@ -22,11 +22,11 @@ public class OperationAdviceWrapper
 
 
 	//	Input:
-	//		todayYear - numeric
+	//		todayYear - numeric			(in 2017)
 	//		todayMonth - numeric
 	//		todayDay - numeric
-	//		stockQuantity - numeric
-	//		targetYear - numeric
+	//		stockQuantity - numeric		(0~25000)
+	//		targetYear - numeric		(in 2017, no earlier than today)
 	//		targetMonth - numeric
 	//		targetDay - numeric
 	//	Output:
