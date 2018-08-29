@@ -16,7 +16,13 @@ public:
 	~TPJar();
 
 	bool Init(const char* modelPath);
-	
+
+	void PurchasePricePredictionSetModelPath(const char* str);
+	void SalePricePredictionSetModelPath(const char* str);
+	void SaleQuantityPredictionSetModelPath(const char* str);
+	void ProfitPredictionSetModelPath(const char* str);
+	void OperationAdviceSetModelPath(const char* str);
+
 	// return [sDay, eDay]'s purchase price vector.
 	vector<double> PurchasePricePredictionPredictPrice(TPDate sDay, TPDate eDay);
 
@@ -34,12 +40,6 @@ public:
 	vector<double> OperationAdviceAdvice(TPDate today, TPDate targetDay, int stockQuantity);
 
 private:
-	
-	void PurchasePricePredictionSetModelPath(const char* str);
-	void SalePricePredictionSetModelPath(const char* str);
-	void SaleQuantityPredictionSetModelPath(const char* str);
-	void ProfitPredictionSetModelPath(const char* str);
-	void OperationAdviceSetModelPath(const char* str);
 
 	void DeInit();
 

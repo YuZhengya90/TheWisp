@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <thread>
 #include "..\resource.h"
 
 #define _WIN32_WINNT _WIN32_WINNT_MAXVER
@@ -115,7 +116,7 @@ void TPOpenGL::PreSubclassWindow()
     hglrc = wglCreateContext(hdc);
     wglMakeCurrent(hdc, hglrc);
 
-    ::SetTimer(m_hWnd, REDRAW_TIMER_ID, 10, NULL);
+    ::SetTimer(m_hWnd, REDRAW_TIMER_ID, 40, NULL);
 
     TPInitGL();
     TPInitUI(m_hWnd);
