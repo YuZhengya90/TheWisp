@@ -202,6 +202,12 @@ void CTheWispDlg::OnBnClickedBtnPredict()
             m_dateFromPredict1.GetTime(predictFrom);
             m_dateToPredict1.GetTime(predictTo);
 
+            if (predictFrom > predictTo)
+            {
+                MessageBox(CString("The date range is not correct!!!"));
+                return;
+            }
+
             m_ctrlChart.PredictModel1(predictFrom, predictTo);
         }
         break;
@@ -212,6 +218,12 @@ void CTheWispDlg::OnBnClickedBtnPredict()
             m_dateFromPredict2.GetTime(predictFrom);
             m_dateToPredict2.GetTime(predictTo);
 
+            if (predictFrom > predictTo)
+            {
+                MessageBox(CString("The date range is not correct!!!"));
+                return;
+            }
+
             m_ctrlChart.PredictModel2(predictFrom, predictTo);
         }
         break;
@@ -219,6 +231,12 @@ void CTheWispDlg::OnBnClickedBtnPredict()
         {
             CTime predictAt;
             m_dateAtPredict3.GetTime(predictAt);
+
+            if (m_dSalesPricePredict3 < 0)
+            {
+                MessageBox(CString("The sales price must be greater than 0."));
+                return;
+            }
 
             m_ctrlChart.PredictModel3(predictAt, m_dStockQtyPredict3, m_dSalesPricePredict3);
         }
@@ -230,6 +248,27 @@ void CTheWispDlg::OnBnClickedBtnPredict()
             m_dateWhenPredict4.GetTime(predictWhen);
             m_dateToPredict4.GetTime(predictTo);
 
+            if (m_dStockQtyPredict4 < 0)
+            {
+                MessageBox(CString("The stock quantity must be greater than 0."));
+                return;
+            }
+            if (m_dSalesPricePredict4 < 0)
+            {
+                MessageBox(CString("The sales price must be greater than 0."));
+                return;
+            }
+            if (m_dPurQtyPredict4 < 0)
+            {
+                MessageBox(CString("The purchase quantity must be greater than 0."));
+                return;
+            }
+            if (m_dPurPricePredict4 < 0)
+            {
+                MessageBox(CString("The purchase price must be greater than 0."));
+                return;
+            }
+
             m_ctrlChart.PredictModel4(predictWhen, predictTo, m_dStockQtyPredict4, m_dSalesPricePredict4, m_dPurQtyPredict4, m_dPurPricePredict4);
         }
         break;
@@ -238,6 +277,12 @@ void CTheWispDlg::OnBnClickedBtnPredict()
             CTime predictWhen, predictTo;
             m_dateWhenPredict5.GetTime(predictWhen);
             m_dateToPredict5.GetTime(predictTo);
+
+            if (m_dStockQtyPredict5 < 0)
+            {
+                MessageBox(CString("The stock quantity must be greater than 0."));
+                return;
+            }
 
             m_ctrlChart.PredictModel5(predictWhen, predictTo, m_dStockQtyPredict5);
         }
