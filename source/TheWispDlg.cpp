@@ -253,27 +253,27 @@ void CTheWispDlg::OnRadioBtnGroup0Clicked()
     {
         case 0:
         {
-            m_ctrlChart.ui.setCurrentCoordByName("1");
+            m_ctrlChart.ui.setCurrentCoordByName(PRE_PURCHASE_PRICE);
         }
         break;
         case 1:
         {
-            m_ctrlChart.ui.setCurrentCoordByName("2");
+            m_ctrlChart.ui.setCurrentCoordByName(PRE_SALES_PRICE);
         }
         break;
         case 2:
         {
-            m_ctrlChart.ui.setCurrentCoordByName("3");
+            m_ctrlChart.ui.setCurrentCoordByName(PRE_SALES_QUANTITY);
         }
         break;
         case 3:
         {
-            m_ctrlChart.ui.setCurrentCoordByName("4");
+            m_ctrlChart.ui.setCurrentCoordByName(PRE_PROFIT);
         }
         break;
         case 4:
         {
-            m_ctrlChart.ui.setCurrentCoordByName("5");
+            m_ctrlChart.ui.setCurrentCoordByName(OPR_ADVICE);
         }
         break;
         default:

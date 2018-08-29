@@ -25,11 +25,11 @@ public final class SaleQuantityPredictionWrapper
 
 
 	// Input:
-	// 		year - numeric,
+	// 		year - numeric,				(in 2017)
 	// 		month - numeric,
 	// 		day - numeric,
-	// 		price - numeric,
-	// 		stockQuantity - numeric
+	// 		price - numeric,			(3.98~7.19)
+	// 		stockQuantity - numeric		(0~25000)
 	// Output:
 	//	 	SalesQuantity - numeric
 	public static double[] predictSaleQuantity(int year, int month, int day, double price,

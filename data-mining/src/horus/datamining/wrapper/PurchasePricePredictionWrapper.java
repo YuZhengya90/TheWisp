@@ -22,7 +22,7 @@ public final class PurchasePricePredictionWrapper
 	}
 
 
-	// Input: year - numeric, month - numeric, day - numeric
+	// Input: year - numeric, month - numeric, day - numeric	(in 2017)
 	// Output: Price - numeric
 	public static double[] predictPrice(int year, int month, int day)
 	{
