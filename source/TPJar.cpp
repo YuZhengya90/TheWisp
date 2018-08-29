@@ -1,4 +1,33 @@
+#include <thread>
 #include "TPJar.h"
+
+using namespace std;
+
+static void TPJarThreadFunc1(TPJar* jar, const char* str)
+{
+	if (jar)
+	{
+		jar->PurchasePricePredictionSetModelPath(str);
+		jar->SalePricePredictionSetModelPath(str);
+		jar->SaleQuantityPredictionSetModelPath(str);
+	}
+}
+
+static void TPJarThreadFunc2(TPJar* jar, const char* str)
+{
+	if (jar)
+	{
+		jar->ProfitPredictionSetModelPath(str);
+	}
+}
+
+static void TPJarThreadFunc3(TPJar* jar, const char* str)
+{
+	if (jar)
+	{
+		jar->OperationAdviceSetModelPath(str);
+	}
+}
 
 TPJar::TPJar()
 	:mInitOK(false), mJVM(nullptr), mJVMEnv(nullptr), mJVMInstance(nullptr)
@@ -17,8 +46,11 @@ void TPJar::PurchasePricePredictionSetModelPath(const char* str)
 		return;
 	}
 
-	jclass purchasePricePredictionWrapper = mJVMEnv->FindClass("horus/datamining/wrapper/PurchasePricePredictionWrapper");
-	jmethodID setModelPath = mJVMEnv->GetStaticMethodID(purchasePricePredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
+	JNIEnv* env;
+	mJVM->AttachCurrentThread((void **)&env, NULL);
+
+	jclass purchasePricePredictionWrapper = env->FindClass("horus/datamining/wrapper/PurchasePricePredictionWrapper");
+	jmethodID setModelPath = env->GetStaticMethodID(purchasePricePredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
 	if (setModelPath == 0)
 	{
 #ifdef _DEBUG
@@ -27,7 +59,8 @@ void TPJar::PurchasePricePredictionSetModelPath(const char* str)
 		return;
 	}
 
-	mJVMEnv->CallStaticObjectMethod(purchasePricePredictionWrapper, setModelPath, mJVMEnv->NewStringUTF(str));
+	env->CallStaticObjectMethod(purchasePricePredictionWrapper, setModelPath, env->NewStringUTF(str));
+	mJVM->DetachCurrentThread();
 }
 
 vector<double> TPJar::PurchasePricePredictionPredictPrice(TPDate sDay, TPDate eDay)
@@ -82,8 +115,11 @@ void TPJar::SalePricePredictionSetModelPath(const char* str)
 		return;
 	}
 
-	jclass salePricePredictionWrapper = mJVMEnv->FindClass("horus/datamining/wrapper/SalePricePredictionWrapper");
-	jmethodID setModelPath = mJVMEnv->GetStaticMethodID(salePricePredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
+	JNIEnv* env;
+	mJVM->AttachCurrentThread((void **)&env, NULL);
+
+	jclass salePricePredictionWrapper = env->FindClass("horus/datamining/wrapper/SalePricePredictionWrapper");
+	jmethodID setModelPath = env->GetStaticMethodID(salePricePredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
 	if (setModelPath == 0)
 	{
 #ifdef _DEBUG
@@ -92,7 +128,8 @@ void TPJar::SalePricePredictionSetModelPath(const char* str)
 		return;
 	}
 
-	mJVMEnv->CallStaticObjectMethod(salePricePredictionWrapper, setModelPath, mJVMEnv->NewStringUTF(str));
+	env->CallStaticObjectMethod(salePricePredictionWrapper, setModelPath, env->NewStringUTF(str));
+	mJVM->DetachCurrentThread();
 }
 
 vector<double> TPJar::SalePricePredictionPredictPrice(TPDate sDay, TPDate eDay)
@@ -147,8 +184,11 @@ void TPJar::SaleQuantityPredictionSetModelPath(const char* str)
 		return;
 	}
 
-	jclass saleQuantityPredictionWrapper = mJVMEnv->FindClass("horus/datamining/wrapper/SaleQuantityPredictionWrapper");
-	jmethodID setModelPath = mJVMEnv->GetStaticMethodID(saleQuantityPredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
+	JNIEnv* env;
+	mJVM->AttachCurrentThread((void **)&env, NULL);
+
+	jclass saleQuantityPredictionWrapper = env->FindClass("horus/datamining/wrapper/SaleQuantityPredictionWrapper");
+	jmethodID setModelPath = env->GetStaticMethodID(saleQuantityPredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
 	if (setModelPath == 0)
 	{
 #ifdef _DEBUG
@@ -157,7 +197,8 @@ void TPJar::SaleQuantityPredictionSetModelPath(const char* str)
 		return;
 	}
 
-	mJVMEnv->CallStaticObjectMethod(saleQuantityPredictionWrapper, setModelPath, mJVMEnv->NewStringUTF(str));
+	env->CallStaticObjectMethod(saleQuantityPredictionWrapper, setModelPath, env->NewStringUTF(str));
+	mJVM->DetachCurrentThread();
 }
 
 vector<double> TPJar::SaleQuantityPredictionPredictSaleQuantity(TPDate atDay, float price, int stockQuantity)
@@ -207,8 +248,11 @@ void TPJar::ProfitPredictionSetModelPath(const char* str)
 		return;
 	}
 
-	jclass profitPredictionWrapper = mJVMEnv->FindClass("horus/datamining/wrapper/ProfitPredictionWrapper");
-	jmethodID setModelPath = mJVMEnv->GetStaticMethodID(profitPredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
+	JNIEnv* env;
+	mJVM->AttachCurrentThread((void **)&env, NULL);
+
+	jclass profitPredictionWrapper = env->FindClass("horus/datamining/wrapper/ProfitPredictionWrapper");
+	jmethodID setModelPath = env->GetStaticMethodID(profitPredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
 	if (setModelPath == 0)
 	{
 #ifdef _DEBUG
@@ -217,7 +261,8 @@ void TPJar::ProfitPredictionSetModelPath(const char* str)
 		return;
 	}
 
-	mJVMEnv->CallStaticObjectMethod(profitPredictionWrapper, setModelPath, mJVMEnv->NewStringUTF(str));
+	env->CallStaticObjectMethod(profitPredictionWrapper, setModelPath, env->NewStringUTF(str));
+	mJVM->DetachCurrentThread();
 }
 
 vector<double> TPJar::ProfitPredictionPredictProfit(
@@ -274,8 +319,11 @@ void TPJar::OperationAdviceSetModelPath(const char* str)
 		return;
 	}
 
-	jclass operationAdviceWrapper = mJVMEnv->FindClass("horus/datamining/wrapper/OperationAdviceWrapper");
-	jmethodID setModelPath = mJVMEnv->GetStaticMethodID(operationAdviceWrapper, "setModelPath", "(Ljava/lang/String;)V");
+	JNIEnv* env;
+	mJVM->AttachCurrentThread((void **)&env, NULL);
+
+	jclass operationAdviceWrapper = env->FindClass("horus/datamining/wrapper/OperationAdviceWrapper");
+	jmethodID setModelPath = env->GetStaticMethodID(operationAdviceWrapper, "setModelPath", "(Ljava/lang/String;)V");
 	if (setModelPath == 0)
 	{
 #ifdef _DEBUG
@@ -284,7 +332,8 @@ void TPJar::OperationAdviceSetModelPath(const char* str)
 		return;
 	}
 
-	mJVMEnv->CallStaticObjectMethod(operationAdviceWrapper, setModelPath, mJVMEnv->NewStringUTF(str));
+	env->CallStaticObjectMethod(operationAdviceWrapper, setModelPath, env->NewStringUTF(str));
+	mJVM->DetachCurrentThread();
 }
 
 vector<double> TPJar::OperationAdviceAdvice(TPDate today, TPDate targetDay, int stockQuantity)
@@ -383,11 +432,19 @@ bool TPJar::Init(const char* modelPath)
 	}
 
 	mInitOK = true;
-	PurchasePricePredictionSetModelPath(modelPath);
-	SalePricePredictionSetModelPath(modelPath);
-	SaleQuantityPredictionSetModelPath(modelPath);
-	ProfitPredictionSetModelPath(modelPath);
-	OperationAdviceSetModelPath(modelPath);
+	std::thread th1(TPJarThreadFunc1, this, modelPath);
+	std::thread th2(TPJarThreadFunc2, this, modelPath);
+	std::thread th3(TPJarThreadFunc3, this, modelPath);
+	
+	th1.join();
+	th2.join();
+	th3.join();
+
+	//PurchasePricePredictionSetModelPath(modelPath);
+	//SalePricePredictionSetModelPath(modelPath);
+	//SaleQuantityPredictionSetModelPath(modelPath);
+	//ProfitPredictionSetModelPath(modelPath);
+	//OperationAdviceSetModelPath(modelPath);
 	
 	return true;
 }
