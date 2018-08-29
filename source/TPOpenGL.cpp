@@ -453,7 +453,7 @@ void TPOpenGL::PredictModel4(CTime predictWhen, CTime predictTo, double dStockQt
     TPDate dateWhen(predictWhen.GetYear(), predictWhen.GetMonth(), predictWhen.GetDay());
     TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
 
-    vector<double> dbrsult = jar.ProfitPredictionPredictProfit(dateWhen, dateTo, dStockQty, dSalesPrice, dPurQty, dPurPrice);
+	vector<double> dbrsult = jar.ProfitPredictionPredictProfit(dateWhen, dateTo, dStockQty, dPurPrice, dPurQty, dSalesPrice);
     vector<TPDate> dtX = TPDate::GetVector(dateWhen, dateTo);
 
     TPCoordinate* coordinate = ui.GetCoordinateByName(PRE_PROFIT);
