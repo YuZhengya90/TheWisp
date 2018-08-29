@@ -85,9 +85,12 @@ void TPUI::Render()
 	}
 	else
 	{
-		GetCurrentCoord().RenderPoints();
-		RenderIllusion();
-		GetCurrentCoord().RenderReferenceValue();
+		unsigned renderPoint = GetCurrentCoord().RenderPoints();
+		if (renderPoint > 0)
+		{
+			RenderIllusion();
+			GetCurrentCoord().RenderReferenceValue();
+		}
 	}	
 }
 

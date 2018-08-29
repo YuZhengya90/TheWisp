@@ -14,7 +14,7 @@
 
 TPCoordinate::TPCoordinate(char * name)
 	:mName(name), mMinX(0), mMaxX(10), mMinY(0), mMaxY(10), mYType(XY_FLOAT)
-{
+{	
 	Init();
 }
 
@@ -22,6 +22,9 @@ void TPCoordinate::Init()
 {
 	mHoveredPoint = -1;
 	mEnableFeatures = 0;
+	SetEnableFeatures(F_HASCHART, false);
+	mView.SetXAnchor(mMinX, mMaxX);
+	mView.SetYAnchor(mMinY, mMaxY);
 }
 
 void TPCoordinate::SetXAnchor(TPDate minX, TPDate maxX)
@@ -115,34 +118,43 @@ void TPCoordinate::SetValues(std::vector<TPDate> dates, std::vector<double> valu
 		SetEnableFeatures(F_CROSSLINE, true);
 		SetEnableFeatures(F_POINT, true);
 		SetEnableFeatures(F_TABLE, false);
+		SetEnableFeatures(F_HASCHART, true);
 	}
 	else
 	{
 		SetEnableFeatures(F_TABLE, true);
+		SetEnableFeatures(F_HASCHART, false);
 	}
 }
 
-void TPCoordinate::RenderPoints()
+unsigned TPCoordinate::RenderPoints()
 {
+	unsigned szPts = mTableFromto.size();
+	if (szPts == 0)
+	{
+		return szPts;
+	}
+
     glColor3f(0.0f, 1.0f, 1.0f);
     if (IsEnableFeatures(F_CURVE))
     {
+		float lineWidth = GetCurveWidth();
+		glLineWidth(lineWidth);
         glLoadIdentity();
         glBegin(GL_LINE_STRIP);
-        unsigned szPts = mTableFromto.size();
         for (unsigned i = 0; i < szPts; ++i)
         {
 			glVertex3f(mTableFromto[i].ToInt(), mTableValues[i], 0);
         }
         glEnd();
+		glLineWidth(1.0);
     }
 
 	if (IsEnableFeatures(F_POINT))
     {
         glLoadIdentity();
-		unsigned szPts = mTableFromto.size();
 		float disX = 1.0f, disY = 1.0f;
-		if (szPts > 1)
+		if (szPts >= 1)
 		{
 			disX = 0.4;
 			disY = (mMaxY - mMinY) / (mMaxX - mMinX) * 0.6;
@@ -177,6 +189,8 @@ void TPCoordinate::RenderPoints()
 
         glPointSize(1.0);
     }
+
+	return szPts;
 }
 
 void TPCoordinate::RenderMesh()
@@ -403,7 +417,16 @@ void TPCoordinate::RenderReferenceValue()
 
 void TPCoordinate::RenderTables()
 {
-	TPDisplayString2(mName, 50, 500, 40, 1);
+	const int titleBeginX = 40;
+	const int titleBeginY = ILLU_H - 70;
+	const int timeBeginX = titleBeginX;
+	const int timeBeginY = titleBeginY - 50;
+	const int detailBeginX = titleBeginX;
+	const int detailBeginY = timeBeginY - 85;
+	const int detailDistance = 70;
+	const int detailValueX = 800;
+	
+	TPDisplayString2(mName, titleBeginX, titleBeginY, 40, 1);
 	if (mTableFromto.size() == 0)
 	{
 		return;
@@ -415,13 +438,13 @@ void TPCoordinate::RenderTables()
 		dateString = mTableFromto[0].ToString() + "-" + mTableFromto[mTableFromto.size() - 1].ToString();
 	}
 	
-	TPDisplayString2(dateString.c_str(), 50, 450, 20, 0);
+	TPDisplayString2(dateString.c_str(), timeBeginX, timeBeginY, 20, 0);
 
 	glColor3f(0.0, 0.0, 0.0);
 	glLineWidth(5);
 	glBegin(GL_LINES);
-	glVertex3f(50.0f, 420.0, 0);
-	glVertex3f(1190.0f, 420.0, 0);
+	glVertex3f(titleBeginX, timeBeginY - 20, 0);
+	glVertex3f(ILLU_W - titleBeginX, timeBeginY - 20, 0);
 	glEnd();
 	glLineWidth(1);
 
@@ -435,12 +458,12 @@ void TPCoordinate::RenderTables()
 
 	for (unsigned i = 0; i < tableTitleSize; ++i)
 	{
-		int yp = (320 - i * 80);
-		TPDisplayString2(mTableTitles[i].c_str(), 50, I2F(yp), 40, 1);
+		int yp = (detailBeginY - i * detailDistance);
+		TPDisplayString2(mTableTitles[i].c_str(), detailBeginX, I2F(yp), 40, 1);
 
 		char value[16] = { 0 };
 		sprintf_s(value, "%.2lf", mTableValues[i]);
-		TPDisplayString2(value, 750, I2F(yp), 40, 0);
+		TPDisplayString2(value, detailValueX, I2F(yp), 40, 0);
 	}
 }
 
@@ -558,4 +581,29 @@ void TPCoordinate::Exchange2IllusionAnchor()
 {
 	mTableAnchor.Push(mMinX, mMaxX, mMinY, mMaxY, mView);
 	mIllusionAnchor.Pop(mMinX, mMaxX, mMinY, mMaxY, mView);
+}
+
+float TPCoordinate::GetCurveWidth()
+{
+	unsigned countInView = 0;
+	unsigned szPts = mTableFromto.size();
+	for (unsigned int i = 0; i < szPts; ++i)
+	{
+		if (mTableFromto[i].ToInt() >= mView.GetNegX() && mTableFromto[i].ToInt() <= mView.GetPosX())
+		{
+			countInView++;
+		}
+	}
+
+	float lineWidth = 100.0f / countInView;
+	if (lineWidth > 8.0f)
+	{
+		lineWidth = 8.0f;
+	}
+	if (lineWidth < 1.0f)
+	{
+		lineWidth = 1.0f;
+	}
+
+	return lineWidth;
 }

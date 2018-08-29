@@ -63,16 +63,13 @@
     <ClInclude Include="source\TPView.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
-    <ClInclude Include="TPOpenGL.h">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
     <ClInclude Include="source\TheWispDlg.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="TheWisp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\TPTable.h">
+    <ClInclude Include="source\TPOpenGL.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -109,9 +106,6 @@
     </ClCompile>
     <ClCompile Include="TheWisp.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\TPTable.cpp">
-      <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

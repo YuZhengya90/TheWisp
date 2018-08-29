@@ -113,14 +113,13 @@
     <ClInclude Include="source\TPEnvironment.h" />
     <ClInclude Include="source\TPFont.h" />
     <ClInclude Include="source\TPJar.h" />
-    <ClInclude Include="source\TPTable.h" />
+    <ClInclude Include="source\TPOpenGL.h" />
     <ClInclude Include="source\TPTexture.h" />
     <ClInclude Include="source\TPUI.h" />
     <ClInclude Include="source\TPView.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TheWisp.h" />
-    <ClInclude Include="TPOpenGL.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\TheWispDlg.cpp" />
@@ -129,7 +128,6 @@
     <ClCompile Include="source\TPFont.cpp" />
     <ClCompile Include="source\TPJar.cpp" />
     <ClCompile Include="source\TPOpenGL.cpp" />
-    <ClCompile Include="source\TPTable.cpp" />
     <ClCompile Include="source\TPTexture.cpp" />
     <ClCompile Include="source\TPUI.cpp" />
     <ClCompile Include="source\TPView.cpp" />

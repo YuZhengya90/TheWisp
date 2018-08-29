@@ -5,6 +5,7 @@
 #include "TPUI.h"
 #include "TPJar.h"
 
+#define HI_HACKATHON "Hi BusinessOne, Hi Hackathon!"
 #define PRE_PURCHASE_PRICE "Predict Purchase Price"
 #define PRE_SALES_PRICE "Predict Sales Price"
 #define PRE_SALES_QUANTITY "Predict Sales Quantity"
@@ -53,6 +54,9 @@ public:
 protected:
     void TPInitGL();
     void TPInitUI(HWND hwnd);
+
+private:
+	void HiHackathon();
 
 public:
     void PredictModel1(CTime predictFrom, CTime predictTo);

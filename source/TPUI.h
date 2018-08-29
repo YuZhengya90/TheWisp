@@ -13,7 +13,7 @@ struct TPMouse
 };
 
 class TPUI
-{    
+{
 private:
     void RenderIllusion();
     void DisplayIllusionBorder();
@@ -47,6 +47,7 @@ public:
 	bool EnableCurve() { return !EnableTable() && GetCurrentCoord().IsEnableFeatures(F_CURVE); }
 	bool EnablePoint() { return !EnableTable() && GetCurrentCoord().IsEnableFeatures(F_POINT); }
 	bool EnableTable() { return GetCurrentCoord().IsEnableFeatures(F_TABLE); }
+	bool HasChart() { return GetCurrentCoord().IsEnableFeatures(F_HASCHART); }
 	
 	void SetEnableIllusion(bool bEnable) { GetCurrentCoord().SetEnableFeatures(F_TABLE, !bEnable); }
 	void SetEnableMesh(bool bEnable) { GetCurrentCoord().SetEnableFeatures(F_MESH, bEnable); }

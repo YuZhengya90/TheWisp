@@ -29,7 +29,7 @@ typedef enum TPCoord_F_T
 	F_CURVE      = 0x0008,
 
 	// 0000 0000 0001 0000
-	F_CHART      = 0x0010,
+	F_HASCHART   = 0x0010,
 
 	// 0000 0000 0010 0000
 	F_TABLE      = 0x0020
@@ -65,10 +65,42 @@ class TPCoordinate
 {	
 public:
 	TPCoordinate(char * name);
-
 	void Init();
-   
-protected:
+	
+	//           ------------------------------------------------------------
+	//           |   Advice                                                 |                   
+	//           | 20180101-20180201                                        |
+	//           ============================================================
+	//           |  SalePrice                                  5.99         |
+	//           |  PurchaseQuantity                           1130         |
+	//           |     Profit                                  5320         |
+	//           ------------------------------------------------------------
+
+	void SetValues(std::vector<TPDate> dates, std::vector<double> values);
+	void SetValues(std::vector<TPDate> dates, std::vector<double> values, std::vector<string> titles, bool onlyTable);
+	void SetEnableFeatures(TPCoord_F_T efType, bool bEnable);
+	bool IsEnableFeatures(TPCoord_F_T efType);
+	 int HoverPoint(TPPoint p);
+
+unsigned RenderPoints();
+    void RenderMesh();
+	void RenderCrossLine();
+    void RenderReferenceValue();
+	void RenderTables();
+
+private:  // for friend class TPUI
+
+	friend class TPUI;
+
+	float GetMinX()const { return mMinX; }
+	float GetMaxX()const { return mMaxX; }
+	float GetMinY()const { return mMinY; }
+	float GetMaxY()const { return mMaxY; }
+
+	TPView& GetView()    { return mView; }
+	char* GetName()const { return mName; }
+
+public:
 	// X Anchor initialized with Date value.
 	void SetXAnchor(TPDate minX, TPDate maxX);
 
@@ -81,47 +113,12 @@ protected:
 	// Y Anchor intialized with int value.
 	void SetYAnchor(int minY, int maxY);
 
-public:
-
-    float GetMinX()const { return mMinX; }
-    float GetMaxX()const { return mMaxX; }
-    float GetMinY()const { return mMinY; }
-    float GetMaxY()const { return mMaxY; }
-
-    TPView& GetView(){ return mView; }
-    char* GetName() { return mName; }
-	
-	//           ------------------                   ----------------------
-	//           |   Advice       |                   |20180101~20180201   |
-	//           ------------------                   ----------------------
-	//           ------------------------------------------------------------
-	//           |  SalePrice       |    PurchaseQuantity     |    Profit   |
-	//           ------------------------------------------------------------
-	//           |   5.99           |         1130            |     5320    |
-	//           ------------------------------------------------------------
-	//
-	//           Advice = caption 
-	//           from ~ to
-	//           rows = 2 cols = 3 titles = {"SalePrice", "PurchaseQuantitiy", "Profit"}, values = {5.99, 1130, 5320}
-
-	void SetValues(std::vector<TPDate> dates, std::vector<double> values);
-	void SetValues(std::vector<TPDate> dates, std::vector<double> values, std::vector<string> titles, bool onlyTable);
-	void SetEnableFeatures(TPCoord_F_T efType, bool bEnable);
-	bool IsEnableFeatures(TPCoord_F_T efType);
-	int HoverPoint(TPPoint p);
-
-	void RenderPoints();
-    void RenderMesh();
-	void RenderCrossLine();
-    void RenderReferenceValue();
-	void RenderTables();
-
 private:
-
 	float GetSuitableXStep();
 	float GetSuitableYStep();
-	void Exchange2TableAnchor();
-	void Exchange2IllusionAnchor();
+	 void Exchange2TableAnchor();
+	 void Exchange2IllusionAnchor();
+	float GetCurveWidth();
 
 	// identity
 	char* mName;

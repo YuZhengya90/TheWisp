@@ -76,6 +76,47 @@ void TPOpenGL::TPInitUI(HWND hwnd)
 	ui.AddCoordinate(PRE_SALES_QUANTITY);
     ui.AddCoordinate(PRE_PROFIT);
 	ui.AddCoordinate(OPR_ADVICE);
+
+	HiHackathon();
+}
+
+void TPOpenGL::HiHackathon()
+{
+	TPCoordinate* coord = ui.AddCoordinate(HI_HACKATHON);
+	
+	vector<TPDate> duration = TPDate::GetVector(TPDate(20180810), TPDate(20180831));
+	vector<double> percentage({0,0.6,0.6,3.6,9.2,14.1,19.5,25.0,30.6,40.3,45.3,49.3,58.6,65.2,70.8,76.2,82.2,86.6,88.9,92.6,96.4,100.0});
+	vector<string> titles({
+		"Start Hackathon",
+		"Question Analysis",
+		"Question Analysis",
+		"Group Discussion",
+		"Tech Analysis",
+		"Tech Model & Demo",
+		"Tech Model & Demo",
+		"Tech Model & Demo",
+		"Tech Model & Demo",
+		"Develop",
+		"Develop",
+		"Develop",
+		"Half-time Discuss",
+		"Develop",
+		"Develop",
+		"Develop",
+		"Merge Modules",
+		"Merge Modules",
+		"Debug",
+		"Debug",
+		"Debug & Develop",
+		"Presentation"
+	});
+
+	coord->SetValues(duration, percentage, titles, false);
+	coord->SetXAnchor(TPDate(20180810), TPDate(20180831));
+
+	ui.SetEnablePoint(false);
+	ui.SetEnableCurve(true);
+	ui.SetEnableTable(true);
 }
 
 BEGIN_MESSAGE_MAP(TPOpenGL, CWnd)
@@ -259,13 +300,30 @@ void TPOpenGL::OnInitMenuPopup(CMenu *pMenuPopup, UINT nIndex, BOOL bSysMenu)
 		int nCount = pMenuPopup->GetMenuItemCount();
 		for (int i = 0; i < nCount; ++i)
 		{
-			if (ui.EnableTable())
+			if (ui.EnableTable() || !ui.HasChart())
 			{
 				pMenuPopup->CheckMenuRadioItem(ID_ILLUSION_USETABLE, ID_ILLUSION_USECHART, ID_ILLUSION_USETABLE, MF_BYCOMMAND);
 			}
 			else
 			{
 				pMenuPopup->CheckMenuRadioItem(ID_ILLUSION_USETABLE, ID_ILLUSION_USECHART, ID_ILLUSION_USECHART, MF_BYCOMMAND);
+			}
+
+			if (!ui.HasChart())
+			{
+				pMenuPopup->EnableMenuItem(ID_ILLUSION_USECHART, MF_DISABLED | MF_GRAYED);
+				pMenuPopup->EnableMenuItem(ID_ILLUSION_ENABLEMESH, MF_DISABLED | MF_GRAYED);
+				pMenuPopup->EnableMenuItem(ID_ILLUSION_ENABLECURVE, MF_DISABLED | MF_GRAYED);
+				pMenuPopup->EnableMenuItem(ID_ILLUSION_ENABLEPOINT, MF_DISABLED | MF_GRAYED);
+				pMenuPopup->EnableMenuItem(ID_ILLUSION_ENABLECROSSLINE, MF_DISABLED | MF_GRAYED);
+			}
+			else
+			{
+				pMenuPopup->EnableMenuItem(ID_ILLUSION_USECHART, MF_ENABLED);
+				pMenuPopup->EnableMenuItem(ID_ILLUSION_ENABLEMESH, MF_ENABLED);
+				pMenuPopup->EnableMenuItem(ID_ILLUSION_ENABLECURVE, MF_ENABLED);
+				pMenuPopup->EnableMenuItem(ID_ILLUSION_ENABLEPOINT, MF_ENABLED);
+				pMenuPopup->EnableMenuItem(ID_ILLUSION_ENABLECROSSLINE, MF_ENABLED);
 			}
 
 			if (pMenuPopup->GetMenuItemID(i) == ID_ILLUSION_ENABLEMESH)
@@ -360,18 +418,9 @@ void TPOpenGL::PredictModel1(CTime predictFrom, CTime predictTo)
 {
     TPDate dateFrom(predictFrom.GetYear(), predictFrom.GetMonth(), predictFrom.GetDay());
     TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
-#if 1
 
     vector<double> dbrsult = jar.PurchasePricePredictionPredictPrice(dateFrom, dateTo);
     vector<TPDate> dtX = TPDate::GetVector(dateFrom, dateTo);
-
-	//vector<double> dbrsult = jar.SalePricePredictionPredictPrice(dateFrom, dateTo);
-	//vector<TPDate> dtX = TPDate::GetVector(dateFrom, dateTo);
-
-	//vector<double> dbrsult = jar.SaleQuantityPredictionPredictSaleQuantity(dateTo, 5.99f, 100);
-
-	//vector<double> dbrsult = jar.ProfitPredictionPredictProfit(dateFrom, dateTo, 100, 2.59, 100, 5.99);
-	//vector<double> dbrsult = jar.OperationAdviceAdvice(dateFrom,dateTo, 100);
 
     TPCoordinate* coordinate = ui.GetCoordinateByName(PRE_PURCHASE_PRICE);
     if (coordinate == nullptr)
@@ -381,35 +430,6 @@ void TPOpenGL::PredictModel1(CTime predictFrom, CTime predictTo)
 
 	coordinate->SetValues(dtX, dbrsult);
 	ui.setCurrentCoordByName(PRE_PURCHASE_PRICE);
-
-#else
-    vector<double> dbrsult = jar.OperationAdviceAdvice(dateFrom, dateTo, 100);	
-	TPCoordinate* coordinate = ui.GetCoordinateByName("1");
-	if (coordinate == nullptr)
-	{
-		coordinate = ui.AddCoordinate("1");
-	}
-
-	vector<string> sdf;
-	sdf.push_back("SalePrice");
-	sdf.push_back("PurchaseQuantity");
-	sdf.push_back("Profit");
-	sdf.push_back("SalePrice");
-	sdf.push_back("PurchaseQuantity");
-	sdf.push_back("Profit");
-
-	vector<double> fff;
-	fff.push_back(5.99);
-	fff.push_back(1152);
-	fff.push_back(55650.51);
-
-	fff.push_back(4.99);
-	fff.push_back(222);
-	fff.push_back(55923.2);
-
-	coordinate->SetTable("Advice", dateFrom, dateTo, sdf, fff);
-	ui.SetEnableTable(true);
-#endif
 }
 
 void TPOpenGL::PredictModel2(CTime predictFrom, CTime predictTo)
@@ -479,7 +499,7 @@ void TPOpenGL::PredictModel5(CTime predictWhen, CTime predictTo, double dStockQt
 	}
 
 	vector<string> titles;
-	titles.push_back("Sale Price");		
+	titles.push_back("Sales Price");		
 	titles.push_back("Purchase Quantity");
 	titles.push_back("Profit");
 	coordinate->SetValues(dtX, dbrsult, titles, true);
