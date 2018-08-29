@@ -6,8 +6,8 @@
 #pragma once
 
 // screen height, width, border
-#define SCRN_H              640
-#define SCRN_W             1280
+#define SCRN_H              540
+#define SCRN_W             1160
 #define SCRN_B               20
 #define WINDOW_TITLE     "TheWisp"
 
@@ -20,8 +20,8 @@
 
 
 // illusion width, height, coordinate x point, y point.
-#define ILLU_W             1240/*(SCRN_W - 2*SCRN_B)*/
-#define ILLU_H              600/*(SCRN_H - 2*SCRN_B)*/
+#define ILLU_W             1120/*(SCRN_W - 2*SCRN_B)*/
+#define ILLU_H              500/*(SCRN_H - 2*SCRN_B)*/
 
 #define TP_MIN(a,b) ((a) < (b) ? (a) : (b))
 #define TP_MAX(a,b) ((a) > (b) ? (a) : (b)) 
