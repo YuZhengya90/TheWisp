@@ -9,6 +9,8 @@
 #define TPCOORD_REFR_MICROLH 100
 #define TPCOORD_FONT_X_REFIX  0.012
 #define TPCOORD_FONT_Y_REFIX  0.007
+#define TPCOORD_DATE_X_MIN    30
+#define TPCOORD_VALU_Y_MIN     5
 
 TPCoordinate::TPCoordinate(char * name)
 	:mName(name), mMinX(0), mMaxX(10), mMinY(0), mMaxY(10), mYType(XY_FLOAT)
@@ -87,10 +89,27 @@ void TPCoordinate::SetValues(std::vector<TPDate> dates, std::vector<double> valu
 
 	if (!onlyTable)
 	{
-		SetXAnchor(dates[0], dates[dateSize - 1]);
+		if (dateSize < TPCOORD_DATE_X_MIN * 2)
+		{
+			int requiredDataSize = TPCOORD_DATE_X_MIN * 2 - dateSize;
+			SetXAnchor(dates[0] - requiredDataSize / 2, dates[dateSize - 1] + requiredDataSize / 2);
+		}
+		else
+		{
+			SetXAnchor(dates[0], dates[dateSize - 1]);
+		}		
+		
 		auto pairMinMax = std::minmax_element(values.begin(), values.end());
 		double duration = *pairMinMax.second - *pairMinMax.first;
-		SetYAnchor(*pairMinMax.first - 0.40 * duration, *pairMinMax.second + 0.40 * duration);
+		if (FEZ(duration))
+		{
+			SetYAnchor(*pairMinMax.first - TPCOORD_VALU_Y_MIN, *pairMinMax.second + TPCOORD_VALU_Y_MIN);
+		}
+		else
+		{
+			SetYAnchor(*pairMinMax.first - 0.40 * duration, *pairMinMax.second + 0.40 * duration);
+		}
+		
 		mIllusionAnchor.Push(mMinX, mMaxX, mMinY, mMaxY, mView);
 		SetEnableFeatures(F_MESH, true);
 		SetEnableFeatures(F_CROSSLINE, true);
@@ -125,7 +144,7 @@ void TPCoordinate::RenderPoints()
 		float disX = 1.0f, disY = 1.0f;
 		if (szPts > 1)
 		{
-			disX = (mMaxX - mMinX) / szPts * 0.4;
+			disX = 0.4;
 			disY = (mMaxY - mMinY) / (mMaxX - mMinX) * 0.6;
 			for (unsigned i = 0; i < szPts; ++i)
 			{
@@ -505,7 +524,7 @@ float TPCoordinate::GetSuitableYStep()
 int TPCoordinate::HoverPoint(TPPoint illuP)
 {
 	unsigned szPts = mTableFromto.size();
-	float disX = (mMaxX - mMinX) / szPts * 0.4;
+	float disX = 0.4;
 	float disY = (mMaxY - mMinY) / (mMaxX - mMinX) * 0.6;
 	
 	for (unsigned i = 0; i < szPts; ++i)

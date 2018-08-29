@@ -34,3 +34,4 @@
 #define HOVER_TIMER_ID   30
 
 #define I2F(a) (a < 0 ? -(float)((int)(-(a))) : (float)a)
+#define FEZ(a) ((a > -0.00000001) && (a < 0.00000001))

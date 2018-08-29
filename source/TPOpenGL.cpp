@@ -443,7 +443,7 @@ void TPOpenGL::PredictModel3(CTime predictAt, double dStockQty, double dSalesPri
 	}
 
 	vector<string> titles;
-	titles.push_back("Profit");
+	titles.push_back("Sales Quantity");
 	coordinate->SetValues(dtX, dbrsult, titles, true);
 	ui.setCurrentCoordByName(PRE_SALES_QUANTITY);
 }
