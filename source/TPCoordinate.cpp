@@ -13,9 +13,20 @@
 #define TPCOORD_VALU_Y_MIN     5
 
 TPCoordinate::TPCoordinate(char * name)
-	:mName(name), mMinX(0), mMaxX(10), mMinY(0), mMaxY(10), mYType(XY_FLOAT)
+:mName(name), mMinX(0), mMaxX(10), mMinY(0), mMaxY(10), mYType(XY_FLOAT), mKeepStatus(false)
 {	
 	Init();
+}
+
+TPCoordinate::~TPCoordinate()
+{
+    for (int i = 0; i < mBitmaps.size(); ++ i)
+    {
+        if (mBitmaps[i] != nullptr)
+        {
+            delete mBitmaps[i];
+        }
+    }
 }
 
 void TPCoordinate::Init()
@@ -424,7 +435,7 @@ void TPCoordinate::RenderReferenceValue()
 	}
 }
 
-void TPCoordinate::RenderTables()
+unsigned TPCoordinate::RenderTables()
 {
 	const int titleBeginX = 40;
 	const int titleBeginY = ILLU_H - 70;
@@ -438,7 +449,7 @@ void TPCoordinate::RenderTables()
 	TPDisplayString2(mName, titleBeginX, titleBeginY, 40, 1);
 	if (mTableFromto.size() == 0)
 	{
-		return;
+		return 0;
 	}
 
 	std::string dateString = mTableFromto[0].ToString();
@@ -473,6 +484,34 @@ void TPCoordinate::RenderTables()
 		sprintf_s(value, "%.2lf", mTableValues[i]);
 		TPDisplayString2(value, detailValueX, I2F(yp), 40, 0);
 	}
+
+    for (int i = 0; i < mBitmaps.size(); ++i)
+    {
+        if (mBitmaps[i])
+        {
+            mBitmaps[i]->Display();
+        }
+    }
+
+    return mTableFromto.size();
+}
+
+void TPCoordinate::SetImage(const char* path, TPPoint pt)
+{
+    TPBitmap* bitmap = new TPBitmap();
+    if (bitmap != nullptr)
+    {
+        if (!bitmap->Load(path))
+        {
+            delete bitmap;
+            bitmap = nullptr;
+        }
+        else
+        {
+            bitmap->SetPosition(pt);
+            mBitmaps.push_back(bitmap);
+        }        
+    }
 }
 
 void TPCoordinate::SetEnableFeatures(TPCoord_F_T efType, bool enable)
@@ -571,12 +610,21 @@ int TPCoordinate::HoverPoint(TPPoint illuP)
 			&& illuP.y > mTableValues[i] - disY && illuP.y < mTableValues[i] + disY)
 		{
 			mHoveredPoint = i;
+            mKeepStatus = true;
 			return i;
 		}
 	}
 
-	mHoveredPoint = -1;
+    if (!mKeepStatus)
+    {
+        mHoveredPoint = -1;
+    }
 	return -1;
+}
+
+void TPCoordinate::DisableHoverStatus()
+{
+    mKeepStatus = false;
 }
 
 void TPCoordinate::Exchange2TableAnchor()

@@ -123,10 +123,13 @@ void TPOpenGL::HiHackathon()
 
 	coord->SetValues(duration, percentage, titles, false);
 	coord->SetXAnchor(TPDate(20180810), TPDate(20180831));
+    coord->SetImage("resource\\DepBrand.bmp", TPPoint(860, 520));
+    coord->SetImage("resource\\CopBrand.bmp", TPPoint( 36, 507));
 
-	ui.SetEnablePoint(false);
-	ui.SetEnableCurve(true);
 	ui.SetEnableTable(true);
+    ui.StartTranslate(ILLU_W / 2, ILLU_H / 2);
+    ui.Translate(0, 380);
+    ui.StopTranslate();
 }
 
 BEGIN_MESSAGE_MAP(TPOpenGL, CWnd)
@@ -226,6 +229,7 @@ void TPOpenGL::OnLButtonDown(UINT nFlags, CPoint point)
     if (ui.InIllusionSection(point.x, point.y))
     {
         ui.StartTranslate(point.x, point.y);
+        ui.DisableHoverStatus();
     }
 
     CWnd::OnLButtonDown(nFlags, point);
@@ -271,7 +275,7 @@ void TPOpenGL::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
     if (ui.InIllusionSection(point.x, point.y) && ui.EnableIllusion())
     {
-        ui.StartScaleAnimation(point.x, point.y, true);
+        ui.StartScaleAnimation(point.x, point.y);
     }
 
     CWnd::OnLButtonDblClk(nFlags, point);
@@ -282,7 +286,7 @@ void TPOpenGL::OnRButtonDblClk(UINT nFlags, CPoint point)
 {
     if (ui.InIllusionSection(point.x, point.y) && ui.EnableIllusion())
     {
-        ui.StartScaleAnimation(point.x, point.y, false);
+        // todo
     }
 
     CWnd::OnRButtonDblClk(nFlags, point);

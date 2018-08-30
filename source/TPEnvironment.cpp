@@ -232,7 +232,7 @@ int TPDate::GetDay()
 }
 
 TPBitmap::TPBitmap()
-	: mImage(nullptr)
+    : mImage(nullptr)
 {
 }
 
@@ -251,23 +251,24 @@ TPBitmap::~TPBitmap()
 void TPBitmap::LoadImageFile(const char* imageName)
 {
 	mImage = (struct ImageFileDate*)malloc(sizeof(struct ImageFileDate));
-	mImage->bHeight = 0;
-	mImage->bWidth = 0;
-	mImage->fileData = NULL;
-	FILE* imageFile = NULL;
-	unsigned long size = 0;
+    memset(mImage, 0, sizeof(ImageFileDate));
 
-	imageFile = fopen(imageName, "rb");
+    FILE* imageFile = fopen(imageName, "rb");
+    if (nullptr == imageFile)
+    {
+        return;
+    }
+
 	fseek(imageFile, 18, SEEK_SET); 
 	fread(&(mImage->bWidth), 4, 1, imageFile);
 	fread(&(mImage->bHeight), 4, 1, imageFile);
 	fseek(imageFile, 0, SEEK_END);
-	size = ftell(imageFile) - 54;
+	mImage->mSize = ftell(imageFile) - 54;
 
-	mImage->fileData = (unsigned char*)malloc(size);
-	memset(mImage->fileData, 0, size);
+	mImage->fileData = (unsigned char*)malloc(mImage->mSize);
+	memset(mImage->fileData, 0, mImage->mSize);
 	fseek(imageFile, 54, SEEK_SET);
-	fread(mImage->fileData, size, 1, imageFile);
+	fread(mImage->fileData, mImage->mSize, 1, imageFile);
 
 	fclose(imageFile);
 }
@@ -275,14 +276,19 @@ void TPBitmap::LoadImageFile(const char* imageName)
 bool TPBitmap::Load(const char* path)
 {	
 	LoadImageFile(path);
-	return true;
+
+    if (mImage && mImage->mSize)
+    {
+        return true;
+    }
+    return false;	
 }
 
-void TPBitmap::Display(float x, float y)
+void TPBitmap::Display()
 {
 	glPixelStoref(GL_UNPACK_ALIGNMENT, 4);
 	glPushAttrib(GL_LIST_BIT);
-	glRasterPos2f(0, 0);
+	glRasterPos2f(mPt.x, mPt.y);
 	glDrawPixels(mImage->bWidth, mImage->bHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, mImage->fileData);
 	glPopAttrib();
 	glPixelStoref(GL_UNPACK_ALIGNMENT, 1);

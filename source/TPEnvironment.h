@@ -88,7 +88,8 @@ public:
 	~TPBitmap();
 
 	bool Load(const char* path);
-	void Display(float x, float y);
+    void SetPosition(TPPoint pt) { mPt = pt; }
+    void Display();
 
 private:
 
@@ -97,11 +98,10 @@ private:
 	struct ImageFileDate {
 		unsigned long bWidth;
 		unsigned long bHeight;
-		unsigned char* fileData;
-
+        unsigned long mSize;
+        unsigned char* fileData;
 	};
 
 	struct ImageFileDate *mImage;
-	GLuint texture[1];
-
+    TPPoint mPt;
 };

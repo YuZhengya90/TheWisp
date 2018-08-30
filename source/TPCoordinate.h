@@ -65,6 +65,7 @@ class TPCoordinate
 {	
 public:
 	TPCoordinate(char * name);
+    ~TPCoordinate();
 	void Init();
 	
 	//           ------------------------------------------------------------
@@ -78,15 +79,18 @@ public:
 
 	void SetValues(std::vector<TPDate> dates, std::vector<double> values);
 	void SetValues(std::vector<TPDate> dates, std::vector<double> values, std::vector<string> titles, bool onlyTable);
+    void SetImage(const char* path, TPPoint pt);
 	void SetEnableFeatures(TPCoord_F_T efType, bool bEnable);
 	bool IsEnableFeatures(TPCoord_F_T efType);
 	 int HoverPoint(TPPoint p);
+    void DisableHoverStatus();
 
 unsigned RenderPoints();
+unsigned RenderTables();
     void RenderMesh();
 	void RenderCrossLine();
     void RenderReferenceValue();
-	void RenderTables();
+
 
 private:  // for friend class TPUI
 
@@ -139,9 +143,12 @@ private:
 	TPView mView;
 
 	int mHoveredPoint;
+    bool mKeepStatus;
 
 	int mEnableFeatures;
 	vector<TPDate> mTableFromto;
 	vector<string> mTableTitles;
 	vector<double> mTableValues;
+
+    vector<TPBitmap*> mBitmaps;
 };

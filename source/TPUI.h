@@ -37,9 +37,10 @@ public:
 	void ScrollTranslate(bool scrollDown);
 
     void StartScale(int x, int y, float rate);
-    void StartScaleAnimation(int x, int y, bool zoomOut);
+    void StartScaleAnimation(int x, int y);
 
 	void HoverPoint(int x, int y);
+    void DisableHoverStatus();
 
 	bool EnableIllusion() { return !EnableTable(); }
 	bool EnableMesh() { return !EnableTable() && GetCurrentCoord().IsEnableFeatures(F_MESH); }
@@ -72,4 +73,5 @@ private:
     
     TPMouse mTranslateStartAction;
     bool mDoingAnimation;
+    bool mZoomOut;
 };

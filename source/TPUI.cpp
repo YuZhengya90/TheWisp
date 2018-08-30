@@ -46,7 +46,7 @@ TPPoint TPUI::ClientToIllusion(const TPPoint& p)
 }
 
 TPUI::TPUI()
-	: mDoingAnimation(false), mCurrCoordOrder(-1)
+    : mDoingAnimation(false), mCurrCoordOrder(-1), mZoomOut(true)
 {
 }
 
@@ -60,13 +60,21 @@ TPUI::~TPUI()
 
 void TPUI::Render()
 {
-	glClearColor(0.96, 1.0, 1.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-
 	if (mVecCoordinate.size() == 0)
 	{
 		return;
 	}
+
+    if (EnableTable())
+    {
+        glClearColor(1.0, 1.0, 1.0, 1.0);
+    }
+    else
+    {
+        glClearColor(0.96, 1.0, 1.0, 1.0);
+    }
+    glClear(GL_COLOR_BUFFER_BIT);
+
 
     GetCurrentCoord().GetView().Render();
 	if (EnableMesh())
@@ -171,7 +179,7 @@ void TPUI::StartScale(int x, int y, float rate)
 	GetView().Scale(ClientToIllusion(TPPoint(x, y)), rate);
 }
 
-void TPUI::StartScaleAnimation(int x, int y, bool zoomOut)
+void TPUI::StartScaleAnimation(int x, int y)
 {
 	if (mDoingAnimation || NoCurrentCoord())
     {
@@ -179,15 +187,17 @@ void TPUI::StartScaleAnimation(int x, int y, bool zoomOut)
     }
    
     // 300 milliseconds in 20 frames (about 60frames per second)
-    float animationFactor = sqrtf(sqrtf(MOUSE_SCALE_FACTOR));
+    float animationFactor = sqrtf(MOUSE_SCALE_FACTOR);
 
-    if (zoomOut)
+    if (mZoomOut)
     {
-        GetView().ScaleAnimation(ClientToIllusion(TPPoint(x, y)), animationFactor, GetTickCount(), 300, 20);
+        GetView().ScaleAnimation(ClientToIllusion(TPPoint(x, y)), animationFactor, GetTickCount(), 400, 10);
+        mZoomOut = false;
     }
     else
     {
-		GetView().ScaleAnimation(ClientToIllusion(TPPoint(x, y)), 1 / animationFactor, GetTickCount(), 300, 20);
+		GetView().ScaleAnimation(ClientToIllusion(TPPoint(x, y)), 1 / animationFactor, GetTickCount(), 400, 10);
+        mZoomOut = true;
     }
 }
 
@@ -200,6 +210,16 @@ void TPUI::HoverPoint(int x, int y)
 	
 	TPPoint p = ClientToIllusion(TPPoint(x, y));
 	GetCurrentCoord().HoverPoint(ClientToIllusion(TPPoint(x, y)));
+}
+
+void TPUI::DisableHoverStatus()
+{
+    if (NoCurrentCoord())
+    {
+        return;
+    }
+
+    GetCurrentCoord().DisableHoverStatus();
 }
 
 TPView& TPUI::GetView()
