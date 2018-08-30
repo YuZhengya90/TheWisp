@@ -96,6 +96,7 @@ BEGIN_MESSAGE_MAP(CTheWispDlg, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO3, &CTheWispDlg::OnRadioBtnGroup0Clicked)
     ON_BN_CLICKED(IDC_RADIO4, &CTheWispDlg::OnRadioBtnGroup0Clicked)
     ON_BN_CLICKED(IDC_RADIO5, &CTheWispDlg::OnRadioBtnGroup0Clicked)
+    ON_BN_CLICKED(IDC_RADIO6, &CTheWispDlg::OnRadioBtnGroup0Clicked)
     ON_MESSAGE(WM_SALQUN_COMPLETE_MESSAGE, &CTheWispDlg::OnSalesQuantityLoadComplete)
     ON_MESSAGE(WM_PROFIT_COMPLETE_MESSAGE, &CTheWispDlg::OnProfitLoadComplete)
     ON_MESSAGE(WM_ADVICE_COMPLETE_MESSAGE, &CTheWispDlg::OnAdviceLoadComplete)
@@ -160,6 +161,25 @@ BOOL CTheWispDlg::OnInitDialog()
     m_advice_DateTo = originalDate;
 
     UpdateData(FALSE);
+
+    CFont * fontPredictBtn;
+    fontPredictBtn = new CFont();
+    fontPredictBtn->CreateFont(36, // nHeight 
+        0, // nWidth 
+        0, // nEscapement 
+        0, // nOrientation 
+        FW_BOLD, // nWeight 
+        FALSE, // bItalic 
+        FALSE, // bUnderline 
+        0, // cStrikeOut 
+        ANSI_CHARSET, // nCharSet 
+        OUT_DEFAULT_PRECIS, // nOutPrecision 
+        CLIP_DEFAULT_PRECIS, // nClipPrecision 
+        DEFAULT_QUALITY, // nQuality 
+        DEFAULT_PITCH | FF_SWISS, // nPitchAndFamily 
+        _T("Arial")); // lpszFac 
+    ((CButton*)GetDlgItem(IDC_BTN_PREDICT))->SetFont(fontPredictBtn);
+
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
