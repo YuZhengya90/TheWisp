@@ -64,6 +64,10 @@ abstract class AbstractModel implements Model
 		}
 		return features;
 	}
+	
+	
+	protected void adjustFeatureVector(FeatureVector featureVector)
+	{}
 
 
 	@Override
@@ -72,6 +76,7 @@ abstract class AbstractModel implements Model
 		if (null == featureVector)
 			return null;
 
+		adjustFeatureVector(featureVector);
 		Instances instances = featureVector.toWekaInstances();
 		Suggestion suggestion = solveInstances(instances);
 		amendSuggestion(suggestion, featureVector);
