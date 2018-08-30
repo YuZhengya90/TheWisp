@@ -29,6 +29,7 @@ public class SalePricePrediction extends AbstractModel
 		if (null == featureVector)
 			return null;
 
+		adjustFeatureVector(featureVector);
 		int year = (int) featureVector.getValue("Year");
 		int month = (int) featureVector.getValue("Month");
 		int day = (int) featureVector.getValue("Day");

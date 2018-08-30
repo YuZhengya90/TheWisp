@@ -14,8 +14,7 @@ public final class Test
 {
 	public static void main(String[] args) throws Exception
 	{
-		ProfitPredictionWrapper.test();
-		OperationAdviceWrapper.test();
+		testPurchasePricePrediction();
 	}
 
 
