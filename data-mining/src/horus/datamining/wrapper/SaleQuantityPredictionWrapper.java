@@ -11,7 +11,6 @@ import horus.datamining.model.feature.FeatureVector;
 public final class SaleQuantityPredictionWrapper
 {
 	private static Environment environment;
-	private static Model commentsModel;
 	private static Model quantityModel;
 
 
@@ -19,7 +18,6 @@ public final class SaleQuantityPredictionWrapper
 	{
 		environment = new EnvironmentImpl();
 		environment.setModelPath(modelPath);
-		commentsModel = new SaleCommentsPrediction(environment);
 		quantityModel = new SaleQuantityPrediction(environment);
 	}
 
@@ -30,32 +28,27 @@ public final class SaleQuantityPredictionWrapper
 	// 		day - numeric,
 	// 		price - numeric,			(3.98~7.19)
 	// 		stockQuantity - numeric		(0~25000)
+	//		temperature - numeric		(0~30)
 	// Output:
 	//	 	SalesQuantity - numeric
 	public static double[] predictSaleQuantity(int year, int month, int day, double price,
-			int stockQuantity)
+			int stockQuantity, double temperature)
 	{
 		double[] result = null;
 		try
 		{
 			LocalDate date = LocalDate.of(year, month, day);
-
-			FeatureVector featureVector = commentsModel.createFeatureVector();
-			featureVector.setValue("Year", date.getYear());
-			featureVector.setValue("DayOfYear", date.getDayOfYear());
-			Suggestion suggestion = commentsModel.solve(featureVector);
-
-			featureVector = quantityModel.createFeatureVector();
+			FeatureVector featureVector = quantityModel.createFeatureVector();
 			featureVector.setValue("Year", date.getYear());
 			featureVector.setValue("Month", date.getMonthValue());
 			featureVector.setValue("Day", date.getDayOfMonth());
 			int dayOfWeek = date.getDayOfWeek().getValue() % DayOfWeek.SUNDAY.getValue();
 			featureVector.setValue("WeekDay", dayOfWeek);
-			featureVector.setValue("Comments", suggestion.getFieldValue("Comments"));
+			featureVector.setValue("Comments", temperature);
 			featureVector.setValue("Price", price);
 			featureVector.setValue("StockQuantity", stockQuantity);
 
-			suggestion = quantityModel.solve(featureVector);
+			Suggestion suggestion = quantityModel.solve(featureVector);
 			result = new double[1];
 			result[0] = ((Number) suggestion.getFieldValue("SalesQuantity")).doubleValue();
 		}
@@ -70,7 +63,7 @@ public final class SaleQuantityPredictionWrapper
 	public static void test() throws Exception
 	{
 		SaleQuantityPredictionWrapper.setModelPath("D:/my-git/data-mining/DataMining/models/");
-		double[] result = SaleQuantityPredictionWrapper.predictSaleQuantity(2014, 5, 20, 5.99, 21133);
+		double[] result = SaleQuantityPredictionWrapper.predictSaleQuantity(2014, 5, 20, 5.99, 21133, 14.14);
 		System.out.println(result[0]);
 	}
 }

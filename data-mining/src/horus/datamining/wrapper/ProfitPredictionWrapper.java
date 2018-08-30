@@ -11,7 +11,6 @@ import horus.datamining.model.feature.FeatureVector;
 public class ProfitPredictionWrapper
 {
 	private static Environment environment;
-	private static Model commentsModel;
 	private static Model saleQuantityModel;
 	private static Model profitModel;
 
@@ -20,7 +19,6 @@ public class ProfitPredictionWrapper
 	{
 		environment = new EnvironmentImpl();
 		environment.setModelPath(modelPath);
-		commentsModel = new SaleCommentsPrediction(environment);
 		saleQuantityModel = new SaleQuantityPrediction(environment);
 		profitModel = new ProfitPrediction(environment);
 	}
@@ -34,6 +32,7 @@ public class ProfitPredictionWrapper
 	//		purchasePrice - numeric		(1.53~3.95)
 	//		purchaseQuantity - numeric	(0~1159)
 	//		salePrice - numeric			(3.99~7.19)
+	//		temperature - numeric		(0~30)
 	//		targetYear - numeric		(in 2017, no earlier than today)
 	//		targetMonth - numeric
 	//		targetDay - numeric
@@ -47,6 +46,7 @@ public class ProfitPredictionWrapper
 			double purchasePrice,
 			int purchaseQuantity,
 			double salePrice,
+			double temperature,
 			int targetYear,
 			int targetMonth,
 			int targetDay)
@@ -59,19 +59,13 @@ public class ProfitPredictionWrapper
 			Suggestion suggestion = null;
 			int dayOfWeek = 0;
 			
-			featureVector = commentsModel.createFeatureVector();
-			featureVector.setValue("Year", todayDate.getYear());
-			featureVector.setValue("DayOfYear", todayDate.getDayOfYear());
-			suggestion = commentsModel.solve(featureVector);
-			double comments = (double) suggestion.getFieldValue("Comments");
-			
 			featureVector = saleQuantityModel.createFeatureVector();
 			featureVector.setValue("Year", todayDate.getYear());
 			featureVector.setValue("Month", todayDate.getMonthValue());
 			featureVector.setValue("Day", todayDate.getDayOfMonth());
 			dayOfWeek = todayDate.getDayOfWeek().getValue() % DayOfWeek.SUNDAY.getValue();
 			featureVector.setValue("WeekDay", dayOfWeek);
-			featureVector.setValue("Comments", comments);
+			featureVector.setValue("Comments", temperature);
 			featureVector.setValue("Price", salePrice);
 			featureVector.setValue("StockQuantity", stockQuantity + purchaseQuantity);
 			suggestion = saleQuantityModel.solve(featureVector);
@@ -87,7 +81,7 @@ public class ProfitPredictionWrapper
 			featureVector.setValue("StockQuantity", stockQuantity);
 			featureVector.setValue("PurchasePrice", purchasePrice);
 			featureVector.setValue("PurchaseQuantity", purchaseQuantity);
-			featureVector.setValue("Comments", comments);
+			featureVector.setValue("Comments", temperature);
 			featureVector.setValue("SalePrice", salePrice);
 			featureVector.setValue("SaleQuantity", saleQuantity);
 			featureVector.setValue("TargetYear", targetDate.getYear());
@@ -114,7 +108,7 @@ public class ProfitPredictionWrapper
 	{
 		ProfitPredictionWrapper.setModelPath("D:/my-git/data-mining/DataMining/models/");
 		double[] result = ProfitPredictionWrapper.predictProfit(
-				2017, 4, 1, 0, 2.334107431547618, 235, 4.99, 2017, 6, 30);
+				2017, 4, 1, 0, 2.334107431547618, 235, 4.99, 14.57, 2017, 6, 30);
 		System.out.println(result[0]);
 	}
 }
