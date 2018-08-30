@@ -15,10 +15,6 @@
 
 TPOpenGL::TPOpenGL()
 {
-    if (!jar.Init("data-mining/models/"))
-    {
-        MessageBoxA(m_hWnd, "", "JAR init failed", MB_OK);
-    }
 }
 
 TPOpenGL::~TPOpenGL()
@@ -26,6 +22,17 @@ TPOpenGL::~TPOpenGL()
     wglMakeCurrent(NULL, NULL);
     wglDeleteContext(hglrc);
     ::ReleaseDC(m_hWnd, hdc);
+}
+
+bool TPOpenGL::Init(CWnd* mainCwnd)
+{
+    if (!jar.Init(mainCwnd, "data-mining/models/"))
+    {
+        MessageBoxA(m_hWnd, "", "JAR init failed", MB_OK);
+        return false;
+    }
+
+    return true;
 }
 
 void TPOpenGL::SetupPixelFormat(HDC hDC)
@@ -85,9 +92,9 @@ void TPOpenGL::HiHackathon()
 	TPCoordinate* coord = ui.AddCoordinate(HI_HACKATHON);
 	
 	vector<TPDate> duration = TPDate::GetVector(TPDate(20180810), TPDate(20180831));
-	vector<double> percentage({0,0.6,0.6,3.6,9.2,14.1,19.5,25.0,30.6,40.3,45.3,49.3,58.6,65.2,70.8,76.2,82.2,86.6,88.9,92.6,96.4,100.0});
+	vector<double> percentage({/*0,0.6,0.6,3.6,9.2,14.1,19.5,25.0,30.6,40.3,45.3,49.3,58.6,65.2,70.8,76.2,82.2,86.6,88.9,92.6,96.4,100.0*/});
 	vector<string> titles({
-		"Start Hackathon",
+		/*"Start Hackathon",
 		"Question Analysis",
 		"Question Analysis",
 		"Group Discussion",
@@ -108,7 +115,10 @@ void TPOpenGL::HiHackathon()
 		"Debug",
 		"Debug",
 		"Debug & Develop",
-		"Presentation"
+		"Presentation"*/
+		"Horus Qiu",
+		"Jerry Tan",
+		"Zhengya Yu"
 	});
 
 	coord->SetValues(duration, percentage, titles, false);

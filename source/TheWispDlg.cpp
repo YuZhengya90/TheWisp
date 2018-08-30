@@ -84,6 +84,9 @@ BEGIN_MESSAGE_MAP(CTheWispDlg, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO3, &CTheWispDlg::OnRadioBtnGroup0Clicked)
     ON_BN_CLICKED(IDC_RADIO4, &CTheWispDlg::OnRadioBtnGroup0Clicked)
     ON_BN_CLICKED(IDC_RADIO5, &CTheWispDlg::OnRadioBtnGroup0Clicked)
+    ON_MESSAGE(WM_SALQUN_COMPLETE_MESSAGE, &CTheWispDlg::OnSalesQuantityLoadComplete)
+    ON_MESSAGE(WM_PROFIT_COMPLETE_MESSAGE, &CTheWispDlg::OnProfitLoadComplete)
+    ON_MESSAGE(WM_ADVICE_COMPLETE_MESSAGE, &CTheWispDlg::OnAdviceLoadComplete)
 END_MESSAGE_MAP()
 
 
@@ -92,6 +95,11 @@ END_MESSAGE_MAP()
 BOOL CTheWispDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
+    if (!m_ctrlChart.Init(this))
+    {
+        return false;
+    }
 
 	// Add "About..." menu item to system menu.
 
@@ -354,4 +362,22 @@ void CTheWispDlg::OnRadioBtnGroup0Clicked()
         default:
             break;
     }
+}
+
+LRESULT CTheWispDlg::OnSalesQuantityLoadComplete(WPARAM wParam, LPARAM lParam)
+{
+    ((CButton *)GetDlgItem(IDC_RADIO3))->EnableWindow(true);
+    return 1;
+}
+
+LRESULT CTheWispDlg::OnProfitLoadComplete(WPARAM wParam, LPARAM lParam)
+{
+    ((CButton *)GetDlgItem(IDC_RADIO4))->EnableWindow(true);
+    return 1;
+}
+
+LRESULT CTheWispDlg::OnAdviceLoadComplete(WPARAM wParam, LPARAM lParam)
+{
+    ((CButton *)GetDlgItem(IDC_RADIO5))->EnableWindow(true);
+    return 1;
 }

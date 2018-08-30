@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <Windows.h>
 #include "GL/glut.h"
 
 #pragma once
@@ -35,3 +36,7 @@
 
 #define I2F(a) (a < 0 ? -(float)((int)(-(a))) : (float)a)
 #define FEZ(a) ((a > -0.00000001) && (a < 0.00000001))
+
+#define WM_SALQUN_COMPLETE_MESSAGE   (WM_USER + 1100)
+#define WM_PROFIT_COMPLETE_MESSAGE   (WM_USER + 1101)
+#define WM_ADVICE_COMPLETE_MESSAGE   (WM_USER + 1102)

@@ -172,7 +172,7 @@ int TPLoadFont()
 	// test;
 	{
 		LoadFontFromPath(0, "C:\\Windows\\Fonts\\ITCKRIST.TTF");
-		LoadFontFromPath(1, "C:\\Windows\\Fonts\\FORTE.TTF");
+		LoadFontFromPath(1, "C:\\Windows\\Fonts\\Corbel.TTF");
 	}
 
     // new string format
