@@ -17,7 +17,7 @@ public final class Test
 {
 	public static void main(String[] args) throws Exception
 	{
-		PurchasePricePredictionWrapper.test();
+		OperationAdviceWrapper.test();
 	}
 
 
@@ -229,6 +229,7 @@ public final class Test
 		Suggestion suggestion = model.solve(featureVector);
 		System.out.println("SalePrice - " + suggestion.getFieldValue("SalePrice"));
 		System.out.println("PurchaseQuantity - " + suggestion.getFieldValue("PurchaseQuantity"));
+		System.out.println("SaleQuantity - " + suggestion.getFieldValue("SaleQuantity"));
 		System.out.println("Profit - " + suggestion.getFieldValue("Profit"));
 	}
 }

@@ -33,6 +33,7 @@ public class OperationAdviceWrapper
 	//	Output:
 	//		SalePrice - numeric
 	//		PurchaseQuantity - numeric
+	//		SaleQuantity - numeric
 	//		Profit - numeric
 	public static double[] advice(int todayYear, int todayMonth, int todayDay, int stockQuantity, double temperature, int targetYear,
 			int targetMonth, int targetDay)
@@ -51,10 +52,11 @@ public class OperationAdviceWrapper
 			featureVector.setValue("TargetDay", targetDay);
 
 			Suggestion suggestion = model.solve(featureVector);
-			result = new double[3];
+			result = new double[4];
 			result[0] = ((Number) suggestion.getFieldValue("SalePrice")).doubleValue();
 			result[1] = ((Number) suggestion.getFieldValue("PurchaseQuantity")).doubleValue();
-			result[2] = ((Number) suggestion.getFieldValue("Profit")).doubleValue();
+			result[2] = ((Number) suggestion.getFieldValue("SaleQuantity")).doubleValue();
+			result[3] = ((Number) suggestion.getFieldValue("Profit")).doubleValue();
 		}
 		catch (Exception e)
 		{
@@ -70,6 +72,7 @@ public class OperationAdviceWrapper
 		double[] result = OperationAdviceWrapper.advice(2017, 4, 1, 0, 14.57, 2017, 6, 30);
 		System.out.println("SalePrice - " + result[0]);
 		System.out.println("PurchaseQuantity - " + result[1]);
-		System.out.println("Profit - " + result[2]);
+		System.out.println("SaleQuantity - " + result[2]);
+		System.out.println("Profit - " + result[3]);
 	}
 }

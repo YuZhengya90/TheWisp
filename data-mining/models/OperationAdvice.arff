@@ -10,7 +10,8 @@
 @attribute TargetDay numeric
 @attribute SalePrice numeric
 @attribute PurchaseQuantity numeric
+@attribute SaleQuantity numeric
 @attribute Profit numeric
 
 @data
-2017,3,26,546,13.03,2017,3,31,4.99,1152,12140.023387056055
+2017,3,26,546,13.03,2017,3,31,4.99,1152,546,12140.023387056055

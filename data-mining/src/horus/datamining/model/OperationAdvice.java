@@ -93,6 +93,7 @@ public class OperationAdvice extends AbstractModel
 		SuggestionImpl suggestion = new SuggestionImpl();
 		suggestion.addField("SalePrice");
 		suggestion.addField("PurchaseQuantity");
+		suggestion.addField("SaleQuantity");
 		suggestion.addField("Profit");
 		return suggestion;
 	}
@@ -139,6 +140,7 @@ public class OperationAdvice extends AbstractModel
 		purchaseQuantityPortion = (0 == purchaseQuantityPortion ? 1 : purchaseQuantityPortion);
 		Suggestion suggestion = null;
 		int optimalPurchaseQuantity = 0;
+		int optimalSaleQuantity = 0;
 		double optimalProfit = 0.0;
 		for (int purchaseQuantity = purchaseQuantityFloor; purchaseQuantity <= purchaseQuantityCeil; purchaseQuantity += purchaseQuantityPortion)
 		{
@@ -154,12 +156,14 @@ public class OperationAdvice extends AbstractModel
 			{
 				optimalProfit = profit;
 				optimalPurchaseQuantity = purchaseQuantity;
+				optimalSaleQuantity = saleQuantity;
 			}
 		}
 		
 		Suggestion result = createSuggestion();
 		result.setFieldValue("SalePrice", salePrice);
 		result.setFieldValue("PurchaseQuantity", optimalPurchaseQuantity);
+		result.setFieldValue("SaleQuantity", optimalSaleQuantity);
 		result.setFieldValue("Profit", optimalProfit);
 		return result;
 	}
@@ -207,6 +211,7 @@ public class OperationAdvice extends AbstractModel
 		Suggestion suggestion = null;
 		int optimalPurchaseQuantity = 0;
 		double optimalSalePrice = 0.0;
+		int optimalSaleQuantity = 0;
 		double optimalProfit = 0.0;
 		for (int purchaseQuantity = purchaseQuantityFloor; purchaseQuantity <= purchaseQuantityCeil; purchaseQuantity += purchaseQuantityPortion)
 		{
@@ -226,6 +231,7 @@ public class OperationAdvice extends AbstractModel
 				{
 					optimalProfit = profit;
 					optimalPurchaseQuantity = purchaseQuantity;
+					optimalSaleQuantity = saleQuantity;
 					optimalSalePrice = salePrice;
 				}
 			}
@@ -234,6 +240,7 @@ public class OperationAdvice extends AbstractModel
 		Suggestion result = createSuggestion();
 		result.setFieldValue("SalePrice", optimalSalePrice);
 		result.setFieldValue("PurchaseQuantity", optimalPurchaseQuantity);
+		result.setFieldValue("SaleQuantity", optimalSaleQuantity);
 		result.setFieldValue("Profit", optimalProfit);
 		return result;
 	}
