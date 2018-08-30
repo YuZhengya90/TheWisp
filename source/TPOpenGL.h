@@ -8,6 +8,7 @@
 #define HI_HACKATHON "Hi BusinessOne, Hi Hackathon!"
 #define PRE_PURCHASE_PRICE "Predict Purchase Price"
 #define PRE_SALES_PRICE "Predict Sales Price"
+#define PRE_TEMPERATURE "Predict Temperature"
 #define PRE_SALES_QUANTITY "Predict Sales Quantity"
 #define PRE_PROFIT "Predict Profit"
 #define OPR_ADVICE "Operation Advice"
@@ -62,10 +63,11 @@ private:
 	void HiHackathon();
 
 public:
-    void PredictModel1(CTime predictFrom, CTime predictTo);
-    void PredictModel2(CTime predictFrom, CTime predictTo);
-    void PredictModel3(CTime predictAt, double dStockQty, double dSalesPrice);
-    void PredictModel4(CTime predictWhen, CTime predictTo, double dStockQty, double dSalesPrice, double dPurQty, double dPurPrice);
-    void PredictModel5(CTime predictWhen, CTime predictTo, double dStockQty);
+    void PredictPurchasePrice(CTime predictFrom, CTime predictTo);
+    void PredictSalesPrice(CTime predictFrom, CTime predictTo);
+    void PredictTemperature(CTime predictFrom, CTime predictTo);
+    void PredictSalesQuantity(CTime predictAt, double temp, double dStockQty, double dSalesPrice);
+    void PredictProfit(CTime predictWhen, CTime predictTo, double temp, double dStockQty, double dSalesPrice, double dPurQty, double dPurPrice);
+    void OperationAdvice(CTime predictWhen, CTime predictTo, double temp, double dStockQty);
 };
 

@@ -36,13 +36,18 @@ END_MESSAGE_MAP()
 CTheWispDlg::CTheWispDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTheWispDlg::IDD, pParent)
     , m_iRadioBtnGroup0(0)
-    , m_dStockQtyPredict4(0)
-    , m_dSalesPricePredict4(0)
-    , m_dStockQtyPredict3(0)
-    , m_dSalesPricePredict3(0)
-    , m_dPurQtyPredict4(0)
-    , m_dPurPricePredict4(0)
-    , m_dStockQtyPredict5(0)
+    , m_profit_StockQty(0)
+    , m_profit_SalesPrice(0)
+    , m_salQty_StockQty(0)
+    , m_SalQty_SalesPrice(0)
+    , m_profit_PurQty(0)
+    , m_profit_PurPrice(0)
+    , m_advice_StockQty(0)
+    , m_salQty_Temperature(0)
+    , m_profit_Temperature(0)
+    , m_advice_Temperature(0)
+    , m_temp_DateFrom(0)
+    , m_temp_DateTo(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -51,25 +56,32 @@ void CTheWispDlg::DoDataExchange(CDataExchange* pDX)
 {
     CDialogEx::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_PIC_CHART, m_ctrlChart);
-    DDX_Control(pDX, IDC_DATETIMEPICKER1, m_dateFromPredict1);
-    DDX_Control(pDX, IDC_DATETIMEPICKER2, m_dateToPredict1);
+    DDX_DateTimeCtrl(pDX, IDC_DATETIMEPICKER1, m_purPrice_DateFrom);
+    DDX_DateTimeCtrl(pDX, IDC_DATETIMEPICKER2, m_purPrice_DateTo);
     DDX_Radio(pDX, IDC_RADIO1, m_iRadioBtnGroup0);
-    DDX_Control(pDX, IDC_DATETIMEPICKER3, m_dateFromPredict2);
-    DDX_Control(pDX, IDC_DATETIMEPICKER4, m_dateToPredict2);
-    DDX_Control(pDX, IDC_DATETIMEPICKER5, m_dateAtPredict3);
-    DDX_Control(pDX, IDC_EDIT1, m_editStockQtyPredict3);
-    DDX_Control(pDX, IDC_EDIT2, m_editSalesPricePredict3);
-    DDX_Control(pDX, IDC_DATETIMEPICKER6, m_dateWhenPredict4);
-    DDX_Control(pDX, IDC_DATETIMEPICKER7, m_dateToPredict4);
-    DDX_Text(pDX, IDC_EDIT3, m_dStockQtyPredict4);
-    DDX_Text(pDX, IDC_EDIT6, m_dSalesPricePredict4);
-    DDX_Text(pDX, IDC_EDIT1, m_dStockQtyPredict3);
-    DDX_Text(pDX, IDC_EDIT2, m_dSalesPricePredict3);
-    DDX_Text(pDX, IDC_EDIT5, m_dPurQtyPredict4);
-    DDX_Text(pDX, IDC_EDIT4, m_dPurPricePredict4);
-    DDX_Control(pDX, IDC_DATETIMEPICKER8, m_dateWhenPredict5);
-    DDX_Control(pDX, IDC_DATETIMEPICKER9, m_dateToPredict5);
-    DDX_Text(pDX, IDC_EDIT7, m_dStockQtyPredict5);
+    DDX_DateTimeCtrl(pDX, IDC_DATETIMEPICKER3, m_salPrice_DateFrom);
+    DDX_DateTimeCtrl(pDX, IDC_DATETIMEPICKER4, m_salPrice_DateTo);
+
+    DDX_DateTimeCtrl(pDX, IDC_DATETIMEPICKER5, m_salQty_DateAt);
+    DDX_Text(pDX, IDC_EDIT8, m_salQty_Temperature);
+    DDX_Text(pDX, IDC_EDIT1, m_salQty_StockQty);
+    DDX_Text(pDX, IDC_EDIT2, m_SalQty_SalesPrice);
+
+    DDX_DateTimeCtrl(pDX, IDC_DATETIMEPICKER6, m_profit_DateWhen);
+    DDX_DateTimeCtrl(pDX, IDC_DATETIMEPICKER7, m_profit_DateTo);
+    DDX_Text(pDX, IDC_EDIT3, m_profit_StockQty);
+    DDX_Text(pDX, IDC_EDIT6, m_profit_SalesPrice);
+
+    DDX_Text(pDX, IDC_EDIT5, m_profit_PurQty);
+    DDX_Text(pDX, IDC_EDIT4, m_profit_PurPrice);
+    DDX_DateTimeCtrl(pDX, IDC_DATETIMEPICKER8, m_advice_DateWhen);
+    DDX_DateTimeCtrl(pDX, IDC_DATETIMEPICKER9, m_advice_DateTo);
+    DDX_Text(pDX, IDC_EDIT7, m_advice_StockQty);
+
+    DDX_Text(pDX, IDC_EDIT9, m_profit_Temperature);
+    DDX_Text(pDX, IDC_EDIT10, m_advice_Temperature);
+    DDX_DateTimeCtrl(pDX, IDC_DATETIMEPICKER10, m_temp_DateFrom);
+    DDX_DateTimeCtrl(pDX, IDC_DATETIMEPICKER11, m_temp_DateTo);
 }
 
 BEGIN_MESSAGE_MAP(CTheWispDlg, CDialogEx)
@@ -129,19 +141,24 @@ BOOL CTheWispDlg::OnInitDialog()
 	// TODO: Add extra initialization here
     CTime originalDate(2017, 4, 1, 0, 0, 0);
 
-    m_dateFromPredict1.SetTime(&originalDate);
-    m_dateToPredict1.SetTime(&originalDate);
+    m_purPrice_DateFrom = originalDate;
+    m_purPrice_DateTo = originalDate;
 
-    m_dateFromPredict2.SetTime(&originalDate);
-    m_dateToPredict2.SetTime(&originalDate);
+    m_salPrice_DateFrom = originalDate;
+    m_salPrice_DateTo = originalDate;
 
-    m_dateAtPredict3.SetTime(&originalDate);
+    m_temp_DateFrom = originalDate;
+    m_temp_DateTo = originalDate;
 
-    m_dateWhenPredict4.SetTime(&originalDate);
-    m_dateToPredict4.SetTime(&originalDate);
+    m_salQty_DateAt = originalDate;
 
-    m_dateWhenPredict5.SetTime(&originalDate);
-    m_dateToPredict5.SetTime(&originalDate);
+    m_profit_DateWhen = originalDate;
+    m_profit_DateTo = originalDate;
+
+    m_advice_DateWhen = originalDate;
+    m_advice_DateTo = originalDate;
+
+    UpdateData(FALSE);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -218,111 +235,94 @@ void CTheWispDlg::OnBnClickedBtnPredict()
     UpdateData(TRUE);
     switch (m_iRadioBtnGroup0)
     {
-        case 0:
+        case PURCHASE_PRICE:
         {
-            CTime predictFrom, predictTo;
-
-            m_dateFromPredict1.GetTime(predictFrom);
-            m_dateToPredict1.GetTime(predictTo);
-
-            if (predictFrom > predictTo)
+            if (m_purPrice_DateFrom > m_purPrice_DateTo)
             {
                 MessageBox(CString("The date range is not correct!!!"));
                 return;
             }
 
-            m_ctrlChart.PredictModel1(predictFrom, predictTo);
+            m_ctrlChart.PredictPurchasePrice(m_purPrice_DateFrom, m_purPrice_DateTo);
         }
         break;
-        case 1:
+        case SALES_PRICE:
         {
-            CTime predictFrom, predictTo;
-
-            m_dateFromPredict2.GetTime(predictFrom);
-            m_dateToPredict2.GetTime(predictTo);
-
-            if (predictFrom > predictTo)
+            if (m_salPrice_DateFrom > m_salPrice_DateTo)
             {
                 MessageBox(CString("The date range is not correct!!!"));
                 return;
             }
 
-            m_ctrlChart.PredictModel2(predictFrom, predictTo);
+            m_ctrlChart.PredictSalesPrice(m_salPrice_DateFrom, m_salPrice_DateTo);
         }
         break;
-        case 2:
+        case TEMPERATURE:
         {
-            CTime predictAt;
-            m_dateAtPredict3.GetTime(predictAt);
-
-            if (m_dStockQtyPredict3 < 0)
+            m_ctrlChart.PredictTemperature(m_temp_DateFrom, m_temp_DateTo);
+        }
+        break;
+        case SALES_QUANTITY:
+        {
+            if (m_salQty_StockQty < 0)
             {
                 MessageBox(CString("The stock quantity must be greater than 0."));
                 return;
             }
-            if (m_dSalesPricePredict3 < 0)
+            if (m_SalQty_SalesPrice < 0)
             {
                 MessageBox(CString("The sales price must be greater than 0."));
                 return;
             }
 
-            m_ctrlChart.PredictModel3(predictAt, m_dStockQtyPredict3, m_dSalesPricePredict3);
+            m_ctrlChart.PredictSalesQuantity(m_salQty_DateAt, m_salQty_Temperature, m_salQty_StockQty, m_SalQty_SalesPrice);
         }
         break;
-        case 3:
+        case PROFIT:
         {
-            CTime predictWhen, predictTo;
-
-            m_dateWhenPredict4.GetTime(predictWhen);
-            m_dateToPredict4.GetTime(predictTo);
-
-            if (predictWhen > predictTo)
+            if (m_profit_DateWhen > m_profit_DateTo)
             {
                 MessageBox(CString("The date range is not correct!!!"));
                 return;
             }
-            if (m_dStockQtyPredict4 < 0)
+            if (m_profit_StockQty < 0)
             {
                 MessageBox(CString("The stock quantity must be greater than 0."));
                 return;
             }
-            if (m_dSalesPricePredict4 < 0)
+            if (m_profit_SalesPrice < 0)
             {
                 MessageBox(CString("The sales price must be greater than 0."));
                 return;
             }
-            if (m_dPurQtyPredict4 < 0)
+            if (m_profit_PurQty < 0)
             {
                 MessageBox(CString("The purchase quantity must be greater than 0."));
                 return;
             }
-            if (m_dPurPricePredict4 < 0)
+            if (m_profit_PurPrice < 0)
             {
                 MessageBox(CString("The purchase price must be greater than 0."));
                 return;
             }
 
-            m_ctrlChart.PredictModel4(predictWhen, predictTo, m_dStockQtyPredict4, m_dSalesPricePredict4, m_dPurQtyPredict4, m_dPurPricePredict4);
+            m_ctrlChart.PredictProfit(m_profit_DateWhen, m_profit_DateTo, m_profit_Temperature, m_profit_StockQty, m_profit_SalesPrice, m_profit_PurQty, m_profit_PurPrice);
         }
         break;
-        case 4:
+        case OPERATION_ADVICE:
         {
-            CTime predictWhen, predictTo;
-            m_dateWhenPredict5.GetTime(predictWhen);
-            m_dateToPredict5.GetTime(predictTo);
-
-            if (predictWhen > predictTo)
+            if (m_advice_DateWhen > m_advice_DateTo)
             {
                 MessageBox(CString("The date range is not correct!!!"));
                 return;
             }
-            if (m_dStockQtyPredict5 < 0)
+            if (m_advice_StockQty < 0)
             {
                 MessageBox(CString("The stock quantity must be greater than 0."));
                 return;
             }
 
-            m_ctrlChart.PredictModel5(predictWhen, predictTo, m_dStockQtyPredict5);
+            m_ctrlChart.OperationAdvice(m_advice_DateWhen, m_advice_DateTo, m_advice_Temperature, m_advice_StockQty);
         }
         break;
     }
@@ -334,27 +334,32 @@ void CTheWispDlg::OnRadioBtnGroup0Clicked()
     UpdateData(TRUE);
     switch (m_iRadioBtnGroup0)
     {
-        case 0:
+        case PURCHASE_PRICE:
         {
             m_ctrlChart.ui.setCurrentCoordByName(PRE_PURCHASE_PRICE);
         }
         break;
-        case 1:
+        case SALES_PRICE:
         {
             m_ctrlChart.ui.setCurrentCoordByName(PRE_SALES_PRICE);
         }
         break;
-        case 2:
+        case TEMPERATURE:
+        {
+            m_ctrlChart.ui.setCurrentCoordByName(PRE_TEMPERATURE);
+        }
+        break;
+        case SALES_QUANTITY:
         {
             m_ctrlChart.ui.setCurrentCoordByName(PRE_SALES_QUANTITY);
         }
         break;
-        case 3:
+        case PROFIT:
         {
             m_ctrlChart.ui.setCurrentCoordByName(PRE_PROFIT);
         }
         break;
-        case 4:
+        case OPERATION_ADVICE:
         {
             m_ctrlChart.ui.setCurrentCoordByName(OPR_ADVICE);
         }

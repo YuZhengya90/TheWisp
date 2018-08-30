@@ -7,8 +7,18 @@
 #include "TPOpenGL.h"
 #include "afxdtctl.h"
 #include "afxwin.h"
+#include "atltime.h"
 
 // CAboutDlg dialog used for App About
+enum PredictRadioIndex
+{
+    PURCHASE_PRICE = 0,
+    SALES_PRICE,
+    TEMPERATURE,
+    SALES_QUANTITY,
+    PROFIT,
+    OPERATION_ADVICE
+};
 
 class CAboutDlg : public CDialogEx
 {
@@ -65,30 +75,34 @@ public:
 
 public:
 
-    TPOpenGL        m_ctrlChart;
+    TPOpenGL m_ctrlChart;
 
-    int             m_iRadioBtnGroup0;
+    int     m_iRadioBtnGroup0;
 
-    CDateTimeCtrl   m_dateFromPredict1;
-    CDateTimeCtrl   m_dateToPredict1;
+    CTime   m_purPrice_DateFrom;
+    CTime   m_purPrice_DateTo;
 
-    CDateTimeCtrl   m_dateFromPredict2;
-    CDateTimeCtrl   m_dateToPredict2;
+    CTime   m_salPrice_DateFrom;
+    CTime   m_salPrice_DateTo;
 
-    CDateTimeCtrl   m_dateAtPredict3;
-    CEdit           m_editStockQtyPredict3;
-    CEdit           m_editSalesPricePredict3;
-    double          m_dStockQtyPredict3;
-    double          m_dSalesPricePredict3;
+    CTime   m_temp_DateFrom;
+    CTime   m_temp_DateTo;
 
-    CDateTimeCtrl   m_dateWhenPredict4;
-    CDateTimeCtrl   m_dateToPredict4;
-    double          m_dStockQtyPredict4;
-    double          m_dSalesPricePredict4;
-    double          m_dPurQtyPredict4;
-    double          m_dPurPricePredict4;
+    CTime   m_salQty_DateAt;
+    double  m_salQty_Temperature;
+    double  m_salQty_StockQty;
+    double  m_SalQty_SalesPrice;
 
-    CDateTimeCtrl   m_dateWhenPredict5;
-    CDateTimeCtrl   m_dateToPredict5;
-    double          m_dStockQtyPredict5;
+    CTime   m_profit_DateWhen;
+    CTime   m_profit_DateTo;
+    double  m_profit_Temperature;
+    double  m_profit_StockQty;
+    double  m_profit_SalesPrice;
+    double  m_profit_PurQty;
+    double  m_profit_PurPrice;
+
+    CTime   m_advice_DateWhen;
+    CTime   m_advice_DateTo;
+    double  m_advice_Temperature;
+    double  m_advice_StockQty;
 };

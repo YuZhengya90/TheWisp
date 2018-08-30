@@ -80,6 +80,7 @@ void TPOpenGL::TPInitUI(HWND hwnd)
 {
     ui.AddCoordinate(PRE_PURCHASE_PRICE);
     ui.AddCoordinate(PRE_SALES_PRICE);
+    ui.AddCoordinate(PRE_TEMPERATURE);
 	ui.AddCoordinate(PRE_SALES_QUANTITY);
     ui.AddCoordinate(PRE_PROFIT);
 	ui.AddCoordinate(OPR_ADVICE);
@@ -430,7 +431,7 @@ void TPOpenGL::OnAbout()
 }
 
 
-void TPOpenGL::PredictModel1(CTime predictFrom, CTime predictTo)
+void TPOpenGL::PredictPurchasePrice(CTime predictFrom, CTime predictTo)
 {
     TPDate dateFrom(predictFrom.GetYear(), predictFrom.GetMonth(), predictFrom.GetDay());
     TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
@@ -448,7 +449,7 @@ void TPOpenGL::PredictModel1(CTime predictFrom, CTime predictTo)
 	ui.setCurrentCoordByName(PRE_PURCHASE_PRICE);
 }
 
-void TPOpenGL::PredictModel2(CTime predictFrom, CTime predictTo)
+void TPOpenGL::PredictSalesPrice(CTime predictFrom, CTime predictTo)
 {
     TPDate dateFrom(predictFrom.GetYear(), predictFrom.GetMonth(), predictFrom.GetDay());
     TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
@@ -466,11 +467,29 @@ void TPOpenGL::PredictModel2(CTime predictFrom, CTime predictTo)
 	ui.setCurrentCoordByName(PRE_SALES_PRICE);
 }
 
-void TPOpenGL::PredictModel3(CTime predictAt, double dStockQty, double dSalesPrice)
+void TPOpenGL::PredictTemperature(CTime predictFrom, CTime predictTo)
+{
+    TPDate dateFrom(predictFrom.GetYear(), predictFrom.GetMonth(), predictFrom.GetDay());
+    TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
+
+    vector<double> dbrsult = jar.TemperaturePredictionPredictTemperature(dateFrom, dateTo);
+    vector<TPDate> dtX = TPDate::GetVector(dateFrom, dateTo);
+
+    TPCoordinate* coordinate = ui.GetCoordinateByName(PRE_TEMPERATURE);
+    if (coordinate == nullptr)
+    {
+        return;
+    }
+
+    coordinate->SetValues(dtX, dbrsult);
+    ui.setCurrentCoordByName(PRE_TEMPERATURE);
+}
+
+void TPOpenGL::PredictSalesQuantity(CTime predictAt, double temp, double dStockQty, double dSalesPrice)
 {
 	TPDate dateAt(predictAt.GetYear(), predictAt.GetMonth(), predictAt.GetDay());
 
-	vector<double> dbrsult = jar.SaleQuantityPredictionPredictSaleQuantity(dateAt, dSalesPrice, dStockQty);
+    vector<double> dbrsult = jar.SaleQuantityPredictionPredictSaleQuantity(dateAt, dSalesPrice, dStockQty, temp);
 	TPCoordinate* coordinate = ui.GetCoordinateByName(PRE_SALES_QUANTITY);
 	vector<TPDate> dtX = TPDate::GetVector(dateAt, dateAt);
 	if (coordinate == nullptr)
@@ -484,12 +503,12 @@ void TPOpenGL::PredictModel3(CTime predictAt, double dStockQty, double dSalesPri
 	ui.setCurrentCoordByName(PRE_SALES_QUANTITY);
 }
 
-void TPOpenGL::PredictModel4(CTime predictWhen, CTime predictTo, double dStockQty, double dSalesPrice, double dPurQty, double dPurPrice)
+void TPOpenGL::PredictProfit(CTime predictWhen, CTime predictTo, double temp, double dStockQty, double dSalesPrice, double dPurQty, double dPurPrice)
 {
     TPDate dateWhen(predictWhen.GetYear(), predictWhen.GetMonth(), predictWhen.GetDay());
     TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
 
-	vector<double> dbrsult = jar.ProfitPredictionPredictProfit(dateWhen, dateTo, dStockQty, dPurPrice, dPurQty, dSalesPrice);
+    vector<double> dbrsult = jar.ProfitPredictionPredictProfit(dateWhen, dateTo, dStockQty, dPurPrice, temp, dPurQty, dSalesPrice);
     vector<TPDate> dtX = TPDate::GetVector(dateWhen, dateTo);
 
     TPCoordinate* coordinate = ui.GetCoordinateByName(PRE_PROFIT);
@@ -502,11 +521,11 @@ void TPOpenGL::PredictModel4(CTime predictWhen, CTime predictTo, double dStockQt
 	ui.setCurrentCoordByName(PRE_PROFIT);
 }
 
-void TPOpenGL::PredictModel5(CTime predictWhen, CTime predictTo, double dStockQty)
+void TPOpenGL::OperationAdvice(CTime predictWhen, CTime predictTo, double temp, double dStockQty)
 {
 	TPDate dateWhen(predictWhen.GetYear(), predictWhen.GetMonth(), predictWhen.GetDay());
 	TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
-	vector<double> dbrsult = jar.OperationAdviceAdvice(dateWhen, dateTo, dStockQty);
+    vector<double> dbrsult = jar.OperationAdviceAdvice(dateWhen, dateTo, dStockQty, temp);
 	vector<TPDate> dtX = TPDate::GetVector(dateTo, dateTo);
 
 	TPCoordinate* coordinate = ui.GetCoordinateByName(OPR_ADVICE);
