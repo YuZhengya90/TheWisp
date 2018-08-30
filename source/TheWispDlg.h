@@ -72,6 +72,7 @@ public:
     afx_msg LRESULT OnSalesQuantityLoadComplete(WPARAM wParam, LPARAM lParam);
     afx_msg LRESULT OnProfitLoadComplete(WPARAM wParam, LPARAM lParam);
     afx_msg LRESULT OnAdviceLoadComplete(WPARAM wParam, LPARAM lParam);
+    afx_msg LRESULT OnTemperatureLoadComplete(WPARAM wParam, LPARAM lParam);
 
 public:
 

@@ -99,6 +99,7 @@ BEGIN_MESSAGE_MAP(CTheWispDlg, CDialogEx)
     ON_MESSAGE(WM_SALQUN_COMPLETE_MESSAGE, &CTheWispDlg::OnSalesQuantityLoadComplete)
     ON_MESSAGE(WM_PROFIT_COMPLETE_MESSAGE, &CTheWispDlg::OnProfitLoadComplete)
     ON_MESSAGE(WM_ADVICE_COMPLETE_MESSAGE, &CTheWispDlg::OnAdviceLoadComplete)
+    ON_MESSAGE(WM_TEMPER_COMPLETE_MESSAGE, &CTheWispDlg::OnTemperatureLoadComplete)
 END_MESSAGE_MAP()
 
 
@@ -383,6 +384,13 @@ LRESULT CTheWispDlg::OnProfitLoadComplete(WPARAM wParam, LPARAM lParam)
 
 LRESULT CTheWispDlg::OnAdviceLoadComplete(WPARAM wParam, LPARAM lParam)
 {
+    ((CButton *)GetDlgItem(IDC_RADIO6))->EnableWindow(true);
+    return 1;
+}
+
+LRESULT CTheWispDlg::OnTemperatureLoadComplete(WPARAM wParam, LPARAM lParam)
+{
     ((CButton *)GetDlgItem(IDC_RADIO5))->EnableWindow(true);
     return 1;
 }
+
