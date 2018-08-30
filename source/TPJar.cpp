@@ -9,10 +9,7 @@ static void TPJarThreadFunc1(TPJar* jar, const char* str)
 {
 	if (jar)
 	{
-		jar->PurchasePricePredictionSetModelPath(str);
-		jar->SalePricePredictionSetModelPath(str);
 		jar->SaleQuantityPredictionSetModelPath(str);
-
         CWnd* wnd = jar->GetMainWnd();
 		if (!jar->GetWndDestroyed() && wnd)
         {
@@ -77,11 +74,8 @@ void TPJar::PurchasePricePredictionSetModelPath(const char* str)
 		return;
 	}
 
-	JNIEnv* env;
-	mJVM->AttachCurrentThread((void **)&env, NULL);
-
-	jclass purchasePricePredictionWrapper = env->FindClass("horus/datamining/wrapper/PurchasePricePredictionWrapper");
-	jmethodID setModelPath = env->GetStaticMethodID(purchasePricePredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
+	jclass purchasePricePredictionWrapper = mJVMEnv->FindClass("horus/datamining/wrapper/PurchasePricePredictionWrapper");
+	jmethodID setModelPath = mJVMEnv->GetStaticMethodID(purchasePricePredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
 	if (setModelPath == 0)
 	{
 #ifdef _DEBUG
@@ -90,8 +84,7 @@ void TPJar::PurchasePricePredictionSetModelPath(const char* str)
 		return;
 	}
 
-	env->CallStaticObjectMethod(purchasePricePredictionWrapper, setModelPath, env->NewStringUTF(str));
-	mJVM->DetachCurrentThread();
+	mJVMEnv->CallStaticObjectMethod(purchasePricePredictionWrapper, setModelPath, mJVMEnv->NewStringUTF(str));	
 }
 
 vector<double> TPJar::PurchasePricePredictionPredictPrice(TPDate sDay, TPDate eDay)
@@ -146,11 +139,8 @@ void TPJar::SalePricePredictionSetModelPath(const char* str)
 		return;
 	}
 
-	JNIEnv* env;
-	mJVM->AttachCurrentThread((void **)&env, NULL);
-
-	jclass salePricePredictionWrapper = env->FindClass("horus/datamining/wrapper/SalePricePredictionWrapper");
-	jmethodID setModelPath = env->GetStaticMethodID(salePricePredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
+	jclass salePricePredictionWrapper = mJVMEnv->FindClass("horus/datamining/wrapper/SalePricePredictionWrapper");
+	jmethodID setModelPath = mJVMEnv->GetStaticMethodID(salePricePredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
 	if (setModelPath == 0)
 	{
 #ifdef _DEBUG
@@ -159,8 +149,7 @@ void TPJar::SalePricePredictionSetModelPath(const char* str)
 		return;
 	}
 
-	env->CallStaticObjectMethod(salePricePredictionWrapper, setModelPath, env->NewStringUTF(str));
-	mJVM->DetachCurrentThread();
+	mJVMEnv->CallStaticObjectMethod(salePricePredictionWrapper, setModelPath, mJVMEnv->NewStringUTF(str));
 }
 
 vector<double> TPJar::SalePricePredictionPredictPrice(TPDate sDay, TPDate eDay)
@@ -535,6 +524,10 @@ bool TPJar::Init(CWnd* wnd, const char* modelPath)
 	}
 
 	mInitOK = true;
+
+	PurchasePricePredictionSetModelPath(modelPath);
+	SalePricePredictionSetModelPath(modelPath);
+
 	std::thread th1(TPJarThreadFunc1, this, modelPath);
 	std::thread th2(TPJarThreadFunc2, this, modelPath);
 	std::thread th3(TPJarThreadFunc3, this, modelPath);

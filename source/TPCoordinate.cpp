@@ -122,6 +122,7 @@ void TPCoordinate::SetValues(std::vector<TPDate> dates, std::vector<double> valu
 		SetEnableFeatures(F_MESH, true);
 		SetEnableFeatures(F_CROSSLINE, true);
 		SetEnableFeatures(F_POINT, true);
+		SetEnableFeatures(F_CURVE, true);
 		SetEnableFeatures(F_TABLE, false);
 		SetEnableFeatures(F_HASCHART, true);
 	}
@@ -360,6 +361,7 @@ void TPCoordinate::RenderReferenceValue()
 
     unsigned loopCount = 1;
 	step = GetSuitableXStep(0);
+	vector<float> xPts;
 	if (step > 0.0f)
 	{
 		for (float ix = mMinX + step; ix < mMaxX - step / 2; ix += step)
@@ -368,34 +370,22 @@ void TPCoordinate::RenderReferenceValue()
 			glVertex3f(ix, mMinY + microX, 0);
 			glVertex3f(ix, mMinY, 0);
 			glEnd();
+			
+			xPts.push_back(loopCount * step);
 			loopCount++;
+			
 		}
 
-		float fontValueStepX = (mView.GetPosX() - mView.GetNegX()) / loopCount;
 		loopCount = 1;
 		for (float ix = mMinX + step; ix < mMaxX - step / 2; ix += step)
 		{
 			char value[16] = { 0 };
-			float curValue = mView.GetNegX() + fontValueStepX * loopCount;
+			float curValue = mView.GetNegX() + xPts[loopCount - 1] / (mMaxX - mMinX) * (mView.GetPosX() - mView.GetNegX());
 			TPDate curDate = TPDate::FromInt((int)roundf(curValue));
 			TPDisplayString(curDate.ToString().c_str(), ix - 2 * fontReFixX, mMinY + microX * 2);
 			loopCount++;
 		}
 	}
-
-	//step = GetSuitableXStep(loopCount);
-	//float xPos = mMinX + step;
-	//while (step >= 0.0f)
-	//{
-	//	glBegin(GL_LINES);
-	//	glVertex3f(xPos, mMinY + microX, 0);
-	//	glVertex3f(xPos, mMinY, 0);
-	//	glEnd();
-
-
-
-	//	step = GetSuitableXStep(++loopCount);
-	//}
 
     loopCount = 1;
 	step = GetSuitableYStep();
@@ -618,9 +608,9 @@ float TPCoordinate::GetCurveWidth()
 	{
 		lineWidth = 8.0f;
 	}
-	if (lineWidth < 1.0f)
+	if (lineWidth < 2.0f)
 	{
-		lineWidth = 1.0f;
+		lineWidth = 2.0f;
 	}
 
 	return lineWidth;
