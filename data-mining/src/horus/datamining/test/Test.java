@@ -15,7 +15,7 @@ public final class Test
 {
 	public static void main(String[] args) throws Exception
 	{
-		TemperaturePredictionWrapper.test();
+		testProfitPrediction();
 	}
 
 
@@ -193,7 +193,7 @@ public final class Test
 		environment.setModelPath("D:/my-git/data-mining/DataMining/models/");
 		Model model = new SalePricePrediction(environment);
 
-		LocalDate date = LocalDate.of(2015, 1, 1);
+		LocalDate date = LocalDate.of(2017, 4, 1);
 		LocalDate endDate = LocalDate.of(2017, 12, 31);
 		while (!date.isAfter(endDate))
 		{

@@ -37,7 +37,7 @@ public class SalePricePrediction extends AbstractModel
 		Suggestion suggestion = createSuggestion();
 		if (2017 == year)
 		{
-			if (date.isAfter(LocalDate.of(year, 3, 22)) && date.isBefore(LocalDate.of(year, 4, 17)))
+			if (date.isAfter(LocalDate.of(year, 3, 22)) && date.isBefore(LocalDate.of(year, 4, 18)))
 				suggestion.setFieldValue("Price", 4.99);
 			else
 				suggestion.setFieldValue("Price", 5.99);
