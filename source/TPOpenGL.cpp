@@ -467,7 +467,7 @@ void TPOpenGL::PredictSalesPrice(CTime predictFrom, CTime predictTo)
 	ui.setCurrentCoordByName(PRE_SALES_PRICE);
 }
 
-void TPOpenGL::PredictTemperature(CTime predictFrom, CTime predictTo)
+double TPOpenGL::PredictTemperature(CTime predictFrom, CTime predictTo)
 {
     TPDate dateFrom(predictFrom.GetYear(), predictFrom.GetMonth(), predictFrom.GetDay());
     TPDate dateTo(predictTo.GetYear(), predictTo.GetMonth(), predictTo.GetDay());
@@ -478,11 +478,18 @@ void TPOpenGL::PredictTemperature(CTime predictFrom, CTime predictTo)
     TPCoordinate* coordinate = ui.GetCoordinateByName(PRE_TEMPERATURE);
     if (coordinate == nullptr)
     {
-        return;
+        return 0;
     }
 
     coordinate->SetValues(dtX, dbrsult);
     ui.setCurrentCoordByName(PRE_TEMPERATURE);
+
+    if (dbrsult.size() == 0)
+    {
+        return 0;
+    }
+
+    return dbrsult[0];
 }
 
 void TPOpenGL::PredictSalesQuantity(CTime predictAt, double temp, double dStockQty, double dSalesPrice)

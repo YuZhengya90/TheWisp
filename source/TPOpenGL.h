@@ -65,7 +65,7 @@ private:
 public:
     void PredictPurchasePrice(CTime predictFrom, CTime predictTo);
     void PredictSalesPrice(CTime predictFrom, CTime predictTo);
-    void PredictTemperature(CTime predictFrom, CTime predictTo);
+    double PredictTemperature(CTime predictFrom, CTime predictTo);
     void PredictSalesQuantity(CTime predictAt, double temp, double dStockQty, double dSalesPrice);
     void PredictProfit(CTime predictWhen, CTime predictTo, double temp, double dStockQty, double dSalesPrice, double dPurQty, double dPurPrice);
     void OperationAdvice(CTime predictWhen, CTime predictTo, double temp, double dStockQty);

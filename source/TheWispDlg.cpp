@@ -141,24 +141,25 @@ BOOL CTheWispDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-    CTime originalDate(2017, 4, 1, 0, 0, 0);
+    CTime beginDate(2017, 4, 1, 0, 0, 0);
+    CTime endDate(2017, 6, 30, 0, 0, 0);
 
-    m_purPrice_DateFrom = originalDate;
-    m_purPrice_DateTo = originalDate;
+    m_purPrice_DateFrom = beginDate;
+    m_purPrice_DateTo = endDate;
 
-    m_salPrice_DateFrom = originalDate;
-    m_salPrice_DateTo = originalDate;
+    m_salPrice_DateFrom = beginDate;
+    m_salPrice_DateTo = endDate;
 
-    m_temp_DateFrom = originalDate;
-    m_temp_DateTo = originalDate;
+    m_temp_DateFrom = beginDate;
+    m_temp_DateTo = endDate;
 
-    m_salQty_DateAt = originalDate;
+    m_salQty_DateAt = beginDate;
 
-    m_profit_DateWhen = originalDate;
-    m_profit_DateTo = originalDate;
+    m_profit_DateWhen = beginDate;
+    m_profit_DateTo = endDate;
 
-    m_advice_DateWhen = originalDate;
-    m_advice_DateTo = originalDate;
+    m_advice_DateWhen = beginDate;
+    m_advice_DateTo = endDate;
 
     UpdateData(FALSE);
 
@@ -280,7 +281,16 @@ void CTheWispDlg::OnBnClickedBtnPredict()
         break;
         case TEMPERATURE:
         {
-            m_ctrlChart.PredictTemperature(m_temp_DateFrom, m_temp_DateTo);
+            double temp = m_ctrlChart.PredictTemperature(m_temp_DateFrom, m_temp_DateTo);
+
+            CString strTemp;
+            strTemp.Format(_T("%.2f"), temp);
+            temp = _wtof(strTemp);
+            m_salQty_Temperature = temp;
+            m_profit_Temperature = temp;
+            m_advice_Temperature = temp;
+
+            UpdateData(FALSE);
         }
         break;
         case SALES_QUANTITY:
