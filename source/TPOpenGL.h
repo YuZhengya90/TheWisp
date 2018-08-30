@@ -18,6 +18,8 @@ public:
     TPOpenGL();
     ~TPOpenGL();
 
+    bool Init(CWnd* mainCwnd);
+
     void SetupPixelFormat(HDC hDC);
 
     HDC hdc;

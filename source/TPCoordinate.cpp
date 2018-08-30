@@ -77,11 +77,6 @@ void TPCoordinate::SetValues(std::vector<TPDate> dates, std::vector<double> valu
 	unsigned valueSize = values.size();
 	unsigned titleSize = titles.size();
 
-	if (titleSize != valueSize)
-	{
-		return;
-	}
-
 	mTableFromto = dates;
 	mTableTitles = titles;
 	mTableValues = values;
@@ -92,6 +87,16 @@ void TPCoordinate::SetValues(std::vector<TPDate> dates, std::vector<double> valu
 
 	if (!onlyTable)
 	{
+		if (titleSize != valueSize)
+		{
+			return;
+		}
+
+		if (titleSize == 0 || valueSize == 0)
+		{
+			return;
+		}
+
 		if (dateSize < TPCOORD_DATE_X_MIN * 2)
 		{
 			int requiredDataSize = TPCOORD_DATE_X_MIN * 2 - dateSize;
@@ -451,16 +456,17 @@ void TPCoordinate::RenderTables()
 	unsigned tableTitleSize = mTableTitles.size();
 	unsigned tableValueSize = mTableValues.size();
 
-	if (tableTitleSize != tableValueSize)
-	{
-		return;
-	}
-
 	for (unsigned i = 0; i < tableTitleSize; ++i)
 	{
 		int yp = (detailBeginY - i * detailDistance);
 		TPDisplayString2(mTableTitles[i].c_str(), detailBeginX, I2F(yp), 40, 1);
 
+
+	}
+
+	for (unsigned  i = 0; i < tableValueSize; ++i)
+	{
+		int yp = (detailBeginY - i * detailDistance);
 		char value[16] = { 0 };
 		sprintf_s(value, "%.2lf", mTableValues[i]);
 		TPDisplayString2(value, detailValueX, I2F(yp), 40, 0);

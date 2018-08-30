@@ -1,3 +1,5 @@
+#define _WIN32_WINNT _WIN32_WINNT_MAXVER
+#include <afxwin.h>
 #include <thread>
 #include "TPJar.h"
 
@@ -10,6 +12,12 @@ static void TPJarThreadFunc1(TPJar* jar, const char* str)
 		jar->PurchasePricePredictionSetModelPath(str);
 		jar->SalePricePredictionSetModelPath(str);
 		jar->SaleQuantityPredictionSetModelPath(str);
+
+        CWnd* wnd = jar->GetMainWnd();
+        if (wnd)
+        {
+            wnd->PostMessage(WM_SALQUN_COMPLETE_MESSAGE);           
+        }
 	}
 }
 
@@ -18,6 +26,11 @@ static void TPJarThreadFunc2(TPJar* jar, const char* str)
 	if (jar)
 	{
 		jar->ProfitPredictionSetModelPath(str);
+        CWnd* wnd = jar->GetMainWnd();
+        if (wnd)
+        {
+            wnd->SendMessage(WM_PROFIT_COMPLETE_MESSAGE);
+        }
 	}
 }
 
@@ -26,11 +39,16 @@ static void TPJarThreadFunc3(TPJar* jar, const char* str)
 	if (jar)
 	{
 		jar->OperationAdviceSetModelPath(str);
+        CWnd* wnd = jar->GetMainWnd();
+        if (wnd)
+        {
+            wnd->SendMessage(WM_ADVICE_COMPLETE_MESSAGE);
+        }
 	}
 }
 
 TPJar::TPJar()
-	:mInitOK(false), mJVM(nullptr), mJVMEnv(nullptr), mJVMInstance(nullptr)
+    :mInitOK(false), mJVM(nullptr), mJVMEnv(nullptr), mJVMInstance(nullptr), mMainWnd(nullptr)
 {	
 }
 
@@ -385,8 +403,9 @@ vector<double> TPJar::OperationAdviceAdvice(TPDate today, TPDate targetDay, int 
 	return vecRet;
 }
 
-bool TPJar::Init(const char* modelPath)
+bool TPJar::Init(CWnd* wnd, const char* modelPath)
 {
+    mMainWnd = wnd;
 	JavaVMInitArgs iniArgs;
 	JavaVMOption options[3];
 	TPJNI_CreateJVM createJVM = nullptr;
@@ -436,15 +455,9 @@ bool TPJar::Init(const char* modelPath)
 	std::thread th2(TPJarThreadFunc2, this, modelPath);
 	std::thread th3(TPJarThreadFunc3, this, modelPath);
 	
-	th1.join();
-	th2.join();
-	th3.join();
-
-	//PurchasePricePredictionSetModelPath(modelPath);
-	//SalePricePredictionSetModelPath(modelPath);
-	//SaleQuantityPredictionSetModelPath(modelPath);
-	//ProfitPredictionSetModelPath(modelPath);
-	//OperationAdviceSetModelPath(modelPath);
+    th1.detach();
+    th2.detach();
+    th3.detach();
 	
 	return true;
 }

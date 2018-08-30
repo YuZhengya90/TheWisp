@@ -7,6 +7,8 @@
 
 using namespace std;
 
+class CWnd;
+
 typedef int(__stdcall *TPJNI_CreateJVM)(JavaVM **pvm, void **penv, void *args);
 
 class TPJar
@@ -15,7 +17,9 @@ public:
 	TPJar();
 	~TPJar();
 
-	bool Init(const char* modelPath);
+	bool Init(CWnd* wnd, const char* modelPath);
+
+    CWnd* GetMainWnd() { return mMainWnd; }
 
 	void PurchasePricePredictionSetModelPath(const char* str);
 	void SalePricePredictionSetModelPath(const char* str);
@@ -46,6 +50,8 @@ private:
 	JavaVM * mJVM;
 	JNIEnv * mJVMEnv;
 	HINSTANCE mJVMInstance;
+
+    CWnd* mMainWnd;
 
 	bool mInitOK;
 };
