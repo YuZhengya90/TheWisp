@@ -79,3 +79,29 @@ private:
 	int mM;
 	int mD;
 };
+
+
+class TPBitmap
+{
+public:
+	TPBitmap();
+	~TPBitmap();
+
+	bool Load(const char* path);
+	void Display(float x, float y);
+
+private:
+
+	void LoadImageFile(const char* imageName);
+
+	struct ImageFileDate {
+		unsigned long bWidth;
+		unsigned long bHeight;
+		unsigned char* fileData;
+
+	};
+
+	struct ImageFileDate *mImage;
+	GLuint texture[1];
+
+};

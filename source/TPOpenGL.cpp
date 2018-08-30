@@ -66,7 +66,6 @@ void TPOpenGL::SetupPixelFormat(HDC hDC)
 void TPOpenGL::TPInitGL()
 {
     TPLoadFont();
-    //TPLoadTexture();
 
     glEnable(GL_BLEND);
     glEnable(GL_LINE_SMOOTH);
@@ -543,6 +542,7 @@ void TPOpenGL::OperationAdvice(CTime predictWhen, CTime predictTo, double temp, 
 	vector<string> titles;
 	titles.push_back("Sales Price");		
 	titles.push_back("Purchase Quantity");
+	titles.push_back("Sales Quantity");
 	titles.push_back("Profit");
 	coordinate->SetValues(dtX, dbrsult, titles, true);
 	ui.setCurrentCoordByName(OPR_ADVICE);

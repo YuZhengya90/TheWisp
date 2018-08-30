@@ -414,13 +414,13 @@ LRESULT CTheWispDlg::OnProfitLoadComplete(WPARAM wParam, LPARAM lParam)
 
 LRESULT CTheWispDlg::OnAdviceLoadComplete(WPARAM wParam, LPARAM lParam)
 {
-    ((CButton *)GetDlgItem(IDC_RADIO6))->EnableWindow(true);
+    ((CButton *)GetDlgItem(IDC_RADIO5))->EnableWindow(true);
     return 1;
 }
 
 LRESULT CTheWispDlg::OnTemperatureLoadComplete(WPARAM wParam, LPARAM lParam)
 {
-    ((CButton *)GetDlgItem(IDC_RADIO5))->EnableWindow(true);
+    ((CButton *)GetDlgItem(IDC_RADIO6))->EnableWindow(true);
     return 1;
 }
 

@@ -230,3 +230,60 @@ int TPDate::GetDay()
 {
 	return mD;
 }
+
+TPBitmap::TPBitmap()
+	: mImage(nullptr)
+{
+}
+
+TPBitmap::~TPBitmap()
+{
+	if (mImage)
+	{
+		if (mImage->fileData)
+		{
+			free(mImage->fileData);
+		}
+		free(mImage);
+	}
+}
+
+void TPBitmap::LoadImageFile(const char* imageName)
+{
+	mImage = (struct ImageFileDate*)malloc(sizeof(struct ImageFileDate));
+	mImage->bHeight = 0;
+	mImage->bWidth = 0;
+	mImage->fileData = NULL;
+	FILE* imageFile = NULL;
+	unsigned long size = 0;
+
+	imageFile = fopen(imageName, "rb");
+	fseek(imageFile, 18, SEEK_SET); 
+	fread(&(mImage->bWidth), 4, 1, imageFile);
+	fread(&(mImage->bHeight), 4, 1, imageFile);
+	fseek(imageFile, 0, SEEK_END);
+	size = ftell(imageFile) - 54;
+
+	mImage->fileData = (unsigned char*)malloc(size);
+	memset(mImage->fileData, 0, size);
+	fseek(imageFile, 54, SEEK_SET);
+	fread(mImage->fileData, size, 1, imageFile);
+
+	fclose(imageFile);
+}
+
+bool TPBitmap::Load(const char* path)
+{	
+	LoadImageFile(path);
+	return true;
+}
+
+void TPBitmap::Display(float x, float y)
+{
+	glPixelStoref(GL_UNPACK_ALIGNMENT, 4);
+	glPushAttrib(GL_LIST_BIT);
+	glRasterPos2f(0, 0);
+	glDrawPixels(mImage->bWidth, mImage->bHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, mImage->fileData);
+	glPopAttrib();
+	glPixelStoref(GL_UNPACK_ALIGNMENT, 1);
+}

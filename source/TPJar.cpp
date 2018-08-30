@@ -387,7 +387,7 @@ vector<double> TPJar::OperationAdviceAdvice(TPDate today, TPDate targetDay, int 
 	}
 
 	jsize sz = mJVMEnv->GetArrayLength(dbResult);
-	if (sz != 3)
+	if (sz != 4)
 	{
 #ifdef _DEBUG
 		cout << "size of Advice result is error!" << endl;
@@ -399,6 +399,7 @@ vector<double> TPJar::OperationAdviceAdvice(TPDate today, TPDate targetDay, int 
 	vecRet.push_back(dbPtr[0]);
 	vecRet.push_back(dbPtr[1]);
 	vecRet.push_back(dbPtr[2]);
+	vecRet.push_back(dbPtr[3]);
 
 	mJVMEnv->ReleaseDoubleArrayElements(dbResult, dbPtr, 0);
 

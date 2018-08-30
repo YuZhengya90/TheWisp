@@ -71,12 +71,6 @@ int TPDisplayString2(const char* txt, GLfloat x, GLfloat y, GLfloat size, GLuint
 		}
 		
 		float yAnch = y - (font.h - font.t) * rateOfSize;
-		//float yAnchP = 0 - yAnch;
-		//if (yAnch < 0)
-		//{
-		//	glRasterPos2f(xAnch, 0);
-		//}
-		//else
 		{
 			glRasterPos2f(xAnch, yAnch);
 		}
