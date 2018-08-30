@@ -8,13 +8,14 @@ import horus.datamining.model.*;
 import horus.datamining.model.feature.FeatureVector;
 import horus.datamining.wrapper.OperationAdviceWrapper;
 import horus.datamining.wrapper.ProfitPredictionWrapper;
+import horus.datamining.wrapper.TemperaturePredictionWrapper;
 
 
 public final class Test
 {
 	public static void main(String[] args) throws Exception
 	{
-		testPurchasePricePrediction();
+		TemperaturePredictionWrapper.test();
 	}
 
 
