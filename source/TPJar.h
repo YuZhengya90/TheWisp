@@ -26,6 +26,7 @@ public:
 	void SaleQuantityPredictionSetModelPath(const char* str);
 	void ProfitPredictionSetModelPath(const char* str);
 	void OperationAdviceSetModelPath(const char* str);
+	void TemperaturePredictionSetModelPath(const char* str);
 
 	// return [sDay, eDay]'s purchase price vector.
 	vector<double> PurchasePricePredictionPredictPrice(TPDate sDay, TPDate eDay);
@@ -42,6 +43,9 @@ public:
 
 	// return the [SalePrice,PurchaseQuantity,Profit]
 	vector<double> OperationAdviceAdvice(TPDate today, TPDate targetDay, int stockQuantity);
+
+	// return temperature [sDay, eDay]
+	vector<double> TemperaturePredictionPredictTemperature(TPDate sDay, TPDate eDay);
 
 private:
 

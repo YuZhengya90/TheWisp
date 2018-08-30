@@ -47,6 +47,19 @@ static void TPJarThreadFunc3(TPJar* jar, const char* str)
 	}
 }
 
+static void TPJarThreadFunc4(TPJar* jar, const char* str)
+{
+	if (jar)
+	{
+		jar->TemperaturePredictionSetModelPath(str);
+		CWnd* wnd = jar->GetMainWnd();
+		if (wnd)
+		{
+			wnd->SendMessage(WM_TEMPER_COMPLETE_MESSAGE);
+		}
+	}
+}
+
 TPJar::TPJar()
     :mInitOK(false), mJVM(nullptr), mJVMEnv(nullptr), mJVMInstance(nullptr), mMainWnd(nullptr)
 {	
@@ -403,9 +416,80 @@ vector<double> TPJar::OperationAdviceAdvice(TPDate today, TPDate targetDay, int 
 	return vecRet;
 }
 
+void TPJar::TemperaturePredictionSetModelPath(const char* str)
+{
+	if (!mInitOK)
+	{
+		return;
+	}
+
+	JNIEnv* env;
+	mJVM->AttachCurrentThread((void **)&env, NULL);
+
+	jclass temperaturePredictionWrapper = env->FindClass("horus/datamining/wrapper/TemperaturePredictionWrapper");
+	jmethodID setModelPath = env->GetStaticMethodID(temperaturePredictionWrapper, "setModelPath", "(Ljava/lang/String;)V");
+	if (setModelPath == 0)
+	{
+#ifdef _DEBUG
+		cout << "Can't Get SetModelPath" << endl;
+#endif
+		return;
+	}
+
+	env->CallStaticObjectMethod(temperaturePredictionWrapper, setModelPath, env->NewStringUTF(str));
+	mJVM->DetachCurrentThread();
+}
+
+vector<double> TPJar::TemperaturePredictionPredictTemperature(TPDate sDay, TPDate eDay)
+{
+	vector<double> vecRet;
+
+	if (!mInitOK)
+	{
+		return vecRet;
+	}
+
+	jclass temperaturePredictionWrapper = mJVMEnv->FindClass("horus/datamining/wrapper/TemperaturePredictionWrapper");
+	jmethodID predictTemperature = mJVMEnv->GetStaticMethodID(temperaturePredictionWrapper, "predictTemperature", "(III)[D");
+	if (predictTemperature == 0)
+	{
+#ifdef _DEBUG
+		cout << "predictPrice Get failed." << endl;
+#endif
+		return vecRet;
+	}
+
+	int dayDistance = eDay - sDay + 1;
+	for (int i = 0; i < dayDistance; ++i)
+	{
+		TPDate oneDay = (sDay + i);
+		jdoubleArray dbResult = (jdoubleArray)mJVMEnv->CallStaticObjectMethod(temperaturePredictionWrapper,
+			predictTemperature, oneDay.GetYear(), oneDay.GetMonth(), oneDay.GetDay());
+		if (dbResult == 0)
+		{
+#ifdef _DEBUG
+			cout << "predictPrice return 0x00000000" << endl;
+#endif
+			return vecRet;
+		}
+
+		jsize sz = mJVMEnv->GetArrayLength(dbResult);
+
+		jboolean isCopy = true;
+		jdouble* dbPtr = mJVMEnv->GetDoubleArrayElements(dbResult, &isCopy);
+		vecRet.push_back(dbPtr[0]);
+
+		mJVMEnv->ReleaseDoubleArrayElements(dbResult, dbPtr, 0);
+	}
+
+	return vecRet;
+}
+
 bool TPJar::Init(CWnd* wnd, const char* modelPath)
 {
+	// used for Enable Radio Button.
     mMainWnd = wnd;
+
 	JavaVMInitArgs iniArgs;
 	JavaVMOption options[3];
 	TPJNI_CreateJVM createJVM = nullptr;
@@ -454,10 +538,12 @@ bool TPJar::Init(CWnd* wnd, const char* modelPath)
 	std::thread th1(TPJarThreadFunc1, this, modelPath);
 	std::thread th2(TPJarThreadFunc2, this, modelPath);
 	std::thread th3(TPJarThreadFunc3, this, modelPath);
+	std::thread th4(TPJarThreadFunc4, this, modelPath);
 	
     th1.detach();
     th2.detach();
     th3.detach();
+	th4.detach();
 	
 	return true;
 }
