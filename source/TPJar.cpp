@@ -232,7 +232,7 @@ void TPJar::SaleQuantityPredictionSetModelPath(const char* str)
 	mJVM->DetachCurrentThread();
 }
 
-vector<double> TPJar::SaleQuantityPredictionPredictSaleQuantity(TPDate atDay, float price, int stockQuantity)
+vector<double> TPJar::SaleQuantityPredictionPredictSaleQuantity(TPDate atDay, float price, int stockQuantity, float temp)
 {
 	vector<double> vecRet;
 
@@ -242,7 +242,7 @@ vector<double> TPJar::SaleQuantityPredictionPredictSaleQuantity(TPDate atDay, fl
 	}
 
 	jclass saleQuantityPredictionWrapper = mJVMEnv->FindClass("horus/datamining/wrapper/SaleQuantityPredictionWrapper");
-	jmethodID predictSaleQuantity = mJVMEnv->GetStaticMethodID(saleQuantityPredictionWrapper, "predictSaleQuantity", "(IIIDI)[D");
+	jmethodID predictSaleQuantity = mJVMEnv->GetStaticMethodID(saleQuantityPredictionWrapper, "predictSaleQuantity", "(IIIDID)[D");
 	if (predictSaleQuantity == 0)
 	{
 #ifdef _DEBUG
@@ -252,7 +252,7 @@ vector<double> TPJar::SaleQuantityPredictionPredictSaleQuantity(TPDate atDay, fl
 	}
 
 	jdoubleArray dbResult = (jdoubleArray)mJVMEnv->CallStaticObjectMethod(saleQuantityPredictionWrapper,
-		predictSaleQuantity, atDay.GetYear(), atDay.GetMonth(), atDay.GetDay(), (jdouble)price, stockQuantity);
+		predictSaleQuantity, atDay.GetYear(), atDay.GetMonth(), atDay.GetDay(), (jdouble)price, stockQuantity, temp);
 	if (dbResult == 0)
 	{
 #ifdef _DEBUG
@@ -297,7 +297,7 @@ void TPJar::ProfitPredictionSetModelPath(const char* str)
 }
 
 vector<double> TPJar::ProfitPredictionPredictProfit(
-	TPDate today, TPDate targetDay, int stockQuantity, float purchasePrice, int purchaseQuantity, float salePrice)
+	TPDate today, TPDate targetDay, int stockQuantity, float purchasePrice, float temp, int purchaseQuantity, float salePrice)
 {
 	vector<double> vecRet;
 
@@ -307,7 +307,7 @@ vector<double> TPJar::ProfitPredictionPredictProfit(
 	}
 
 	jclass profitPredictionWrapper = mJVMEnv->FindClass("horus/datamining/wrapper/ProfitPredictionWrapper");
-	jmethodID predictProfit = mJVMEnv->GetStaticMethodID(profitPredictionWrapper, "predictProfit", "(IIIIDIDIII)[D");
+	jmethodID predictProfit = mJVMEnv->GetStaticMethodID(profitPredictionWrapper, "predictProfit", "(IIIIDIDDIII)[D");
 	if (predictProfit == 0)
 	{
 #ifdef _DEBUG
@@ -322,7 +322,7 @@ vector<double> TPJar::ProfitPredictionPredictProfit(
 		TPDate nextDay = today + i;
 		jdoubleArray dbResult = (jdoubleArray)mJVMEnv->CallStaticObjectMethod(profitPredictionWrapper,
 			predictProfit, today.GetYear(), today.GetMonth(), today.GetDay(), stockQuantity, purchasePrice, purchaseQuantity, salePrice
-			, nextDay.GetYear(), nextDay.GetMonth(), nextDay.GetDay());
+			,temp , nextDay.GetYear(), nextDay.GetMonth(), nextDay.GetDay());
 		if (dbResult == 0)
 		{
 #ifdef _DEBUG
@@ -367,7 +367,7 @@ void TPJar::OperationAdviceSetModelPath(const char* str)
 	mJVM->DetachCurrentThread();
 }
 
-vector<double> TPJar::OperationAdviceAdvice(TPDate today, TPDate targetDay, int stockQuantity)
+vector<double> TPJar::OperationAdviceAdvice(TPDate today, TPDate targetDay, int stockQuantity, float temp)
 {
 	vector<double> vecRet;
 
@@ -377,7 +377,7 @@ vector<double> TPJar::OperationAdviceAdvice(TPDate today, TPDate targetDay, int 
 	}
 
 	jclass operationAdviceWrapper = mJVMEnv->FindClass("horus/datamining/wrapper/OperationAdviceWrapper");
-	jmethodID advice = mJVMEnv->GetStaticMethodID(operationAdviceWrapper, "advice", "(IIIIIII)[D");
+	jmethodID advice = mJVMEnv->GetStaticMethodID(operationAdviceWrapper, "advice", "(IIIIDIII)[D");
 	if (advice == 0)
 	{
 #ifdef _DEBUG
@@ -388,7 +388,7 @@ vector<double> TPJar::OperationAdviceAdvice(TPDate today, TPDate targetDay, int 
 
 	jdoubleArray dbResult = (jdoubleArray)mJVMEnv->CallStaticObjectMethod(operationAdviceWrapper, advice
 		, today.GetYear(), today.GetMonth(), today.GetDay(), stockQuantity
-		, targetDay.GetYear(), targetDay.GetMonth(), targetDay.GetDay());
+		, temp, targetDay.GetYear(), targetDay.GetMonth(), targetDay.GetDay());
 	if (dbResult == 0)
 	{
 #ifdef _DEBUG

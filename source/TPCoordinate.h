@@ -114,7 +114,7 @@ public:
 	void SetYAnchor(int minY, int maxY);
 
 private:
-	float GetSuitableXStep();
+	float GetSuitableXStep(int count);
 	float GetSuitableYStep();
 	 void Exchange2TableAnchor();
 	 void Exchange2IllusionAnchor();

@@ -39,14 +39,14 @@ public:
 	vector<double> SalePricePredictionPredictPrice(TPDate sDay, TPDate eDay);
 
 	// return the [AtDay]'s sale quantity.
-	vector<double> SaleQuantityPredictionPredictSaleQuantity(TPDate atDay, float price, int stockQuantity);
+	vector<double> SaleQuantityPredictionPredictSaleQuantity(TPDate atDay, float price, int stockQuantity, float temp);
 
 	// return [today, targetDay]'s profit vector.
 	vector<double> ProfitPredictionPredictProfit(
-		TPDate today, TPDate targetDay, int stockQuantity, float purchasePrice, int purchaseQuantity, float salePrice);
+		TPDate today, TPDate targetDay, int stockQuantity, float purchasePrice, float temp, int purchaseQuantity, float salePrice);
 
 	// return the [SalePrice,PurchaseQuantity,Profit]
-	vector<double> OperationAdviceAdvice(TPDate today, TPDate targetDay, int stockQuantity);
+	vector<double> OperationAdviceAdvice(TPDate today, TPDate targetDay, int stockQuantity, float temp);
 
 	// return temperature [sDay, eDay]
 	vector<double> TemperaturePredictionPredictTemperature(TPDate sDay, TPDate eDay);
