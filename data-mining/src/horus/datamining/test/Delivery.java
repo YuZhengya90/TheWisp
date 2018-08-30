@@ -2,6 +2,7 @@ package horus.datamining.test;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.List;
 import horus.datamining.env.Environment;
 import horus.datamining.env.EnvironmentImpl;
 import horus.datamining.model.*;
@@ -14,65 +15,79 @@ public class Delivery
 	{
 		Environment environment = new EnvironmentImpl();
 		environment.setModelPath("D:/my-git/data-mining/DataMining/models/");
-		Model operationAdvice = new OperationAdvice(environment, true);
-		Model purchasePricePredict = new PurchasePricePrediction(environment);
-		Model saleCommentsPredict = new SaleCommentsPrediction(environment);
-		Model saleQuantityPredict = new SaleQuantityPrediction(environment);
-
-		LocalDate today = LocalDate.of(2017, 4, 1);
-		int stockQuantity = 0;
-		LocalDate target = LocalDate.of(2017, 6, 30);
-		double profit = 0.0;
-		System.out.println("Date\tPurchase Quantity\tSaleQuantity\tStock Quantity\tProfit");
-		while (!today.isAfter(target))
+//		deliverGoal1(environment, Goal1Reader.defaultDataFile);
+		deliverGoal3(environment, Goal3Reader.defaultDataFile);
+	}
+	
+	
+	private static void deliverGoal1(Environment environment, String dataFile) throws Exception
+	{
+		Model model = new PurchasePricePrediction(environment);
+		List<LocalDate> dates = Goal1Reader.readData(dataFile);
+		for (LocalDate date : dates)
 		{
-			FeatureVector featureVector;
-			Suggestion suggestion;
-			int dayOfWeek;
-			
-			featureVector = operationAdvice.createFeatureVector();
-			featureVector.setValue("TodayYear", today.getYear());
-			featureVector.setValue("TodayMonth", today.getMonthValue());
-			featureVector.setValue("TodayDay", today.getDayOfMonth());
-			featureVector.setValue("StockQuantity", stockQuantity);
-			featureVector.setValue("TargetYear", target.getYear());
-			featureVector.setValue("TargetMonth", target.getMonthValue());
-			featureVector.setValue("TargetDay", target.getDayOfMonth());
-			suggestion = operationAdvice.solve(featureVector);
-			double salePrice = ((Number) suggestion.getFieldValue("SalePrice")).doubleValue();
-			int purchaseQuantity = ((Number) suggestion.getFieldValue("PurchaseQuantity")).intValue();
+			FeatureVector featureVector = model.createFeatureVector();
+			featureVector.setValue("Year", date.getYear());
+			featureVector.setValue("Month", date.getMonthValue());
+			featureVector.setValue("Day", date.getDayOfMonth());
+			int dayOfWeek = date.getDayOfWeek().getValue() % DayOfWeek.SUNDAY.getValue();
+			featureVector.setValue("WeekDay", dayOfWeek);
+
+			Suggestion suggestion = model.solve(featureVector);
+			System.out.println(suggestion.getFieldValue("Price"));
+		}
+	}
+	
+	
+	private static void deliverGoal3(Environment environment, String dataFile) throws Exception
+	{
+		Model purchasePricePredict = new PurchasePricePrediction(environment);
+		Model operationAdvice = new OperationAdvice(environment, true);
+		Model saleQuantityPredict = new SaleQuantityPrediction(environment);
+		int stock = 0;
+		List<Goal3Reader.Item> items = Goal3Reader.readData(dataFile);
+		for (Goal3Reader.Item item : items)
+		{
+			FeatureVector featureVector = null;
+			Suggestion suggestion = null;
+			int dayOfWeek = 0;
 			
 			featureVector = purchasePricePredict.createFeatureVector();
-			featureVector.setValue("Year", today.getYear());
-			featureVector.setValue("Month", today.getMonthValue());
-			featureVector.setValue("Day", today.getDayOfMonth());
-			dayOfWeek = today.getDayOfWeek().getValue() % DayOfWeek.SUNDAY.getValue();
+			featureVector.setValue("Year", item.date.getYear());
+			featureVector.setValue("Month", item.date.getMonthValue());
+			featureVector.setValue("Day", item.date.getDayOfMonth());
+			dayOfWeek = item.date.getDayOfWeek().getValue() % DayOfWeek.SUNDAY.getValue();
 			featureVector.setValue("WeekDay", dayOfWeek);
 			suggestion = purchasePricePredict.solve(featureVector);
-			double purchasePrice = ((Number) suggestion.getFieldValue("Price")).doubleValue();
+			System.out.print(suggestion.getFieldValue("Price") + "\t");
 			
-			featureVector = saleCommentsPredict.createFeatureVector();
-			featureVector.setValue("Year", today.getYear());
-			featureVector.setValue("DayOfYear", today.getDayOfYear());
-			suggestion = saleCommentsPredict.solve(featureVector);
-			double saleComments = ((Number) suggestion.getFieldValue("Comments")).doubleValue();
+			featureVector = operationAdvice.createFeatureVector();
+			featureVector.setValue("TodayYear", item.date.getYear());
+			featureVector.setValue("TodayMonth", item.date.getMonthValue());
+			featureVector.setValue("TodayDay", item.date.getDayOfMonth());
+			featureVector.setValue("StockQuantity", stock);
+			featureVector.setValue("Temperature", item.temperature);
+			featureVector.setValue("TargetYear", 2017);
+			featureVector.setValue("TargetMonth", 6);
+			featureVector.setValue("TargetDay", 30);
+			suggestion = operationAdvice.solve(featureVector);
+			int purchaseQuantity = ((Number) suggestion.getFieldValue("PurchaseQuantity")).intValue();
+			System.out.print(purchaseQuantity + "\t");
+			stock += purchaseQuantity;
 			
 			featureVector = saleQuantityPredict.createFeatureVector();
-			featureVector.setValue("Year", today.getYear());
-			featureVector.setValue("Month", today.getMonthValue());
-			featureVector.setValue("Day", today.getDayOfMonth());
-			dayOfWeek = today.getDayOfWeek().getValue() % DayOfWeek.SUNDAY.getValue();
+			featureVector.setValue("Year", item.date.getYear());
+			featureVector.setValue("Month", item.date.getMonthValue());
+			featureVector.setValue("Day", item.date.getDayOfMonth());
+			dayOfWeek = item.date.getDayOfWeek().getValue() % DayOfWeek.SUNDAY.getValue();
 			featureVector.setValue("WeekDay", dayOfWeek);
-			featureVector.setValue("Comments", saleComments);
-			featureVector.setValue("Price", salePrice);
-			featureVector.setValue("StockQuantity", stockQuantity + purchaseQuantity);
+			featureVector.setValue("Comments", item.temperature);
+			featureVector.setValue("Price", item.salePrice);
+			featureVector.setValue("StockQuantity", stock);
 			suggestion = saleQuantityPredict.solve(featureVector);
 			int saleQuantity = ((Number) suggestion.getFieldValue("SalesQuantity")).intValue();
-			
-			stockQuantity += purchaseQuantity - saleQuantity;
-			profit += salePrice * saleQuantity - purchasePrice * purchaseQuantity;
-			System.out.println(today.toString() + '\t' + purchaseQuantity + '\t' + saleQuantity + '\t' + stockQuantity + '\t' + profit);
-			today = today.plusDays(1);
+			System.out.println(saleQuantity);
+			stock -= saleQuantity;
 		}
 	}
 }
