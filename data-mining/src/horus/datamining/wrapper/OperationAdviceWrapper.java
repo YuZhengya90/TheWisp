@@ -26,6 +26,7 @@ public class OperationAdviceWrapper
 	//		todayMonth - numeric
 	//		todayDay - numeric
 	//		stockQuantity - numeric		(0~25000)
+	//		temperature - numeric		(0~30)
 	//		targetYear - numeric		(in 2017, no earlier than today)
 	//		targetMonth - numeric
 	//		targetDay - numeric
@@ -33,7 +34,7 @@ public class OperationAdviceWrapper
 	//		SalePrice - numeric
 	//		PurchaseQuantity - numeric
 	//		Profit - numeric
-	public static double[] advice(int todayYear, int todayMonth, int todayDay, int stockQuantity, int targetYear,
+	public static double[] advice(int todayYear, int todayMonth, int todayDay, int stockQuantity, double temperature, int targetYear,
 			int targetMonth, int targetDay)
 	{
 		double[] result = null;
@@ -44,6 +45,7 @@ public class OperationAdviceWrapper
 			featureVector.setValue("TodayMonth", todayMonth);
 			featureVector.setValue("TodayDay", todayDay);
 			featureVector.setValue("StockQuantity", stockQuantity);
+			featureVector.setValue("Temperature", temperature);
 			featureVector.setValue("TargetYear", targetYear);
 			featureVector.setValue("TargetMonth", targetMonth);
 			featureVector.setValue("TargetDay", targetDay);
@@ -65,7 +67,7 @@ public class OperationAdviceWrapper
 	public static void test() throws Exception
 	{
 		OperationAdviceWrapper.setModelPath("D:/my-git/data-mining/DataMining/models/");
-		double[] result = OperationAdviceWrapper.advice(2017, 4, 1, 0, 2017, 6, 30);
+		double[] result = OperationAdviceWrapper.advice(2017, 4, 1, 0, 14.57, 2017, 6, 30);
 		System.out.println("SalePrice - " + result[0]);
 		System.out.println("PurchaseQuantity - " + result[1]);
 		System.out.println("Profit - " + result[2]);

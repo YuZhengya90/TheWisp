@@ -17,7 +17,6 @@ public class OperationAdvice extends AbstractModel
 	
 	
 	private Model purchasePricePrediction;
-	private Model saleCommentsPrediction;
 	private Model salePricePrediction;
 	private Model saleQuantityPrediction;
 	private Model profitPrediction;
@@ -28,7 +27,6 @@ public class OperationAdvice extends AbstractModel
 	{
 		super(environment);
 		purchasePricePrediction = new PurchasePricePrediction(environment);
-		saleCommentsPrediction = new SaleCommentsPrediction(environment);
 		salePricePrediction = new SalePricePrediction(environment);
 		saleQuantityPrediction = new SaleQuantityPrediction(environment);
 		profitPrediction = new ProfitPrediction(environment);
@@ -52,6 +50,7 @@ public class OperationAdvice extends AbstractModel
 		int todayDay = (int) instance.value(instances.attribute("TodayDay"));
 		LocalDate todayDate = LocalDate.of(todayYear, todayMonth, todayDay);
 		double stockQuantity = instance.value(instances.attribute("StockQuantity"));
+		double saleComments = instance.value(instances.attribute("Temperature"));
 		FeatureVector featureVector = null;
 		Suggestion suggestion = null;
 		
@@ -63,12 +62,6 @@ public class OperationAdvice extends AbstractModel
 		featureVector.setValue("WeekDay", dayOfWeek);
 		suggestion = purchasePricePrediction.solve(featureVector);
 		double purchasePrice = (double) suggestion.getFieldValue("Price");
-		
-		featureVector = saleCommentsPrediction.createFeatureVector();
-		featureVector.setValue("Year", todayDate.getYear());
-		featureVector.setValue("DayOfYear", todayDate.getDayOfYear());
-		suggestion = saleCommentsPrediction.solve(featureVector);
-		double saleComments = (double) suggestion.getFieldValue("Comments");
 		
 		double salePrice = 0.0;
 		if (isPredictedSalePrice)

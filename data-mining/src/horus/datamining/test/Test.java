@@ -16,7 +16,8 @@ public final class Test
 {
 	public static void main(String[] args) throws Exception
 	{
-		ProfitPredictionWrapper.test();
+		testOperationAdvice();
+		OperationAdviceWrapper.test();
 	}
 
 
@@ -221,6 +222,7 @@ public final class Test
 		featureVector.setValue("TodayMonth", 4);
 		featureVector.setValue("TodayDay", 1);
 		featureVector.setValue("StockQuantity", 0);
+		featureVector.setValue("Temperature", 14.57);
 		featureVector.setValue("TargetYear", 2017);
 		featureVector.setValue("TargetMonth", 6);
 		featureVector.setValue("TargetDay", 30);
