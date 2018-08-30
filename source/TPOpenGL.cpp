@@ -131,6 +131,7 @@ void TPOpenGL::HiHackathon()
 
 BEGIN_MESSAGE_MAP(TPOpenGL, CWnd)
 	ON_WM_CREATE()
+	ON_WM_DESTROY()
 	ON_WM_PAINT()
 	ON_WM_TIMER()
 	ON_WM_MOUSEWHEEL()
@@ -175,6 +176,11 @@ int TPOpenGL::OnCreate(LPCREATESTRUCT lpCreateStruct)
         return -1;
 
     return 0;
+}
+
+void TPOpenGL::OnDestroy()
+{
+	jar.SetWndDestroyed();
 }
 
 void TPOpenGL::OnPaint()

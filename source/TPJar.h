@@ -21,6 +21,10 @@ public:
 
     CWnd* GetMainWnd() { return mMainWnd; }
 
+	void SetWndDestroyed() { mDestroyed = true; }
+	bool GetWndDestroyed() { return mDestroyed; }
+	
+
 	void PurchasePricePredictionSetModelPath(const char* str);
 	void SalePricePredictionSetModelPath(const char* str);
 	void SaleQuantityPredictionSetModelPath(const char* str);
@@ -58,4 +62,5 @@ private:
     CWnd* mMainWnd;
 
 	bool mInitOK;
+	bool mDestroyed;
 };

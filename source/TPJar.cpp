@@ -14,7 +14,7 @@ static void TPJarThreadFunc1(TPJar* jar, const char* str)
 		jar->SaleQuantityPredictionSetModelPath(str);
 
         CWnd* wnd = jar->GetMainWnd();
-        if (wnd)
+		if (!jar->GetWndDestroyed() && wnd)
         {
             wnd->PostMessage(WM_SALQUN_COMPLETE_MESSAGE);           
         }
@@ -27,7 +27,7 @@ static void TPJarThreadFunc2(TPJar* jar, const char* str)
 	{
 		jar->ProfitPredictionSetModelPath(str);
         CWnd* wnd = jar->GetMainWnd();
-        if (wnd)
+		if (!jar->GetWndDestroyed() && wnd)
         {
             wnd->SendMessage(WM_PROFIT_COMPLETE_MESSAGE);
         }
@@ -40,7 +40,7 @@ static void TPJarThreadFunc3(TPJar* jar, const char* str)
 	{
 		jar->OperationAdviceSetModelPath(str);
         CWnd* wnd = jar->GetMainWnd();
-        if (wnd)
+		if (!jar->GetWndDestroyed() && wnd)
         {
             wnd->SendMessage(WM_ADVICE_COMPLETE_MESSAGE);
         }
@@ -53,7 +53,7 @@ static void TPJarThreadFunc4(TPJar* jar, const char* str)
 	{
 		jar->TemperaturePredictionSetModelPath(str);
 		CWnd* wnd = jar->GetMainWnd();
-		if (wnd)
+		if (!jar->GetWndDestroyed() && wnd)
 		{
 			wnd->SendMessage(WM_TEMPER_COMPLETE_MESSAGE);
 		}
@@ -61,7 +61,7 @@ static void TPJarThreadFunc4(TPJar* jar, const char* str)
 }
 
 TPJar::TPJar()
-    :mInitOK(false), mJVM(nullptr), mJVMEnv(nullptr), mJVMInstance(nullptr), mMainWnd(nullptr)
+	:mInitOK(false), mJVM(nullptr), mJVMEnv(nullptr), mJVMInstance(nullptr), mMainWnd(nullptr), mDestroyed(false)
 {	
 }
 

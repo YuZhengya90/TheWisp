@@ -34,6 +34,7 @@ public:
 
     DECLARE_MESSAGE_MAP()
     afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnDestroy();
     afx_msg void OnPaint();
     afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
